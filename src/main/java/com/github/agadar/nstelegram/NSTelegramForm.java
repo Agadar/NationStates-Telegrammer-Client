@@ -1,5 +1,10 @@
 package com.github.agadar.nstelegram;
 
+import com.github.agadar.nsapi.NSAPI;
+import com.github.agadar.nsapi.event.TelegramSentEvent;
+import com.github.agadar.nsapi.event.TelegramSentListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.UIManager;
@@ -10,18 +15,23 @@ import javax.swing.UnsupportedLookAndFeelException;
  *
  * @author Agadar <https://github.com/Agadar/>
  */
-public class NSTelegramForm extends javax.swing.JFrame
+public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentListener
 {
-
-    /**
-     * Creates new form NSTelegramForm
-     */
     public NSTelegramForm()
     {
-        initComponents();
-        NSTelegramControl.init();
+        // Sets the user agent.
+        NSAPI.setUserAgent("Agadar's Telegrammer (https://github.com/Agadar/NationStates-Telegrammer)");
+        
+        // Some testing code.
+        TelegramManager tm = TelegramManager.Instance;
+        List<String> names = new ArrayList<>();
+        names.add("agadar");
+        names.add("sdfjhsbjkhgbndskj");
+        tm.addAddressees(names);
+        tm.startSending("e410c889", "15346505", "dffb17d06b0d", true, this);
+        tm.stopSending();
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -257,4 +267,10 @@ public class NSTelegramForm extends javax.swing.JFrame
     private javax.swing.JTextField TxtFieldSecretKey;
     private javax.swing.JTextField TxtFieldTelegramId;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void handleTelegramSent(TelegramSentEvent event)
+    {
+        System.out.println(event.PositionInQuery + " - " + event.Addressee + " - " + event.Queued);
+    }
 }
