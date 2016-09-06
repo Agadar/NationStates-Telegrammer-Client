@@ -6,10 +6,11 @@ import com.github.agadar.nsapi.event.TelegramSentListener;
 import java.awt.event.ItemEvent;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -174,12 +175,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
 
         ScrollPaneAddressees.setName("ScrollPaneAddressees"); // NOI18N
 
-        ListAddressees.setModel(new javax.swing.AbstractListModel<String>()
-        {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
+        ListAddressees.setModel(new DefaultListModel());
         ListAddressees.setName("ListAddressees"); // NOI18N
         ListAddressees.addListSelectionListener(new javax.swing.event.ListSelectionListener()
         {
@@ -232,7 +228,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
                 .addContainerGap()
                 .addGroup(PanelAddresseesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(ComboBoxAddresseeType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(ScrollPaneAddressees)
+                    .addComponent(ScrollPaneAddressees, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
                     .addGroup(PanelAddresseesLayout.createSequentialGroup()
                         .addComponent(ButtonRemoveAddressee, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
@@ -310,7 +306,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(BtnStart, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
                 .addComponent(BtnStop, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -397,17 +393,6 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         BtnStop.setEnabled(false);
     }//GEN-LAST:event_BtnStopActionPerformed
 
-    private void ListAddresseesValueChanged(javax.swing.event.ListSelectionEvent evt)//GEN-FIRST:event_ListAddresseesValueChanged
-    {//GEN-HEADEREND:event_ListAddresseesValueChanged
-        if (evt.getValueIsAdjusting())
-        {
-            return;
-        }
-        
-        ButtonRemoveAddressee.setEnabled(true);
-        String selected = ListAddressees.getSelectedValue();
-    }//GEN-LAST:event_ListAddresseesValueChanged
-
     private void ComboBoxAddresseeTypeItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_ComboBoxAddresseeTypeItemStateChanged
     {//GEN-HEADEREND:event_ComboBoxAddresseeTypeItemStateChanged
         if (evt.getStateChange() != ItemEvent.SELECTED) 
@@ -463,51 +448,79 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         switch (AddresseesType.getViaText((String) ComboBoxAddresseeType.getSelectedItem()))
         {
             case ALL:
-                tm.addAddressees(TelegramManager.allNations());
+                tm.addAddressees(TelegramManager.allNations());        
+                ((DefaultListModel)ListAddressees.getModel()).addElement(AddresseesType.ALL.getText());
                 break;
             case DELEGATES_INCL:
                 tm.addAddressees(TelegramManager.delegates());
+                ((DefaultListModel)ListAddressees.getModel()).addElement(AddresseesType.DELEGATES_INCL.getText());
                 break;
             case DELEGATES_EXCL:
                 tm.removeAddressees(TelegramManager.delegates());
+                ((DefaultListModel)ListAddressees.getModel()).addElement(AddresseesType.DELEGATES_EXCL.getText());
                 break;
             case NATIONS_INCL:
-                tm.addAddressees(TelegramManager.stringToStringList(TextFieldAddresseeVar.getText()));
+                List<String> nations_incl = TelegramManager.stringToStringList(TextFieldAddresseeVar.getText());
+                tm.addAddressees(nations_incl);
+                ((DefaultListModel)ListAddressees.getModel()).addElement(AddresseesType.NATIONS_INCL.getText() + ": " + nations_incl);
                 break;
             case NATIONS_EXCL:
-                tm.removeAddressees(TelegramManager.stringToStringList(TextFieldAddresseeVar.getText()));
+                List<String> nations_excl = TelegramManager.stringToStringList(TextFieldAddresseeVar.getText());
+                tm.removeAddressees(nations_excl);
+                ((DefaultListModel)ListAddressees.getModel()).addElement(AddresseesType.NATIONS_EXCL.getText() + ": " + nations_excl);
                 break;
             case NEW_NATIONS:
                 tm.addAddressees(TelegramManager.newNations());
+                ((DefaultListModel)ListAddressees.getModel()).addElement(AddresseesType.NEW_NATIONS.getText());
                 break;
             case REGIONS_INCL:
-                TelegramManager.stringToStringList(TextFieldAddresseeVar.getText()).stream().forEach((region) ->
+                List<String> regions_incl = TelegramManager.stringToStringList(TextFieldAddresseeVar.getText());
+                regions_incl.stream().forEach((region) ->
                 {
                     tm.addAddressees(TelegramManager.nationsInRegion(region));
                 });
+                ((DefaultListModel)ListAddressees.getModel()).addElement(AddresseesType.REGIONS_INCL.getText() + ": " + regions_incl);
                 break;
             case REGIONS_EXCL:
-                TelegramManager.stringToStringList(TextFieldAddresseeVar.getText()).stream().forEach((region) ->
+                List<String> regions_excl = TelegramManager.stringToStringList(TextFieldAddresseeVar.getText());
+                regions_excl.stream().forEach((region) ->
                 {
                     tm.removeAddressees(TelegramManager.nationsInRegion(region));
                 });
+                ((DefaultListModel)ListAddressees.getModel()).addElement(AddresseesType.REGIONS_EXCL.getText() + ": " + regions_excl);
                 break;
             case WA_MEMBERS_INCL:
                 tm.addAddressees(TelegramManager.worldAssemblyMembers());
+                ((DefaultListModel)ListAddressees.getModel()).addElement(AddresseesType.WA_MEMBERS_INCL.getText());
                 break;
             case WA_MEMBERS_EXCL:
                 tm.removeAddressees(TelegramManager.worldAssemblyMembers());
+                ((DefaultListModel)ListAddressees.getModel()).addElement(AddresseesType.WA_MEMBERS_EXCL.getText());
                 break;
         }
         
-        System.out.println(tm.Addressees.size());
-        System.out.println(tm.Addressees);
+        int estimatedDuration = tm.numberOfAddressees() * (RadioBtnNormal.isSelected() ? 31 : 181);
+        int hours = estimatedDuration / 3600;
+        int minutes = estimatedDuration % 3600 / 60;
+        int seconds = estimatedDuration % 3600 % 60;
+        TextOutput.setText(String.format("Addressees selected: %s%nEstimated duration: %s hours, %s minutes, %s seconds\n"
+                , tm.numberOfAddressees(), hours, minutes, seconds));
     }//GEN-LAST:event_ButtonAddAddresseeActionPerformed
 
     private void ButtonRemoveAddresseeActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_ButtonRemoveAddresseeActionPerformed
     {//GEN-HEADEREND:event_ButtonRemoveAddresseeActionPerformed
-        ListAddressees.clearSelection();
         ButtonRemoveAddressee.setEnabled(false);
+        int index = ListAddressees.getSelectedIndex();
+        tm.removeStep(index);
+        ((DefaultListModel)ListAddressees.getModel()).remove(index);
+        ListAddressees.clearSelection();
+        
+        int estimatedDuration = tm.numberOfAddressees() * (RadioBtnNormal.isSelected() ? 31 : 181);
+        int hours = estimatedDuration / 3600;
+        int minutes = estimatedDuration % 3600 / 60;
+        int seconds = estimatedDuration % 3600 % 60;
+        TextOutput.setText(String.format("Addressees selected: %s%nEstimated duration: %s hours, %s minutes, %s seconds\n"
+                , tm.numberOfAddressees(), hours, minutes, seconds));
     }//GEN-LAST:event_ButtonRemoveAddresseeActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt)//GEN-FIRST:event_formWindowClosing
@@ -520,6 +533,14 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         props.setProperty("isRecruitment", RadioBtnRecruitment.isSelected() ? "1" : "0");
         PropertiesHelper.saveProperties(props);
     }//GEN-LAST:event_formWindowClosing
+
+    private void ListAddresseesValueChanged(javax.swing.event.ListSelectionEvent evt)//GEN-FIRST:event_ListAddresseesValueChanged
+    {//GEN-HEADEREND:event_ListAddresseesValueChanged
+        if (!evt.getValueIsAdjusting() && ListAddressees.getSelectedIndex() != -1)
+        {
+            ButtonRemoveAddressee.setEnabled(true);
+        }
+    }//GEN-LAST:event_ListAddresseesValueChanged
 
     /**
      * @param args the command line arguments

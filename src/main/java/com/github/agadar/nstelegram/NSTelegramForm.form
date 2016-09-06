@@ -230,7 +230,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="ComboBoxAddresseeType" max="32767" attributes="0"/>
-                      <Component id="ScrollPaneAddressees" max="32767" attributes="0"/>
+                      <Component id="ScrollPaneAddressees" pref="257" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="ButtonRemoveAddressee" min="-2" pref="120" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -274,14 +274,8 @@
           <SubComponents>
             <Component class="javax.swing.JList" name="ListAddressees">
               <Properties>
-                <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
-                  <StringArray count="5">
-                    <StringItem index="0" value="Item 1"/>
-                    <StringItem index="1" value="Item 2"/>
-                    <StringItem index="2" value="Item 3"/>
-                    <StringItem index="3" value="Item 4"/>
-                    <StringItem index="4" value="Item 5"/>
-                  </StringArray>
+                <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="new DefaultListModel()" type="code"/>
                 </Property>
                 <Property name="name" type="java.lang.String" value="ListAddressees" noResource="true"/>
               </Properties>
@@ -411,7 +405,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="BtnStart" min="-2" pref="120" max="-2" attributes="0"/>
-                  <EmptySpace pref="32" max="32767" attributes="0"/>
+                  <EmptySpace pref="47" max="32767" attributes="0"/>
                   <Component id="BtnStop" min="-2" pref="120" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>

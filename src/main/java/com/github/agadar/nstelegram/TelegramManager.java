@@ -22,12 +22,10 @@ import java.util.Set;
  */
 public final class TelegramManager 
 {
-    // Singleton public instance.
-    public final static TelegramManager Instance = new TelegramManager();   
-    // List of addresses.
-    public final Set<String> Addressees = new HashSet<>();
-    // The thread on which the TelegramQuery is running on.
-    private Thread telegramThread;
+    public final static TelegramManager Instance = new TelegramManager(); // Singleton public instance.
+    private final List<Tuple<Boolean, List<String>>> Steps = new ArrayList<>(); // List of steps. True = add, false = remove.
+    //private final Set<String> Addressees = new HashSet<>(); // List of addresses.
+    private Thread telegramThread; // The thread on which the TelegramQuery is running on.
     
     private TelegramManager() { }
     
@@ -36,7 +34,8 @@ public final class TelegramManager
      */
     public void resetAddressees()
     {
-        Addressees.clear();
+        //Addressees.clear();
+        Steps.clear();
     }
     
     /**
@@ -46,7 +45,8 @@ public final class TelegramManager
      */
     public void addAddressees(Collection<String> addressees)
     {
-        this.Addressees.addAll(addressees);
+        //this.Addressees.addAll(addressees);
+        Steps.add(new Tuple(true, addressees));
     }
     
     /**
@@ -56,12 +56,33 @@ public final class TelegramManager
      */
     public void removeAddressees(Collection<String> addressees)
     {
-        this.Addressees.removeAll(addressees);
+        //this.Addressees.removeAll(addressees);
+        Steps.add(new Tuple(false, addressees));
     }
     
     public int numberOfAddressees()
     {
-        return this.Addressees.size();
+        //return this.Addressees.size();
+        Set<String> addressees = new HashSet<>();
+                
+        Steps.stream().forEach((step) ->
+        {
+            if (step.x)
+            {
+                addressees.addAll(step.y);
+            }
+            else
+            {
+                addressees.removeAll(step.y);
+            }
+        });
+        
+        return addressees.size();
+    }
+    
+    public void removeStep(int index)
+    {
+        Steps.remove(index);
     }
     
     /**
@@ -76,9 +97,24 @@ public final class TelegramManager
     public void startSending(String clientKey, String telegramId, 
             String secretKey, boolean isRecruitment, TelegramSentListener... listeners)
     {
+        // Calculate addressees.
+        Set<String> addressees = new HashSet<>();
+                
+        Steps.stream().forEach((step) ->
+        {
+            if (step.x)
+            {
+                addressees.addAll(step.y);
+            }
+            else
+            {
+                addressees.removeAll(step.y);
+            }
+        });
+        
         // Prepare TelegramQuery.
         final TelegramQuery q = NSAPI.telegram(clientKey, telegramId, secretKey, 
-                Addressees.toArray(new String[Addressees.size()])).addListeners(listeners);
+                addressees.toArray(new String[addressees.size()])).addListeners(listeners);
         
         if (isRecruitment)
         {
@@ -198,6 +234,7 @@ public final class TelegramManager
      */
     public static List<String> stringToStringList(String string)
     {
-        return Arrays.asList(string.trim().split("\\s*,\\s*"));
+        List<String> asList = Arrays.asList(string.trim().split("\\s*,\\s*"));
+        return asList.size() == 1 && asList.get(0).isEmpty() ? new ArrayList<>() : asList;
     }
 }
