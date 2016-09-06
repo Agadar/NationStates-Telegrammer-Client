@@ -1,12 +1,14 @@
 package com.github.agadar.nstelegram;
 
 import com.github.agadar.nsapi.NSAPI;
+import com.github.agadar.nsapi.domain.region.Region;
 import com.github.agadar.nsapi.enums.Council;
 import com.github.agadar.nsapi.enums.shard.RegionShard;
 import com.github.agadar.nsapi.enums.shard.WAShard;
 import com.github.agadar.nsapi.enums.shard.WorldShard;
 import com.github.agadar.nsapi.event.TelegramSentListener;
 import com.github.agadar.nsapi.query.TelegramQuery;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -23,7 +25,7 @@ public final class TelegramManager
     // Singleton public instance.
     public final static TelegramManager Instance = new TelegramManager();   
     // List of addresses.
-    private final Set<String> Addressees = new HashSet<>();
+    public final Set<String> Addressees = new HashSet<>();
     // The thread on which the TelegramQuery is running on.
     private Thread telegramThread;
     
@@ -118,7 +120,8 @@ public final class TelegramManager
      */
     public static List<String> nationsInRegion(String region)
     {
-        return NSAPI.region(region).shards(RegionShard.NationNames).execute().NationNames;
+        Region r = NSAPI.region(region).shards(RegionShard.NationNames).execute();
+        return r != null ? r.NationNames : new ArrayList<>();
     }
     
     /**

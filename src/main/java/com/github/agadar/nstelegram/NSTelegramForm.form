@@ -331,6 +331,7 @@
         </Component>
         <Component class="javax.swing.JTextField" name="TextFieldAddresseeVar">
           <Properties>
+            <Property name="editable" type="boolean" value="false"/>
             <Property name="name" type="java.lang.String" value="TextFieldAddresseeVar" noResource="true"/>
           </Properties>
         </Component>

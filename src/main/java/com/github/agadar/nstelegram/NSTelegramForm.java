@@ -211,6 +211,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             }
         });
 
+        TextFieldAddresseeVar.setEditable(false);
         TextFieldAddresseeVar.setName("TextFieldAddresseeVar"); // NOI18N
 
         ButtonAddAddressee.setText("Add");
@@ -414,31 +415,40 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             return;
         }
         
+        TextFieldAddresseeVar.setText("");
+        
         switch (AddresseesType.getViaText((String) evt.getItem()))
         {
             case ALL:
-                
+                TextFieldAddresseeVar.setEditable(false);
                 break;
             case DELEGATES_INCL:
+                TextFieldAddresseeVar.setEditable(false);
                 break;
             case DELEGATES_EXCL:
+                TextFieldAddresseeVar.setEditable(false);
                 break;
             case NATIONS_INCL:
+                TextFieldAddresseeVar.setEditable(true);
                 break;
             case NATIONS_EXCL:
+                TextFieldAddresseeVar.setEditable(true);
                 break;
             case NEW_NATIONS:
+                TextFieldAddresseeVar.setEditable(false);
                 break;
             case REGIONS_INCL:
+                TextFieldAddresseeVar.setEditable(true);
                 break;
             case REGIONS_EXCL:
+                TextFieldAddresseeVar.setEditable(true);
                 break;
             case WA_MEMBERS_INCL:
+                TextFieldAddresseeVar.setEditable(false);
                 break;
             case WA_MEMBERS_EXCL:
+                TextFieldAddresseeVar.setEditable(false);
                 break;
-            default:
-                return;
         }
     }//GEN-LAST:event_ComboBoxAddresseeTypeItemStateChanged
 
@@ -450,7 +460,48 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
 
     private void ButtonAddAddresseeActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_ButtonAddAddresseeActionPerformed
     {//GEN-HEADEREND:event_ButtonAddAddresseeActionPerformed
-        System.out.println(TelegramManager.stringToStringList(TextFieldAddresseeVar.getText()));
+        switch (AddresseesType.getViaText((String) ComboBoxAddresseeType.getSelectedItem()))
+        {
+            case ALL:
+                tm.addAddressees(TelegramManager.allNations());
+                break;
+            case DELEGATES_INCL:
+                tm.addAddressees(TelegramManager.delegates());
+                break;
+            case DELEGATES_EXCL:
+                tm.removeAddressees(TelegramManager.delegates());
+                break;
+            case NATIONS_INCL:
+                tm.addAddressees(TelegramManager.stringToStringList(TextFieldAddresseeVar.getText()));
+                break;
+            case NATIONS_EXCL:
+                tm.removeAddressees(TelegramManager.stringToStringList(TextFieldAddresseeVar.getText()));
+                break;
+            case NEW_NATIONS:
+                tm.addAddressees(TelegramManager.newNations());
+                break;
+            case REGIONS_INCL:
+                TelegramManager.stringToStringList(TextFieldAddresseeVar.getText()).stream().forEach((region) ->
+                {
+                    tm.addAddressees(TelegramManager.nationsInRegion(region));
+                });
+                break;
+            case REGIONS_EXCL:
+                TelegramManager.stringToStringList(TextFieldAddresseeVar.getText()).stream().forEach((region) ->
+                {
+                    tm.removeAddressees(TelegramManager.nationsInRegion(region));
+                });
+                break;
+            case WA_MEMBERS_INCL:
+                tm.addAddressees(TelegramManager.worldAssemblyMembers());
+                break;
+            case WA_MEMBERS_EXCL:
+                tm.removeAddressees(TelegramManager.worldAssemblyMembers());
+                break;
+        }
+        
+        System.out.println(tm.Addressees.size());
+        System.out.println(tm.Addressees);
     }//GEN-LAST:event_ButtonAddAddresseeActionPerformed
 
     private void ButtonRemoveAddresseeActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_ButtonRemoveAddresseeActionPerformed
