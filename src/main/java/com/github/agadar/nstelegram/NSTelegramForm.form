@@ -15,6 +15,10 @@
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
     <SyntheticProperty name="generateCenter" type="boolean" value="false"/>
   </SyntheticProperties>
+  <Events>
+    <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="formMouseClicked"/>
+    <EventHandler event="windowClosing" listener="java.awt.event.WindowListener" parameters="java.awt.event.WindowEvent" handler="formWindowClosing"/>
+  </Events>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -32,11 +36,16 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="PanelTelegram" min="-2" max="-2" attributes="0"/>
-                  <Component id="PanelAddressees" alignment="0" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="PanelAddressees" max="32767" attributes="0"/>
+                  <Component id="PanelTelegram" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace pref="317" max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jPanel1" max="32767" attributes="0"/>
+                  <Component id="jPanel2" max="32767" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -44,9 +53,18 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="PanelTelegram" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="PanelAddressees" min="-2" pref="203" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Component id="PanelTelegram" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="PanelAddressees" min="-2" pref="234" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <Component id="jPanel1" max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
@@ -80,15 +98,10 @@
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="LabelSecretKey" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="32767" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="1" attributes="0">
-                                  <Component id="LabelSendAs" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
-                              </Group>
+                              <Component id="LabelSecretKey" min="-2" max="-2" attributes="0"/>
+                              <Component id="LabelSendAs" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
+                          <EmptySpace max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="RadioBtnNormal" min="-2" max="-2" attributes="0"/>
                               <Component id="TxtFieldSecretKey" min="-2" pref="150" max="-2" attributes="0"/>
@@ -96,14 +109,14 @@
                           </Group>
                       </Group>
                   </Group>
-                  <EmptySpace pref="42" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="LabelClientKey" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="TxtFieldClientKey" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -125,6 +138,7 @@
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="RadioBtnRecruitment" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -135,7 +149,7 @@
             <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
               <ComponentRef name="TxtFieldTelegramId"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Telegram Id"/>
+            <Property name="text" type="java.lang.String" value="Telegram Id:"/>
             <Property name="name" type="java.lang.String" value="LabelTelegramId" noResource="true"/>
           </Properties>
         </Component>
@@ -149,7 +163,7 @@
             <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
               <ComponentRef name="TxtFieldSecretKey"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Secret Key"/>
+            <Property name="text" type="java.lang.String" value="Secret Key:"/>
             <Property name="name" type="java.lang.String" value="LabelSecretKey" noResource="true"/>
           </Properties>
         </Component>
@@ -163,7 +177,7 @@
             <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
               <ComponentRef name="TxtFieldClientKey"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="Client Key"/>
+            <Property name="text" type="java.lang.String" value="Client Key:"/>
             <Property name="name" type="java.lang.String" value="LabelClientKey" noResource="true"/>
           </Properties>
         </Component>
@@ -212,16 +226,17 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
+              <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="ComboBoxAddresseeType" pref="257" max="32767" attributes="0"/>
+                      <Component id="ComboBoxAddresseeType" max="32767" attributes="0"/>
                       <Component id="ScrollPaneAddressees" max="32767" attributes="0"/>
-                      <Group type="102" alignment="1" attributes="0">
-                          <Component id="TextFieldAddresseeVar" max="32767" attributes="0"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="ButtonAddAddressee" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="ButtonRemoveAddressee" min="-2" pref="120" max="-2" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Component id="ButtonAddAddressee" pref="119" max="32767" attributes="0"/>
                       </Group>
+                      <Component id="TextFieldAddresseeVar" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -235,9 +250,11 @@
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="ComboBoxAddresseeType" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="TextFieldAddresseeVar" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="ButtonRemoveAddressee" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="ButtonAddAddressee" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="TextFieldAddresseeVar" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -268,38 +285,46 @@
                 </Property>
                 <Property name="name" type="java.lang.String" value="ListAddressees" noResource="true"/>
               </Properties>
+              <Events>
+                <EventHandler event="valueChanged" listener="javax.swing.event.ListSelectionListener" parameters="javax.swing.event.ListSelectionEvent" handler="ListAddresseesValueChanged"/>
+              </Events>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
               </AuxValues>
             </Component>
           </SubComponents>
         </Container>
-        <Component class="javax.swing.JButton" name="ButtonAddAddressee">
+        <Component class="javax.swing.JButton" name="ButtonRemoveAddressee">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Add addressee"/>
-            <Property name="name" type="java.lang.String" value="ButtonAddAddressee" noResource="true"/>
+            <Property name="text" type="java.lang.String" value="Remove"/>
+            <Property name="enabled" type="boolean" value="false"/>
+            <Property name="name" type="java.lang.String" value="ButtonRemoveAddressee" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ButtonRemoveAddresseeActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JComboBox" name="ComboBoxAddresseeType">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="12">
+              <StringArray count="10">
                 <StringItem index="0" value="All"/>
                 <StringItem index="1" value="Delegates (include)"/>
                 <StringItem index="2" value="Delegates (exclude)"/>
                 <StringItem index="3" value="Nations (include)"/>
                 <StringItem index="4" value="Nations (exclude)"/>
-                <StringItem index="5" value="New Delegates"/>
-                <StringItem index="6" value="New Nations"/>
-                <StringItem index="7" value="Refounded Nations"/>
-                <StringItem index="8" value="Regions (include)"/>
-                <StringItem index="9" value="Regions (exclude)"/>
-                <StringItem index="10" value="WA Members (include)"/>
-                <StringItem index="11" value="WA Members (exclude)"/>
+                <StringItem index="5" value="New Nations"/>
+                <StringItem index="6" value="Regions (include)"/>
+                <StringItem index="7" value="Regions (exclude)"/>
+                <StringItem index="8" value="WA Members (include)"/>
+                <StringItem index="9" value="WA Members (exclude)"/>
               </StringArray>
             </Property>
             <Property name="name" type="java.lang.String" value="ComboBoxAddresseeType" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="ComboBoxAddresseeTypeItemStateChanged"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
@@ -308,6 +333,121 @@
           <Properties>
             <Property name="name" type="java.lang.String" value="TextFieldAddresseeVar" noResource="true"/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="ButtonAddAddressee">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Add"/>
+            <Property name="name" type="java.lang.String" value="ButtonAddAddressee" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ButtonAddAddresseeActionPerformed"/>
+          </Events>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JPanel" name="jPanel1">
+      <Properties>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+            <TitledBorder title="Output"/>
+          </Border>
+        </Property>
+      </Properties>
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jScrollPane1" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jScrollPane1" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Container class="javax.swing.JScrollPane" name="jScrollPane1">
+          <AuxValues>
+            <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+          </AuxValues>
+
+          <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+          <SubComponents>
+            <Component class="javax.swing.JTextArea" name="TextOutput">
+              <Properties>
+                <Property name="columns" type="int" value="20"/>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Tahoma" size="11" style="0"/>
+                </Property>
+                <Property name="rows" type="int" value="5"/>
+              </Properties>
+            </Component>
+          </SubComponents>
+        </Container>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JPanel" name="jPanel2">
+      <Properties>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+            <TitledBorder title="Actions"/>
+          </Border>
+        </Property>
+      </Properties>
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="BtnStart" min="-2" pref="120" max="-2" attributes="0"/>
+                  <EmptySpace pref="32" max="32767" attributes="0"/>
+                  <Component id="BtnStop" min="-2" pref="120" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="BtnStart" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="BtnStop" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="32767" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Component class="javax.swing.JButton" name="BtnStart">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Start sending"/>
+            <Property name="name" type="java.lang.String" value="ButtonRemoveAddressee" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BtnStartActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="BtnStop">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Stop sending"/>
+            <Property name="enabled" type="boolean" value="false"/>
+            <Property name="name" type="java.lang.String" value="ButtonRemoveAddressee" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="BtnStopActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

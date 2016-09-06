@@ -3,8 +3,11 @@ package com.github.agadar.nstelegram;
 import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nsapi.event.TelegramSentEvent;
 import com.github.agadar.nsapi.event.TelegramSentListener;
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.event.ItemEvent;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.UIManager;
@@ -17,19 +20,19 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentListener
 {
+    private final TelegramManager tm = TelegramManager.Instance;
+    
     public NSTelegramForm()
     {
-        // Sets the user agent.
-        NSAPI.setUserAgent("Agadar's Telegrammer (https://github.com/Agadar/NationStates-Telegrammer)");
+        initComponents();
+        NSAPI.setUserAgent("Agadar's Telegrammer (https://github.com/Agadar/NationStates-Telegrammer)"); // Set the user agent.
         
-        // Some testing code.
-        TelegramManager tm = TelegramManager.Instance;
-        List<String> names = new ArrayList<>();
-        names.add("agadar");
-        names.add("sdfjhsbjkhgbndskj");
-        tm.addAddressees(names);
-        tm.startSending("e410c889", "15346505", "dffb17d06b0d", true, this);
-        tm.stopSending();
+        // Set fields according to values retrieved from properties file.
+        Properties props = PropertiesHelper.loadProperties();
+        TxtFieldClientKey.setText(props.getProperty("clientKey"));
+        TxtFieldTelegramId.setText(props.getProperty("telegramId"));
+        TxtFieldSecretKey.setText(props.getProperty("secretKey"));
+        RadioBtnRecruitment.setSelected(!props.getProperty("isRecruitment", "0").equals("0"));
     }
     
     /**
@@ -56,31 +59,52 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         PanelAddressees = new javax.swing.JPanel();
         ScrollPaneAddressees = new javax.swing.JScrollPane();
         ListAddressees = new javax.swing.JList<>();
-        ButtonAddAddressee = new javax.swing.JButton();
+        ButtonRemoveAddressee = new javax.swing.JButton();
         ComboBoxAddresseeType = new javax.swing.JComboBox<>();
         TextFieldAddresseeVar = new javax.swing.JTextField();
+        ButtonAddAddressee = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        TextOutput = new javax.swing.JTextArea();
+        jPanel2 = new javax.swing.JPanel();
+        BtnStart = new javax.swing.JButton();
+        BtnStop = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Agadar's NationStates Telegrammer");
         setName("NSTelegramFrame"); // NOI18N
         setResizable(false);
+        addMouseListener(new java.awt.event.MouseAdapter()
+        {
+            public void mouseClicked(java.awt.event.MouseEvent evt)
+            {
+                formMouseClicked(evt);
+            }
+        });
+        addWindowListener(new java.awt.event.WindowAdapter()
+        {
+            public void windowClosing(java.awt.event.WindowEvent evt)
+            {
+                formWindowClosing(evt);
+            }
+        });
 
         PanelTelegram.setBorder(javax.swing.BorderFactory.createTitledBorder("Telegram"));
 
         LabelTelegramId.setLabelFor(TxtFieldTelegramId);
-        LabelTelegramId.setText("Telegram Id");
+        LabelTelegramId.setText("Telegram Id:");
         LabelTelegramId.setName("LabelTelegramId"); // NOI18N
 
         TxtFieldTelegramId.setName("TxtFieldTelegramId"); // NOI18N
 
         LabelSecretKey.setLabelFor(TxtFieldSecretKey);
-        LabelSecretKey.setText("Secret Key");
+        LabelSecretKey.setText("Secret Key:");
         LabelSecretKey.setName("LabelSecretKey"); // NOI18N
 
         TxtFieldSecretKey.setName("TxtFieldSecretKey"); // NOI18N
 
         LabelClientKey.setLabelFor(TxtFieldClientKey);
-        LabelClientKey.setText("Client Key");
+        LabelClientKey.setText("Client Key:");
         LabelClientKey.setName("LabelClientKey"); // NOI18N
 
         LabelSendAs.setText("Send as...");
@@ -112,22 +136,19 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
                         .addComponent(TxtFieldClientKey, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(PanelTelegramLayout.createSequentialGroup()
                         .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(PanelTelegramLayout.createSequentialGroup()
-                                .addComponent(LabelSecretKey)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelTelegramLayout.createSequentialGroup()
-                                .addComponent(LabelSendAs)
-                                .addGap(25, 25, 25)))
+                            .addComponent(LabelSecretKey)
+                            .addComponent(LabelSendAs))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(RadioBtnNormal)
                             .addComponent(TxtFieldSecretKey, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(RadioBtnRecruitment))))
-                .addContainerGap(42, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         PanelTelegramLayout.setVerticalGroup(
             PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelTelegramLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(LabelClientKey)
                     .addComponent(TxtFieldClientKey, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -144,7 +165,8 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
                     .addComponent(LabelSendAs)
                     .addComponent(RadioBtnNormal))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(RadioBtnRecruitment))
+                .addComponent(RadioBtnRecruitment)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         PanelAddressees.setBorder(javax.swing.BorderFactory.createTitledBorder("Addressees"));
@@ -159,15 +181,47 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             public String getElementAt(int i) { return strings[i]; }
         });
         ListAddressees.setName("ListAddressees"); // NOI18N
+        ListAddressees.addListSelectionListener(new javax.swing.event.ListSelectionListener()
+        {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt)
+            {
+                ListAddresseesValueChanged(evt);
+            }
+        });
         ScrollPaneAddressees.setViewportView(ListAddressees);
 
-        ButtonAddAddressee.setText("Add addressee");
-        ButtonAddAddressee.setName("ButtonAddAddressee"); // NOI18N
+        ButtonRemoveAddressee.setText("Remove");
+        ButtonRemoveAddressee.setEnabled(false);
+        ButtonRemoveAddressee.setName("ButtonRemoveAddressee"); // NOI18N
+        ButtonRemoveAddressee.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                ButtonRemoveAddresseeActionPerformed(evt);
+            }
+        });
 
-        ComboBoxAddresseeType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "Delegates (include)", "Delegates (exclude)", "Nations (include)", "Nations (exclude)", "New Delegates", "New Nations", "Refounded Nations", "Regions (include)", "Regions (exclude)", "WA Members (include)", "WA Members (exclude)" }));
+        ComboBoxAddresseeType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "Delegates (include)", "Delegates (exclude)", "Nations (include)", "Nations (exclude)", "New Nations", "Regions (include)", "Regions (exclude)", "WA Members (include)", "WA Members (exclude)" }));
         ComboBoxAddresseeType.setName("ComboBoxAddresseeType"); // NOI18N
+        ComboBoxAddresseeType.addItemListener(new java.awt.event.ItemListener()
+        {
+            public void itemStateChanged(java.awt.event.ItemEvent evt)
+            {
+                ComboBoxAddresseeTypeItemStateChanged(evt);
+            }
+        });
 
         TextFieldAddresseeVar.setName("TextFieldAddresseeVar"); // NOI18N
+
+        ButtonAddAddressee.setText("Add");
+        ButtonAddAddressee.setName("ButtonAddAddressee"); // NOI18N
+        ButtonAddAddressee.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                ButtonAddAddresseeActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout PanelAddresseesLayout = new javax.swing.GroupLayout(PanelAddressees);
         PanelAddressees.setLayout(PanelAddresseesLayout);
@@ -176,12 +230,13 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             .addGroup(PanelAddresseesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(PanelAddresseesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(ComboBoxAddresseeType, 0, 257, Short.MAX_VALUE)
+                    .addComponent(ComboBoxAddresseeType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(ScrollPaneAddressees)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelAddresseesLayout.createSequentialGroup()
-                        .addComponent(TextFieldAddresseeVar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(ButtonAddAddressee)))
+                    .addGroup(PanelAddresseesLayout.createSequentialGroup()
+                        .addComponent(ButtonRemoveAddressee, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(ButtonAddAddressee, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE))
+                    .addComponent(TextFieldAddresseeVar))
                 .addContainerGap())
         );
         PanelAddresseesLayout.setVerticalGroup(
@@ -192,9 +247,79 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(ComboBoxAddresseeType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(TextFieldAddresseeVar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(PanelAddresseesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(ButtonAddAddressee)
-                    .addComponent(TextFieldAddresseeVar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(ButtonRemoveAddressee)
+                    .addComponent(ButtonAddAddressee))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Output"));
+
+        TextOutput.setColumns(20);
+        TextOutput.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        TextOutput.setRows(5);
+        jScrollPane1.setViewportView(TextOutput);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1)
+                .addContainerGap())
+        );
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Actions"));
+
+        BtnStart.setText("Start sending");
+        BtnStart.setName("ButtonRemoveAddressee"); // NOI18N
+        BtnStart.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                BtnStartActionPerformed(evt);
+            }
+        });
+
+        BtnStop.setText("Stop sending");
+        BtnStop.setEnabled(false);
+        BtnStop.setName("ButtonRemoveAddressee"); // NOI18N
+        BtnStop.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                BtnStopActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(BtnStart, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+                .addComponent(BtnStop, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(BtnStart)
+                    .addComponent(BtnStop))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -204,23 +329,146 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(PanelAddressees, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(PanelTelegram, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(22, 22, 22)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(PanelTelegram, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(PanelAddressees, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(317, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(PanelTelegram, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(PanelAddressees, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(PanelTelegram, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(PanelAddressees, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void BtnStartActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_BtnStartActionPerformed
+    {//GEN-HEADEREND:event_BtnStartActionPerformed
+        BtnStart.setEnabled(false);
+        BtnStop.setEnabled(true);
+        TextOutput.setText("");
+        
+        String clientKey = TxtFieldClientKey.getText();
+        String telegramId = TxtFieldTelegramId.getText();
+        String secretKey = TxtFieldSecretKey.getText();
+        boolean isRecruitment = RadioBtnRecruitment.isSelected();
+        
+        if (clientKey == null || clientKey.isEmpty())
+        {
+            TextOutput.append("Please supply a Client Key!");
+            return;
+        }
+        
+        if (telegramId == null || telegramId.isEmpty())
+        {
+            TextOutput.append("Please supply a Telegram Id!");
+            return;
+        }
+        
+        if (secretKey == null || secretKey.isEmpty())
+        {
+            TextOutput.append("Please supply a Secret Key!");
+            return;
+        }
+        
+        tm.startSending(clientKey, telegramId, secretKey, isRecruitment, this);
+    }//GEN-LAST:event_BtnStartActionPerformed
+
+    private void BtnStopActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_BtnStopActionPerformed
+    {//GEN-HEADEREND:event_BtnStopActionPerformed
+        tm.stopSending();
+        BtnStart.setEnabled(true);
+        BtnStop.setEnabled(false);
+    }//GEN-LAST:event_BtnStopActionPerformed
+
+    private void ListAddresseesValueChanged(javax.swing.event.ListSelectionEvent evt)//GEN-FIRST:event_ListAddresseesValueChanged
+    {//GEN-HEADEREND:event_ListAddresseesValueChanged
+        if (evt.getValueIsAdjusting())
+        {
+            return;
+        }
+        
+        ButtonRemoveAddressee.setEnabled(true);
+        String selected = ListAddressees.getSelectedValue();
+    }//GEN-LAST:event_ListAddresseesValueChanged
+
+    private void ComboBoxAddresseeTypeItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_ComboBoxAddresseeTypeItemStateChanged
+    {//GEN-HEADEREND:event_ComboBoxAddresseeTypeItemStateChanged
+        if (evt.getStateChange() != ItemEvent.SELECTED) 
+        {
+            return;
+        }
+        
+        switch (AddresseesType.getViaText((String) evt.getItem()))
+        {
+            case ALL:
+                
+                break;
+            case DELEGATES_INCL:
+                break;
+            case DELEGATES_EXCL:
+                break;
+            case NATIONS_INCL:
+                break;
+            case NATIONS_EXCL:
+                break;
+            case NEW_NATIONS:
+                break;
+            case REGIONS_INCL:
+                break;
+            case REGIONS_EXCL:
+                break;
+            case WA_MEMBERS_INCL:
+                break;
+            case WA_MEMBERS_EXCL:
+                break;
+            default:
+                return;
+        }
+    }//GEN-LAST:event_ComboBoxAddresseeTypeItemStateChanged
+
+    private void formMouseClicked(java.awt.event.MouseEvent evt)//GEN-FIRST:event_formMouseClicked
+    {//GEN-HEADEREND:event_formMouseClicked
+        ListAddressees.clearSelection();
+        ButtonRemoveAddressee.setEnabled(false); 
+    }//GEN-LAST:event_formMouseClicked
+
+    private void ButtonAddAddresseeActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_ButtonAddAddresseeActionPerformed
+    {//GEN-HEADEREND:event_ButtonAddAddresseeActionPerformed
+        System.out.println(TelegramManager.stringToStringList(TextFieldAddresseeVar.getText()));
+    }//GEN-LAST:event_ButtonAddAddresseeActionPerformed
+
+    private void ButtonRemoveAddresseeActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_ButtonRemoveAddresseeActionPerformed
+    {//GEN-HEADEREND:event_ButtonRemoveAddresseeActionPerformed
+        ListAddressees.clearSelection();
+        ButtonRemoveAddressee.setEnabled(false);
+    }//GEN-LAST:event_ButtonRemoveAddresseeActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt)//GEN-FIRST:event_formWindowClosing
+    {//GEN-HEADEREND:event_formWindowClosing
+        // Store relevant variables to properties file.
+        Properties props = new Properties();
+        props.setProperty("clientKey", TxtFieldClientKey.getText());
+        props.setProperty("telegramId", TxtFieldTelegramId.getText());
+        props.setProperty("secretKey", TxtFieldSecretKey.getText());
+        props.setProperty("isRecruitment", RadioBtnRecruitment.isSelected() ? "1" : "0");
+        PropertiesHelper.saveProperties(props);
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments
@@ -250,7 +498,10 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup BtnGrpTelegramType;
+    private javax.swing.JButton BtnStart;
+    private javax.swing.JButton BtnStop;
     private javax.swing.JButton ButtonAddAddressee;
+    private javax.swing.JButton ButtonRemoveAddressee;
     private javax.swing.JComboBox<String> ComboBoxAddresseeType;
     private javax.swing.JLabel LabelClientKey;
     private javax.swing.JLabel LabelSecretKey;
@@ -263,14 +514,36 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     private javax.swing.JRadioButton RadioBtnRecruitment;
     private javax.swing.JScrollPane ScrollPaneAddressees;
     private javax.swing.JTextField TextFieldAddresseeVar;
+    private javax.swing.JTextArea TextOutput;
     private javax.swing.JTextField TxtFieldClientKey;
     private javax.swing.JTextField TxtFieldSecretKey;
     private javax.swing.JTextField TxtFieldTelegramId;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void handleTelegramSent(TelegramSentEvent event)
     {
-        System.out.println(event.PositionInQuery + " - " + event.Addressee + " - " + event.Queued);
+        String message = "[" + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + "]";
+        
+        if (event.Queued)
+        {
+            message += " queued telegram for '" + event.Addressee + "'\n";
+        }
+        else
+        {
+            message += " failed to queue telegram for '" + event.Addressee + "'\n";
+        }
+        
+        TextOutput.append(message);
+        
+        // If all telegrams were sent, reset the buttons.
+        if (event.PositionInQuery + 1 == tm.numberOfAddressees())
+        {
+            BtnStart.setEnabled(true);
+            BtnStop.setEnabled(false);
+        }
     }
 }

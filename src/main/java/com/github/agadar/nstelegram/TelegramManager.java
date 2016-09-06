@@ -7,6 +7,7 @@ import com.github.agadar.nsapi.enums.shard.WAShard;
 import com.github.agadar.nsapi.enums.shard.WorldShard;
 import com.github.agadar.nsapi.event.TelegramSentListener;
 import com.github.agadar.nsapi.query.TelegramQuery;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -22,7 +23,7 @@ public final class TelegramManager
     // Singleton public instance.
     public final static TelegramManager Instance = new TelegramManager();   
     // List of addresses.
-    public final Set<String> Addressees = new HashSet<>();
+    private final Set<String> Addressees = new HashSet<>();
     // The thread on which the TelegramQuery is running on.
     private Thread telegramThread;
     
@@ -56,8 +57,13 @@ public final class TelegramManager
         this.Addressees.removeAll(addressees);
     }
     
+    public int numberOfAddressees()
+    {
+        return this.Addressees.size();
+    }
+    
     /**
-     * Starts sending the telegram to the addressees.
+     * Starts sending the telegram to the addressees in a new thread.
      * 
      * @param clientKey
      * @param telegramId
@@ -86,7 +92,8 @@ public final class TelegramManager
             }
             catch (RuntimeException ex)
             {
-                System.out.println("Whoopsiedaisy!");
+                System.out.println("Shit's fucked, yo. \n");
+                ex.printStackTrace();
             }
         });       
         telegramThread.start();
@@ -109,7 +116,7 @@ public final class TelegramManager
      * @param region the region of which the nations to return
      * @return a list of nations that live in the given region
      */
-    public List<String> nationsInRegion(String region)
+    public static List<String> nationsInRegion(String region)
     {
         return NSAPI.region(region).shards(RegionShard.NationNames).execute().NationNames;
     }
@@ -119,7 +126,7 @@ public final class TelegramManager
      * 
      * @return a list of new nations
      */
-    public List<String> newNations()
+    public static List<String> newNations()
     {
         return NSAPI.world(WorldShard.NewestNations).execute().NewestNations;
     }
@@ -132,7 +139,7 @@ public final class TelegramManager
      * 
      * @return a list of refounded nations
      */
-    public List<String> refoundedNations()
+    public static List<String> refoundedNations()
     {
         throw new UnsupportedOperationException();
     }
@@ -145,7 +152,7 @@ public final class TelegramManager
      * 
      * @return a list of nations that are new delegates
      */
-    public List<String> newDelegates()
+    public static List<String> newDelegates()
     {
         throw new UnsupportedOperationException();
     }
@@ -155,7 +162,7 @@ public final class TelegramManager
      * 
      * @return a list of all delegate nations
      */
-    public List<String> delegates()
+    public static List<String> delegates()
     {
         return NSAPI.wa(Council.SECURITY_COUNCIL).shards(WAShard.Delegates).execute().Delegates;
     }
@@ -165,7 +172,7 @@ public final class TelegramManager
      * 
      * @return a list of all nations that are World Assembly members.
      */
-    public List<String> worldAssemblyMembers()
+    public static List<String> worldAssemblyMembers()
     {
         return NSAPI.wa(Council.SECURITY_COUNCIL).shards(WAShard.Members).execute().Members;
     }
@@ -175,8 +182,19 @@ public final class TelegramManager
      * 
      * @return a list of all nations in the world.
      */
-    public List<String> allNations()
+    public static List<String> allNations()
     {
         return NSAPI.world(WorldShard.Nations).execute().Nations;
+    }
+    
+    /**
+     * Converts a comma-separated string to a list of strings.
+     * 
+     * @param string
+     * @return 
+     */
+    public static List<String> stringToStringList(String string)
+    {
+        return Arrays.asList(string.trim().split("\\s*,\\s*"));
     }
 }
