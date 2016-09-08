@@ -14,8 +14,14 @@ import java.util.Properties;
  */
 public class PropertiesHelper
 {
+    // Standard name for this app's properties file.
     private static final String fileName = "nationstates-telegrammer.properties";
 
+    /**
+     * Saves the app's properties to the file.
+     * 
+     * @param props 
+     */
     public static void saveProperties(Properties props)
     {
         try (OutputStream output = new FileOutputStream(fileName))
@@ -28,6 +34,11 @@ public class PropertiesHelper
         }
     }
 
+    /**
+     * Loads the app's properties from the file, or creates an empty new one.
+     * 
+     * @return 
+     */
     public static Properties loadProperties()
     {
         Properties props = new Properties();
