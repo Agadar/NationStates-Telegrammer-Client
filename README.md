@@ -13,4 +13,4 @@ It uses my own [NationStates API Java Wrapper](https://github.com/Agadar/NationS
 
 ## Links
 
-[NationStates forum thread]()
+[NationStates forum thread](https://forum.nationstates.net/viewtopic.php?f=15&t=388960)
