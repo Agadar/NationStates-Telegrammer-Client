@@ -23,6 +23,8 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentListener
 {
+    // Form title.
+    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.0.0";
     // Key values etc. for this application's properties.
     private final static String CLIENT_KEY = "clientKey";
     private final static String TELEGRAM_ID = "telegramId";
@@ -86,7 +88,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         BtnStop = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Agadar's NationStates Telegrammer");
+        setTitle(NSTelegramForm.FORM_TITLE);
         setName("NSTelegramFrame"); // NOI18N
         setResizable(false);
         addMouseListener(new java.awt.event.MouseAdapter()
@@ -414,8 +416,16 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             return;
         }
         
+        // If no addressees were selected, make it known and cancel.
+        if (tm.numberOfAddressees() == 0)
+        {
+            TextOutput.setText("Please supply at least one addressee!");
+            return;
+        }
+        
         // Set GUI components.
         updateGui(true);
+        TextOutput.setText(duration());
         
         // Call telegram manager to start sending.
         tm.startSending(clientKey, telegramId, secretKey, isRecruitment, this);
@@ -547,19 +557,19 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             case REGIONS_INCL:
                 addressees = new ArrayList<>();
                 List<String> regions_incl = stringToStringList(TextFieldAddresseeVar.getText());               
-                for (String region : regions_incl)
+                regions_incl.stream().forEach((region) ->
                 {
                     addressees.addAll(AddresseesHelper.nationsInRegion(region));
-                }
+                });
                 type = AddresseesType.REGIONS_INCL.getText() + ": " + regions_incl;
                 break;
             case REGIONS_EXCL:
                 addressees = new ArrayList<>();
                 List<String> regions_excl = stringToStringList(TextFieldAddresseeVar.getText());              
-                for (String region : regions_excl)
+                regions_excl.stream().forEach((region) ->
                 {
                     addressees.addAll(AddresseesHelper.nationsInRegion(region));
-                }
+                });
                 type = AddresseesType.REGIONS_EXCL.getText() + ": " + regions_excl;
                 add = false;
                 break;
@@ -675,8 +685,10 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
 
             /* Create and display the form */
             java.awt.EventQueue.invokeLater(() -> 
-                    {
-                        new NSTelegramForm().setVisible(true);
+            {
+                NSTelegramForm form = new NSTelegramForm();
+                form.setLocationRelativeTo(null);
+                form.setVisible(true);
             });
         }
         catch (ClassNotFoundException | InstantiationException |
@@ -733,7 +745,8 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         }
         else
         {
-            message += " failed to queue telegram for '" + event.Addressee + "'\n";
+            message += " failed to queue telegram for '" + event.Addressee + "'\n"
+                    + event.ErrorMessage + "\n";
         }       
         TextOutput.append(message);
         
@@ -764,6 +777,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             TxtFieldSecretKey.setEditable(false);
             RadioBtnNormal.setEnabled(false);
             RadioBtnRecruitment.setEnabled(false);
+            ComboBoxAddresseeType.setEnabled(false);
         }
         else
         {
@@ -776,6 +790,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             TxtFieldSecretKey.setEditable(true);
             RadioBtnNormal.setEnabled(true);
             RadioBtnRecruitment.setEnabled(true);
+            ComboBoxAddresseeType.setEnabled(true);
         }
     }
     

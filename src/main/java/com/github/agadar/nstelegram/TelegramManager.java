@@ -1,6 +1,7 @@
 package com.github.agadar.nstelegram;
 
 import com.github.agadar.nsapi.NSAPI;
+import com.github.agadar.nsapi.NationStatesAPIException;
 import com.github.agadar.nsapi.event.TelegramSentListener;
 import com.github.agadar.nsapi.query.TelegramQuery;
 import java.util.ArrayList;
@@ -103,10 +104,9 @@ public final class TelegramManager
             {
                 q.execute(null);
             }
-            catch (RuntimeException ex)
+            catch (NationStatesAPIException ex)
             {
-                System.out.println("Shit's fucked, yo. \n");
-                ex.printStackTrace();
+                
             }
         });       
         telegramThread.start();

@@ -5,7 +5,7 @@
     <!-- General properties -->
     <groupId>com.github.agadar</groupId>
     <artifactId>nationstates-telegrammer</artifactId>
-    <version>0.1.0</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>   
     <name>NationStates Telegrammer</name>
     <description>Agadar's client for consuming the NationStates telegram API.</description>
@@ -42,9 +42,39 @@
         <dependency>
             <groupId>com.github.agadar</groupId>
             <artifactId>nationstates-api-java-wrapper</artifactId>
-            <version>1.2.0</version>
+            <version>1.2.1</version>
         </dependency>
     </dependencies>
+    
+    <!-- Plugins -->
+    <build>
+        <plugins>
+            <plugin>
+                <!-- Plugin for building an executable .jar with dependencies -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.github.agadar.nstelegram.NSTelegramForm</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <!-- Other properties -->
     <properties>

@@ -7,7 +7,9 @@
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
-    <Property name="title" type="java.lang.String" value="Agadar&apos;s NationStates Telegrammer"/>
+    <Property name="title" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+      <Connection code="NSTelegramForm.FORM_TITLE" type="code"/>
+    </Property>
     <Property name="name" type="java.lang.String" value="NSTelegramFrame" noResource="true"/>
     <Property name="resizable" type="boolean" value="false"/>
   </Properties>
