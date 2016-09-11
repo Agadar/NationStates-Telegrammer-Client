@@ -3,6 +3,7 @@ package com.github.agadar.nstelegram;
 import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nsapi.domain.region.Region;
 import com.github.agadar.nsapi.domain.shared.Happening;
+import com.github.agadar.nsapi.domain.wa.WorldAssembly;
 import com.github.agadar.nsapi.domain.world.World;
 import com.github.agadar.nsapi.enums.Council;
 import com.github.agadar.nsapi.enums.HapFilter;
@@ -21,6 +22,9 @@ import java.util.regex.Pattern;
  */
 public class FilterHelper 
 {
+    // Pattern used for extracting nation names from happenings descriptions.
+    private final static Pattern PATTERN = Pattern.compile("\\@\\@(.*?)\\@\\@");
+    
     /**
      * Returns a list of nations that live in the given region.
      * 
@@ -50,15 +54,15 @@ public class FilterHelper
      */
     public static List<String> refoundedNations()
     {
-        final World w = NSAPI.world(WorldShard.Happenings).happeningsFilter(HapFilter.founding).execute();
+        final World w = NSAPI.world(WorldShard.Happenings)
+                .happeningsFilter(HapFilter.founding).execute();
         final List<String> refounded = new ArrayList<>();
-        final Pattern pattern = Pattern.compile("\\@\\@(.*?)\\@\\@");
         
         w.Happenings.forEach(h -> 
         {
             if (h.Description.contains("refounded"))
             {
-                final Matcher matcher = pattern.matcher(h.Description);
+                final Matcher matcher = PATTERN.matcher(h.Description);
                 
                 if (matcher.find())
                 {
@@ -80,7 +84,25 @@ public class FilterHelper
      */
     public static List<String> newDelegates()
     {
-        throw new UnsupportedOperationException();
+        WorldAssembly w = NSAPI.wa(Council.SECURITY_COUNCIL)
+                .shards(WAShard.RecentHappenings).execute();
+        
+        final List<String> newDels = new ArrayList<>();
+        
+        w.RecentHappenings.forEach(h -> 
+        {
+            if (h.Description.contains("became"))
+            {
+                final Matcher matcher = PATTERN.matcher(h.Description);
+                
+                if (matcher.find())
+                {
+                    newDels.add(matcher.group(1));
+                }
+            }
+        });
+        System.out.println(newDels);
+        return newDels;
     }
     
     /**

@@ -501,40 +501,39 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         final DefaultListModel model = ((DefaultListModel)ListAddressees.getModel());
         List<String> addressees;
         boolean add = true; // if true, add. if false, remove.
-        String type;
+        final FilterType filter = FilterType.getViaText((String) ComboBoxAddresseeType.getSelectedItem());
+        String type = filter.getText();
         
         // Set above variables according to addressees type selected.
-        switch (FilterType.getViaText((String) ComboBoxAddresseeType.getSelectedItem()))
+        switch (filter)
         {
             case ALL:
                 addressees = FilterHelper.allNations();        
-                type = FilterType.ALL.getText();
                 break;
             case DELEGATES_INCL:
                 addressees = FilterHelper.delegates();
-                type = FilterType.DELEGATES_INCL.getText();
                 break;
             case DELEGATES_EXCL:
                 addressees = FilterHelper.delegates();
-                type = FilterType.DELEGATES_EXCL.getText();
                 add = false;
+                break;
+            case DELEGATES_NEW:
+                addressees = FilterHelper.newDelegates();
                 break;
             case NATIONS_INCL:
                 addressees = stringToStringList(TextFieldAddresseeVar.getText());
-                type = FilterType.NATIONS_INCL.getText() + ": " + addressees;
+                type += ": " + addressees;
                 break;
             case NATIONS_EXCL:
                 addressees = stringToStringList(TextFieldAddresseeVar.getText());
-                type = FilterType.NATIONS_EXCL.getText() + ": " + addressees;
+                type += ": " + addressees;
                 add = false;
                 break;
-            case NEW_NATIONS:
+            case NATIONS_NEW:
                 addressees = FilterHelper.newNations();
-                type = FilterType.NEW_NATIONS.getText();
                 break;
-            case REFOUNDED:
+            case NATIOS_REFOUNDED:
                 addressees = FilterHelper.refoundedNations();
-                type = FilterType.REFOUNDED.getText();
                 break;
             case REGIONS_INCL:
                 addressees = new ArrayList<>();
@@ -543,7 +542,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
                 {
                     addressees.addAll(FilterHelper.nationsInRegion(region));
                 });
-                type = FilterType.REGIONS_INCL.getText() + ": " + regions_incl;
+                type += ": " + regions_incl;
                 break;
             case REGIONS_EXCL:
                 addressees = new ArrayList<>();
@@ -552,16 +551,14 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
                 {
                     addressees.addAll(FilterHelper.nationsInRegion(region));
                 });
-                type = FilterType.REGIONS_EXCL.getText() + ": " + regions_excl;
+                type += ": " + regions_excl;
                 add = false;
                 break;
             case WA_MEMBERS_INCL:
                 addressees = FilterHelper.worldAssemblyMembers();
-                type = FilterType.WA_MEMBERS_INCL.getText();
                 break;
             case WA_MEMBERS_EXCL:
                 addressees = FilterHelper.worldAssemblyMembers();
-                type = FilterType.WA_MEMBERS_EXCL.getText();
                 add = false;
                 break;
             default:
