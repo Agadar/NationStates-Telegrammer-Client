@@ -26,15 +26,60 @@ public class FilterHelper
     private final static Pattern PATTERN = Pattern.compile("\\@\\@(.*?)\\@\\@");
     
     /**
-     * Returns a list of nations that live in the given region.
+     * Returns a list of nations that live in the given regions.
      * 
-     * @param region the region of which the nations to return
-     * @return a list of nations that live in the given region
+     * @param regions the regions of which the nations to return
+     * @return a list of nations that live in the given regions
      */
-    public static List<String> nationsInRegion(String region)
+    public static List<String> nationsInRegions(List<String> regions)
     {
-        Region r = NSAPI.region(region).shards(RegionShard.NationNames).execute();
-        return r != null ? r.NationNames : new ArrayList<>();
+        final List<String> nations = new ArrayList<>();
+        
+        for (String region : regions)
+        {
+            Region r = NSAPI.region(region).shards(RegionShard.NationNames).execute();
+            
+            if (r.NationNames != null)
+            {
+                nations.addAll(r.NationNames);
+            }
+        }
+
+        return nations;
+    }
+    
+    /**
+     * Gives all nations in regions that have all of the supplied tags.
+     * 
+     * @param tags
+     * @return 
+     */
+    public static List<String> nationsInRegionsWithTags(List<String> tags)
+    {
+        final World w = NSAPI.world(WorldShard.RegionsByTag).regionsWithTags(
+                tags.toArray(new String[tags.size()])).execute();
+        
+        // This check need be done because when no regions are found, the API
+        // nevertheless sends back one empty string.
+        if (w.RegionsByTag().size() != 1 || !w.RegionsByTag().get(0).isEmpty())
+        {
+            return nationsInRegions(w.RegionsByTag());
+        }
+        
+        return new ArrayList<>();
+    }
+    
+    /**
+     * Gives all nations in regions that DO NOT have all of the supplied tags.
+     * 
+     * @param tags
+     * @return 
+     */
+    public static List<String> nationsInRegionsWithoutTags(List<String> tags)
+    {
+        final World w = NSAPI.world(WorldShard.RegionsByTag).regionsWithoutTags(
+                tags.toArray(new String[tags.size()])).execute();
+        return nationsInRegions(w.RegionsByTag());
     }
     
     /**
@@ -61,9 +106,6 @@ public class FilterHelper
     
     /**
      * Returns a list of nations that are new delegates.
-     * 
-     * NOTE: It is currently unsupported by the NationStates API to retrieve a 
-     * list of new delegates, so this only throws UnsupportedOperationException.
      * 
      * @return a list of nations that are new delegates
      */

@@ -469,6 +469,10 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             case NATIONS_EXCL:
             case REGIONS_INCL:
             case REGIONS_EXCL:
+            case REGIONS_WITH_TAGS_INCL:
+            case REGIONS_WITH_TAGS_EXCL:
+            case REGIONS_WO_TAGS_INCL:
+            case REGIONS_WO_TAGS_EXCL:
                 TextFieldAddresseeVar.setEditable(true);
                 break;
             default:
@@ -510,42 +514,62 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             case ALL:
                 addressees = FilterHelper.allNations();        
                 break;
+                
             case DELEGATES_EXCL:
                 add = false;
             case DELEGATES_INCL:
                 addressees = FilterHelper.delegates();
                 break;
+                
             case DELEGATES_NEW:
                 addressees = FilterHelper.newDelegates();
                 break;
+                
             case NATIONS_EXCL:
                 add = false;
             case NATIONS_INCL:
                 addressees = stringToStringList(TextFieldAddresseeVar.getText());
                 type += ": " + addressees;
                 break;
+                
             case NATIONS_NEW:
                 addressees = FilterHelper.newNations();
                 break;
-            case NATIOS_REFOUNDED:
+                
+            case NATIONS_REFOUNDED:
                 addressees = FilterHelper.refoundedNations();
                 break;
+                
             case REGIONS_EXCL:
                 add = false;
             case REGIONS_INCL:
-                addressees = new ArrayList<>();
                 List<String> regions = stringToStringList(TextFieldAddresseeVar.getText());               
-                regions.stream().forEach((region) ->
-                {
-                    addressees.addAll(FilterHelper.nationsInRegion(region));
-                });
+                addressees = FilterHelper.nationsInRegions(regions);
                 type += ": " + regions;
                 break;
+                
+            case REGIONS_WITH_TAGS_EXCL:
+                add = false;
+            case REGIONS_WITH_TAGS_INCL:
+                List<String> tags = stringToStringList(TextFieldAddresseeVar.getText());
+                addressees = FilterHelper.nationsInRegionsWithTags(tags);
+                type += ": " + tags;
+                break;
+                
+            case REGIONS_WO_TAGS_EXCL:
+                add = false;
+            case REGIONS_WO_TAGS_INCL:
+                tags = stringToStringList(TextFieldAddresseeVar.getText());
+                addressees = FilterHelper.nationsInRegionsWithoutTags(tags);
+                type += ": " + tags;
+                break;
+                
             case WA_MEMBERS_EXCL:
                 add = false;
             case WA_MEMBERS_INCL:
                 addressees = FilterHelper.worldAssemblyMembers();
                 break;
+                
             default:
                 return;
         }
