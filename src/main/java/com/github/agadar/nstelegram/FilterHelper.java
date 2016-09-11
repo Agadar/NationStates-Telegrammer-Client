@@ -56,22 +56,7 @@ public class FilterHelper
     {
         final World w = NSAPI.world(WorldShard.Happenings)
                 .happeningsFilter(HapFilter.founding).execute();
-        final List<String> refounded = new ArrayList<>();
-        
-        w.Happenings.forEach(h -> 
-        {
-            if (h.Description.contains("refounded"))
-            {
-                final Matcher matcher = PATTERN.matcher(h.Description);
-                
-                if (matcher.find())
-                {
-                    refounded.add(matcher.group(1));
-                }
-            }
-        });
-
-        return refounded;
+        return filterHappenings(w.Happenings, "refounded");
     }
     
     /**
@@ -86,23 +71,7 @@ public class FilterHelper
     {
         WorldAssembly w = NSAPI.wa(Council.SECURITY_COUNCIL)
                 .shards(WAShard.RecentHappenings).execute();
-        
-        final List<String> newDels = new ArrayList<>();
-        
-        w.RecentHappenings.forEach(h -> 
-        {
-            if (h.Description.contains("became"))
-            {
-                final Matcher matcher = PATTERN.matcher(h.Description);
-                
-                if (matcher.find())
-                {
-                    newDels.add(matcher.group(1));
-                }
-            }
-        });
-        System.out.println(newDels);
-        return newDels;
+        return filterHappenings(w.RecentHappenings, "became");
     }
     
     /**
@@ -133,5 +102,32 @@ public class FilterHelper
     public static List<String> allNations()
     {
         return NSAPI.world(WorldShard.Nations).execute().Nations;
+    }
+    
+    /**
+     * From a list of happenings, derives nation names from each happening that
+     * contains in its description the supplied string.
+     * 
+     * @param toApplyTo
+     * @return 
+     */
+    private static List<String> filterHappenings(List<Happening> happenings, String ifContains)
+    {       
+        final List<String> nations = new ArrayList<>();
+        
+        happenings.forEach(h -> 
+        {
+            if (h.Description.contains(ifContains))
+            {
+                final Matcher matcher = PATTERN.matcher(h.Description);
+                
+                if (matcher.find())
+                {
+                    nations.add(matcher.group(1));
+                }
+            }
+        });    
+        
+        return nations;
     }
 }
