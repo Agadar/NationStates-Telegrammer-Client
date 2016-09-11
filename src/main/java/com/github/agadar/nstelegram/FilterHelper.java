@@ -14,7 +14,7 @@ import java.util.List;
  * 
  * @author Agadar <https://github.com/Agadar/>
  */
-public class AddresseesHelper 
+public class FilterHelper 
 {
     /**
      * Returns a list of nations that live in the given region.

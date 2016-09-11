@@ -231,7 +231,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             }
         });
 
-        ComboBoxAddresseeType.setModel(new DefaultComboBoxModel(AddresseesType.getTexts()));
+        ComboBoxAddresseeType.setModel(new DefaultComboBoxModel(FilterType.getTexts()));
         ComboBoxAddresseeType.setName("ComboBoxAddresseeType"); // NOI18N
         ComboBoxAddresseeType.addItemListener(new java.awt.event.ItemListener()
         {
@@ -467,7 +467,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         TextFieldAddresseeVar.setText("");  // Clear the textfield in question.
         
         // According to which item was selected, enable or disable the textfield.
-        switch (AddresseesType.getViaText((String) evt.getItem()))
+        switch (FilterType.getViaText((String) evt.getItem()))
         {
             case ALL:
                 TextFieldAddresseeVar.setEditable(false);
@@ -530,60 +530,60 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         String type;
         
         // Set above variables according to addressees type selected.
-        switch (AddresseesType.getViaText((String) ComboBoxAddresseeType.getSelectedItem()))
+        switch (FilterType.getViaText((String) ComboBoxAddresseeType.getSelectedItem()))
         {
             case ALL:
-                addressees = AddresseesHelper.allNations();        
-                type = AddresseesType.ALL.getText();
+                addressees = FilterHelper.allNations();        
+                type = FilterType.ALL.getText();
                 break;
             case DELEGATES_INCL:
-                addressees = AddresseesHelper.delegates();
-                type = AddresseesType.DELEGATES_INCL.getText();
+                addressees = FilterHelper.delegates();
+                type = FilterType.DELEGATES_INCL.getText();
                 break;
             case DELEGATES_EXCL:
-                addressees = AddresseesHelper.delegates();
-                type = AddresseesType.DELEGATES_EXCL.getText();
+                addressees = FilterHelper.delegates();
+                type = FilterType.DELEGATES_EXCL.getText();
                 add = false;
                 break;
             case NATIONS_INCL:
                 addressees = stringToStringList(TextFieldAddresseeVar.getText());
-                type = AddresseesType.NATIONS_INCL.getText() + ": " + addressees;
+                type = FilterType.NATIONS_INCL.getText() + ": " + addressees;
                 break;
             case NATIONS_EXCL:
                 addressees = stringToStringList(TextFieldAddresseeVar.getText());
-                type = AddresseesType.NATIONS_EXCL.getText() + ": " + addressees;
+                type = FilterType.NATIONS_EXCL.getText() + ": " + addressees;
                 add = false;
                 break;
             case NEW_NATIONS:
-                addressees = AddresseesHelper.newNations();
-                type = AddresseesType.NEW_NATIONS.getText();
+                addressees = FilterHelper.newNations();
+                type = FilterType.NEW_NATIONS.getText();
                 break;
             case REGIONS_INCL:
                 addressees = new ArrayList<>();
                 List<String> regions_incl = stringToStringList(TextFieldAddresseeVar.getText());               
                 regions_incl.stream().forEach((region) ->
                 {
-                    addressees.addAll(AddresseesHelper.nationsInRegion(region));
+                    addressees.addAll(FilterHelper.nationsInRegion(region));
                 });
-                type = AddresseesType.REGIONS_INCL.getText() + ": " + regions_incl;
+                type = FilterType.REGIONS_INCL.getText() + ": " + regions_incl;
                 break;
             case REGIONS_EXCL:
                 addressees = new ArrayList<>();
                 List<String> regions_excl = stringToStringList(TextFieldAddresseeVar.getText());              
                 regions_excl.stream().forEach((region) ->
                 {
-                    addressees.addAll(AddresseesHelper.nationsInRegion(region));
+                    addressees.addAll(FilterHelper.nationsInRegion(region));
                 });
-                type = AddresseesType.REGIONS_EXCL.getText() + ": " + regions_excl;
+                type = FilterType.REGIONS_EXCL.getText() + ": " + regions_excl;
                 add = false;
                 break;
             case WA_MEMBERS_INCL:
-                addressees = AddresseesHelper.worldAssemblyMembers();
-                type = AddresseesType.WA_MEMBERS_INCL.getText();
+                addressees = FilterHelper.worldAssemblyMembers();
+                type = FilterType.WA_MEMBERS_INCL.getText();
                 break;
             case WA_MEMBERS_EXCL:
-                addressees = AddresseesHelper.worldAssemblyMembers();
-                type = AddresseesType.WA_MEMBERS_EXCL.getText();
+                addressees = FilterHelper.worldAssemblyMembers();
+                type = FilterType.WA_MEMBERS_EXCL.getText();
                 add = false;
                 break;
             default:

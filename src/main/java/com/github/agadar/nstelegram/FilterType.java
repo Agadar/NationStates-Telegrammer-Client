@@ -8,7 +8,7 @@ import java.util.Map;
  * 
  * @author marti
  */
-public enum AddresseesType
+public enum FilterType
 {
     ALL("All"),
     DELEGATES_INCL("Delegates (include)"),
@@ -23,12 +23,12 @@ public enum AddresseesType
     ;
      
     // Map for looking up addressees type via its explanation.
-    private final static Map<String, AddresseesType> reverse = new HashMap<>();
+    private final static Map<String, FilterType> reverse = new HashMap<>();
     
     // Static initializer for filling the reverse map.
     static
     {
-        for (AddresseesType type : AddresseesType.values())
+        for (FilterType type : FilterType.values())
         {
             reverse.put(type.Text, type);
         }
@@ -42,7 +42,7 @@ public enum AddresseesType
      * 
      * @param text 
      */
-    private AddresseesType(String text)
+    private FilterType(String text)
     {
         this.Text = text;
     }
@@ -63,7 +63,7 @@ public enum AddresseesType
      * @param text
      * @return 
      */
-    public static AddresseesType getViaText(String text)
+    public static FilterType getViaText(String text)
     {
         return reverse.get(text);
     }
@@ -75,7 +75,7 @@ public enum AddresseesType
      */
     public static String[] getTexts()
     {
-        final AddresseesType[] vals = values();
+        final FilterType[] vals = values();
         final String[] help = new String[vals.length];
         
         for (int i = 0; i < help.length; i++)
