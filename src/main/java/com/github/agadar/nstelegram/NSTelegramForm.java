@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.text.DefaultCaret;
 
 /**
  * The main GUI of this application.
@@ -39,6 +40,8 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     public NSTelegramForm()
     {
         initComponents();
+        // Sets the output textarea such that it auto-scrolls down.
+        ((DefaultCaret) TextOutput.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         NSAPI.setUserAgent(USER_AGENT); // Set the user agent.
         
         // Set fields according to values retrieved from properties file.
