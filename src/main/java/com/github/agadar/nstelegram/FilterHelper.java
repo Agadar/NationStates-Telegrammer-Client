@@ -79,6 +79,14 @@ public class FilterHelper
     {
         final World w = NSAPI.world(WorldShard.RegionsByTag).regionsWithoutTags(
                 tags.toArray(new String[tags.size()])).execute();
+        
+        // This check need be done because when no regions are found, the API
+        // nevertheless sends back one empty string.
+        if (w.RegionsByTag().size() != 1 || !w.RegionsByTag().get(0).isEmpty())
+        {
+            return nationsInRegions(w.RegionsByTag());
+        }
+        
         return nationsInRegions(w.RegionsByTag());
     }
     
