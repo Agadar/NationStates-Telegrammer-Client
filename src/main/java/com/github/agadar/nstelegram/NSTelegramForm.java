@@ -32,9 +32,6 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     private final static String TELEGRAM_ID = "telegramId";
     private final static String SECRET_KEY = "secretKey";
     private final static String IS_RECRUITMENT = "isRecruitment";
-    // User agent for this application.
-    private final static String USER_AGENT = 
-        "Agadar's Telegrammer (https://github.com/Agadar/NationStates-Telegrammer)";
     // Short reference to telegram manager.
     private final TelegramManager tm = TelegramManager.Instance;
     
@@ -43,7 +40,6 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         initComponents();
         // Sets the output textarea such that it auto-scrolls down.
         ((DefaultCaret) TextOutput.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        NSAPI.setUserAgent(USER_AGENT); // Set the user agent.
         
         // Set fields according to values retrieved from properties file.
         Properties props = PropertiesHelper.loadProperties();

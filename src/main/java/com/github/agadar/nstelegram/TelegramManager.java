@@ -18,6 +18,8 @@ import java.util.Set;
 public final class TelegramManager 
 {
     public final static TelegramManager Instance = new TelegramManager(); // Singleton public instance.
+    
+    private final static String USER_AGENT = "Agadar's Telegrammer using Client Key '%s' (https://github.com/Agadar/NationStates-Telegrammer)";
     private final List<Tuple<Boolean, List<String>>> Steps = new ArrayList<>(); // List of steps. True = add, false = remove.
     private final Set<String> Addressees = new HashSet<>(); // Presumably most up-to-date addressees list, based on Steps.
     private Thread telegramThread; // The thread on which the TelegramQuery is running on.
@@ -88,6 +90,9 @@ public final class TelegramManager
     public void startSending(String clientKey, String telegramId, 
             String secretKey, boolean isRecruitment, TelegramSentListener... listeners)
     {
+        // Update user agent.
+        NSAPI.setUserAgent(String.format(USER_AGENT, clientKey));
+
         // Prepare TelegramQuery.
         final TelegramQuery q = NSAPI.telegram(clientKey, telegramId, secretKey, 
                 Addressees.toArray(new String[Addressees.size()])).addListeners(listeners);
