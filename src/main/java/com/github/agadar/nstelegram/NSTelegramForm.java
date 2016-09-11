@@ -203,7 +203,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        PanelAddressees.setBorder(javax.swing.BorderFactory.createTitledBorder("Addressees"));
+        PanelAddressees.setBorder(javax.swing.BorderFactory.createTitledBorder("Filters"));
         PanelAddressees.setPreferredSize(new java.awt.Dimension(289, 172));
 
         ScrollPaneAddressees.setName("ScrollPaneAddressees"); // NOI18N
@@ -219,7 +219,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         });
         ScrollPaneAddressees.setViewportView(ListAddressees);
 
-        ButtonRemoveAddressee.setText("Remove");
+        ButtonRemoveAddressee.setText("Remove filter");
         ButtonRemoveAddressee.setEnabled(false);
         ButtonRemoveAddressee.setName("ButtonRemoveAddressee"); // NOI18N
         ButtonRemoveAddressee.addActionListener(new java.awt.event.ActionListener()
@@ -243,7 +243,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         TextFieldAddresseeVar.setEditable(false);
         TextFieldAddresseeVar.setName("TextFieldAddresseeVar"); // NOI18N
 
-        ButtonAddAddressee.setText("Add");
+        ButtonAddAddressee.setText("Add filter");
         ButtonAddAddressee.setName("ButtonAddAddressee"); // NOI18N
         ButtonAddAddressee.addActionListener(new java.awt.event.ActionListener()
         {
@@ -682,9 +682,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     {
         try
         {
-            // Just use the windows look and feel, because that's what we see in
-            // the designer. This way, what we see is what we get.
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
             /* Create and display the form */
             java.awt.EventQueue.invokeLater(() -> 

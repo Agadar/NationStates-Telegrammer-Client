@@ -223,7 +223,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Addressees"/>
+            <TitledBorder title="Filters"/>
           </Border>
         </Property>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -298,7 +298,7 @@
         </Container>
         <Component class="javax.swing.JButton" name="ButtonRemoveAddressee">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Remove"/>
+            <Property name="text" type="java.lang.String" value="Remove filter"/>
             <Property name="enabled" type="boolean" value="false"/>
             <Property name="name" type="java.lang.String" value="ButtonRemoveAddressee" noResource="true"/>
           </Properties>
@@ -339,7 +339,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="ButtonAddAddressee">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Add"/>
+            <Property name="text" type="java.lang.String" value="Add filter"/>
             <Property name="name" type="java.lang.String" value="ButtonAddAddressee" noResource="true"/>
           </Properties>
           <Events>
