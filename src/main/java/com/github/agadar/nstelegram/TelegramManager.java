@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manages the addressees list and sending telegrams to the former.
@@ -24,7 +26,11 @@ public final class TelegramManager
     private final Set<String> Addressees = new HashSet<>(); // Presumably most up-to-date addressees list, based on Steps.
     private Thread telegramThread; // The thread on which the TelegramQuery is running on.
     
-    private TelegramManager() { }
+    private TelegramManager() 
+    {
+        // Set user agent for the first time.
+        NSAPI.setUserAgent("Agadar's Telegrammer (https://github.com/Agadar/NationStates-Telegrammer)");
+    }
     
     /**
      * Resets the address list.
@@ -111,7 +117,7 @@ public final class TelegramManager
             }
             catch (NationStatesAPIException ex)
             {
-                
+                // Ignore error.
             }
         });       
         telegramThread.start();

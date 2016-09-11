@@ -1,6 +1,5 @@
 package com.github.agadar.nstelegram;
 
-import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nsapi.event.TelegramSentEvent;
 import com.github.agadar.nsapi.event.TelegramSentListener;
 import java.awt.event.ItemEvent;
@@ -26,7 +25,7 @@ import javax.swing.text.DefaultCaret;
 public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentListener
 {
     // Form title.
-    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.0.0";
+    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.1.0";
     // Key values etc. for this application's properties.
     private final static String CLIENT_KEY = "clientKey";
     private final static String TELEGRAM_ID = "telegramId";
@@ -443,7 +442,8 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         tm.stopSending();
         
         // Set GUI components.
-        updateGui(false);
+        updateGui(false);        
+        TextOutput.append("\nStopped!\n");
     }//GEN-LAST:event_BtnStopActionPerformed
 
     /**
@@ -752,7 +752,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         if (event.PositionInQuery + 1 == tm.numberOfAddressees())
         {
             updateGui(false);
-            TextOutput.append("Finished!");
+            TextOutput.append("\nFinished!\n");
         }
     }
     
@@ -807,7 +807,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         int minutes = estimatedDuration % 3600 / 60;
         int seconds = estimatedDuration % 3600 % 60;
         return String.format("Addressees selected: %s%nEstimated duration: "
-                + "%s hours, %s minutes, %s seconds\n"
+                + "%s hours, %s minutes, %s seconds\n\n"
                 , tm.numberOfAddressees(), hours, minutes, seconds);
     }
     
