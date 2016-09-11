@@ -308,19 +308,8 @@
         </Component>
         <Component class="javax.swing.JComboBox" name="ComboBoxAddresseeType">
           <Properties>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="10">
-                <StringItem index="0" value="All"/>
-                <StringItem index="1" value="Delegates (include)"/>
-                <StringItem index="2" value="Delegates (exclude)"/>
-                <StringItem index="3" value="Nations (include)"/>
-                <StringItem index="4" value="Nations (exclude)"/>
-                <StringItem index="5" value="New Nations"/>
-                <StringItem index="6" value="Regions (include)"/>
-                <StringItem index="7" value="Regions (exclude)"/>
-                <StringItem index="8" value="WA Members (include)"/>
-                <StringItem index="9" value="WA Members (exclude)"/>
-              </StringArray>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="new DefaultComboBoxModel(AddresseesType.getTexts())" type="code"/>
             </Property>
             <Property name="name" type="java.lang.String" value="ComboBoxAddresseeType" noResource="true"/>
           </Properties>

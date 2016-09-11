@@ -67,4 +67,22 @@ public enum AddresseesType
     {
         return reverse.get(text);
     }
+    
+    /**
+     * Returns all string explanations.
+     * 
+     * @return 
+     */
+    public static String[] getTexts()
+    {
+        final AddresseesType[] vals = values();
+        final String[] help = new String[vals.length];
+        
+        for (int i = 0; i < help.length; i++)
+        {
+            help[i] = vals[i].getText();
+        }
+        
+        return help;
+    }
 }

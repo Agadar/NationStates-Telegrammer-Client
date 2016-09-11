@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -230,7 +231,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             }
         });
 
-        ComboBoxAddresseeType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "Delegates (include)", "Delegates (exclude)", "Nations (include)", "Nations (exclude)", "New Nations", "Regions (include)", "Regions (exclude)", "WA Members (include)", "WA Members (exclude)" }));
+        ComboBoxAddresseeType.setModel(new DefaultComboBoxModel(AddresseesType.getTexts()));
         ComboBoxAddresseeType.setName("ComboBoxAddresseeType"); // NOI18N
         ComboBoxAddresseeType.addItemListener(new java.awt.event.ItemListener()
         {
