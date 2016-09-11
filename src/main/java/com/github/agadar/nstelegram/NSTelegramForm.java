@@ -755,6 +755,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         if (event.PositionInQuery + 1 == tm.numberOfAddressees())
         {
             updateGui(false);
+            TextOutput.append("Finished!");
         }
     }
     
