@@ -465,36 +465,14 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         // According to which item was selected, enable or disable the textfield.
         switch (FilterType.getViaText((String) evt.getItem()))
         {
-            case ALL:
-                TextFieldAddresseeVar.setEditable(false);
-                break;
-            case DELEGATES_INCL:
-                TextFieldAddresseeVar.setEditable(false);
-                break;
-            case DELEGATES_EXCL:
-                TextFieldAddresseeVar.setEditable(false);
-                break;
             case NATIONS_INCL:
-                TextFieldAddresseeVar.setEditable(true);
-                break;
             case NATIONS_EXCL:
-                TextFieldAddresseeVar.setEditable(true);
-                break;
-            case NEW_NATIONS:
-                TextFieldAddresseeVar.setEditable(false);
-                break;
             case REGIONS_INCL:
-                TextFieldAddresseeVar.setEditable(true);
-                break;
             case REGIONS_EXCL:
                 TextFieldAddresseeVar.setEditable(true);
                 break;
-            case WA_MEMBERS_INCL:
-                TextFieldAddresseeVar.setEditable(false);
-                break;
-            case WA_MEMBERS_EXCL:
-                TextFieldAddresseeVar.setEditable(false);
-                break;
+            default:
+                TextFieldAddresseeVar.setEditable(false);     
         }
     }//GEN-LAST:event_ComboBoxAddresseeTypeItemStateChanged
 
@@ -553,6 +531,10 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             case NEW_NATIONS:
                 addressees = FilterHelper.newNations();
                 type = FilterType.NEW_NATIONS.getText();
+                break;
+            case REFOUNDED:
+                addressees = FilterHelper.refoundedNations();
+                type = FilterType.REFOUNDED.getText();
                 break;
             case REGIONS_INCL:
                 addressees = new ArrayList<>();

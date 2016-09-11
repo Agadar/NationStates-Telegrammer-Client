@@ -16,6 +16,7 @@ public enum FilterType
     NATIONS_INCL("Nations (include)"),
     NATIONS_EXCL("Nations (exclude)"),
     NEW_NATIONS("New Nations"),
+    REFOUNDED("Refounded Nations"),
     REGIONS_INCL("Regions (include)"),
     REGIONS_EXCL("Regions (exclude)"),
     WA_MEMBERS_INCL("WA Members (include)"),

@@ -2,12 +2,17 @@ package com.github.agadar.nstelegram;
 
 import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nsapi.domain.region.Region;
+import com.github.agadar.nsapi.domain.shared.Happening;
+import com.github.agadar.nsapi.domain.world.World;
 import com.github.agadar.nsapi.enums.Council;
+import com.github.agadar.nsapi.enums.HapFilter;
 import com.github.agadar.nsapi.enums.shard.RegionShard;
 import com.github.agadar.nsapi.enums.shard.WAShard;
 import com.github.agadar.nsapi.enums.shard.WorldShard;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Assists in retrieving nation names from the server.
@@ -41,14 +46,28 @@ public class FilterHelper
     /**
      * Returns a list of refounded nations.
      * 
-     * NOTE: It is currently unsupported by the NationStates API to retrieve a 
-     * list of refounded nations, so this only throws UnsupportedOperationException.
-     * 
      * @return a list of refounded nations
      */
     public static List<String> refoundedNations()
     {
-        throw new UnsupportedOperationException();
+        final World w = NSAPI.world(WorldShard.Happenings).happeningsFilter(HapFilter.founding).execute();
+        final List<String> refounded = new ArrayList<>();
+        final Pattern pattern = Pattern.compile("\\@\\@(.*?)\\@\\@");
+        
+        w.Happenings.forEach(h -> 
+        {
+            if (h.Description.contains("refounded"))
+            {
+                final Matcher matcher = pattern.matcher(h.Description);
+                
+                if (matcher.find())
+                {
+                    refounded.add(matcher.group(1));
+                }
+            }
+        });
+
+        return refounded;
     }
     
     /**
