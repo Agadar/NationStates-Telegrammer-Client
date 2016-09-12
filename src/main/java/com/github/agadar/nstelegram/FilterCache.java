@@ -15,18 +15,16 @@ public class FilterCache
     private final Map<String, Set<String>> NationsToRegions;       // nations mapped to regions
     private final Map<Set<String>, Set<String>> RegionsToTagsWith;      // regions mapped to tags they have
     private final Map<Set<String>, Set<String>> RegionsToTagsWithout;   // regions mapped to tags they don't have
-    private final Set<String> Delegates;   // world assembly delegates
-    private final Set<String> WaMembers;   // world assembly members
-    private final Set<String> All;         // all nations
+    
+    public Set<String> Delegates;   // world assembly delegates
+    public Set<String> WaMembers;   // world assembly members
+    public Set<String> All;         // all nations
     
     public FilterCache()
     {
         NationsToRegions = new HashMap<>();
         RegionsToTagsWith = new HashMap<>();
         RegionsToTagsWithout = new HashMap<>();
-        Delegates = new HashSet<>();
-        WaMembers = new HashSet<>();
-        All = new HashSet<>();
     }
     
     /**

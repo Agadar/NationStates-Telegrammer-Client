@@ -194,7 +194,17 @@ public class FilterHelper
      */
     public static Set<String> delegates()
     {
-        return new HashSet<>(NSAPI.wa(Council.SECURITY_COUNCIL).shards(WAShard.Delegates).execute().Delegates);
+        if (CACHE.Delegates == null)
+        {
+            WorldAssembly wa = NSAPI.wa(Council.SECURITY_COUNCIL)
+                    .shards(WAShard.Delegates).execute();
+            
+            if (wa != null && wa.Delegates != null)
+            {
+                CACHE.Delegates = new HashSet<>(wa.Delegates);
+            }            
+        }      
+        return CACHE.Delegates;
     }
     
     /**
@@ -204,7 +214,17 @@ public class FilterHelper
      */
     public static Set<String> worldAssemblyMembers()
     {
-        return new HashSet<>(NSAPI.wa(Council.SECURITY_COUNCIL).shards(WAShard.Members).execute().Members);
+        if (CACHE.WaMembers == null)
+        {
+            WorldAssembly wa = NSAPI.wa(Council.SECURITY_COUNCIL)
+                    .shards(WAShard.Members).execute();
+            
+            if (wa != null && wa.Members != null)
+            {
+                CACHE.WaMembers = new HashSet<>(wa.Members);
+            }            
+        }      
+        return CACHE.WaMembers;
     }
     
     /**
@@ -214,7 +234,16 @@ public class FilterHelper
      */
     public static Set<String> allNations()
     {
-        return new HashSet<>(NSAPI.world(WorldShard.Nations).execute().Nations);
+        if (CACHE.All == null)
+        {
+            World w = NSAPI.world(WorldShard.Nations).execute();
+            
+            if (w != null && w.Nations != null)
+            {
+                CACHE.All = new HashSet<>(w.Nations);
+            }            
+        }      
+        return CACHE.All;
     }
     
     /**
