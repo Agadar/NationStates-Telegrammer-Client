@@ -7,8 +7,10 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
@@ -511,7 +513,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         final FilterType filter = FilterType.getViaText((String) ComboBoxAddresseeType.getSelectedItem());      
         worker = new Thread(() ->
         {
-            List<String> addressees;
+            Set<String> addressees;
             boolean add = true; // if true, add. if false, remove.
             String type = filter.getText();
             
@@ -554,7 +556,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
                 case REGIONS_EXCL:
                     add = false;
                 case REGIONS_INCL:
-                    List<String> regions = stringToStringList(TextFieldAddresseeVar.getText());               
+                    Set<String> regions = stringToStringList(TextFieldAddresseeVar.getText());               
                     addressees = FilterHelper.nationsInRegions(regions);
                     type += ": " + regions;
                     break;
@@ -562,7 +564,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
                 case REGIONS_WITH_TAGS_EXCL:
                     add = false;
                 case REGIONS_WITH_TAGS_INCL:
-                    List<String> tags = stringToStringList(TextFieldAddresseeVar.getText());
+                    Set<String> tags = stringToStringList(TextFieldAddresseeVar.getText());
                     addressees = FilterHelper.nationsInRegionsWithTags(tags);
                     type += ": " + tags;
                     break;
@@ -824,9 +826,9 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
      * @param string
      * @return 
      */
-    private static List<String> stringToStringList(String string)
+    private static Set<String> stringToStringList(String string)
     {
         List<String> asList = Arrays.asList(string.trim().split("\\s*,\\s*"));
-        return asList.size() == 1 && asList.get(0).isEmpty() ? new ArrayList<>() : asList;
+        return asList.size() == 1 && asList.get(0).isEmpty() ? new HashSet<>() : new HashSet<>(asList);
     }
 }

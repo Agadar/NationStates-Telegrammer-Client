@@ -5,7 +5,6 @@ import com.github.agadar.nsapi.NationStatesAPIException;
 import com.github.agadar.nsapi.event.TelegramSentListener;
 import com.github.agadar.nsapi.query.TelegramQuery;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,7 +19,7 @@ public final class TelegramManager
     public final static TelegramManager Instance = new TelegramManager(); // Singleton public instance.
     
     private final static String USER_AGENT = "Agadar's Telegrammer using Client Key '%s' (https://github.com/Agadar/NationStates-Telegrammer)";
-    private final List<Tuple<Boolean, List<String>>> Steps = new ArrayList<>(); // List of steps. True = add, false = remove.
+    private final List<Tuple<Boolean, Set<String>>> Steps = new ArrayList<>(); // List of steps. True = add, false = remove.
     private final Set<String> Addressees = new HashSet<>(); // Presumably most up-to-date addressees list, based on Steps.
     private Thread telegramThread; // The thread on which the TelegramQuery is running on.
     
@@ -44,7 +43,7 @@ public final class TelegramManager
      * 
      * @param addressees 
      */
-    public void addAddressees(Collection<String> addressees)
+    public void addAddressees(Set<String> addressees)
     {
         Steps.add(new Tuple(true, addressees));
         updateAddressees();
@@ -55,7 +54,7 @@ public final class TelegramManager
      * 
      * @param addressees 
      */
-    public void removeAddressees(Collection<String> addressees)
+    public void removeAddressees(Set<String> addressees)
     {
         Steps.add(new Tuple(false, addressees));
         updateAddressees();

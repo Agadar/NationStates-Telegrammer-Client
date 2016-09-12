@@ -11,7 +11,9 @@ import com.github.agadar.nsapi.enums.shard.RegionShard;
 import com.github.agadar.nsapi.enums.shard.WAShard;
 import com.github.agadar.nsapi.enums.shard.WorldShard;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,23 +27,44 @@ public class FilterHelper
     // Pattern used for extracting nation names from happenings descriptions.
     private final static Pattern PATTERN = Pattern.compile("\\@\\@(.*?)\\@\\@");
     
+    // Cache used for reducing API calls.
+    private final static FilterCache CACHE = new FilterCache();
+    
     /**
      * Returns a list of nations that live in the given regions.
      * 
      * @param regions the regions of which the nations to return
      * @return a list of nations that live in the given regions
      */
-    public static List<String> nationsInRegions(List<String> regions)
+    public static Set<String> nationsInRegions(Set<String> regions)
     {
-        final List<String> nations = new ArrayList<>();
+        final Set<String> nations = new HashSet<>();
         
         for (String region : regions)
         {
-            Region r = NSAPI.region(region).shards(RegionShard.NationNames).execute();
+            // Check if cache already contains the values.
+            Set<String> nationsInRegion = CACHE.getNationsInRegion(region);
             
-            if (r.NationNames != null)
+            // If not, make an API call and add the values to the cache.
+            if (nationsInRegion == null)
             {
-                nations.addAll(r.NationNames);
+                final Region r = NSAPI.region(region)
+                        .shards(RegionShard.NationNames).execute();
+                
+                if (r.NationNames == null)
+                {
+                    CACHE.mapNationsToRegion(region, new HashSet<>());
+                }
+                else
+                {
+                    nationsInRegion = new HashSet<>(r.NationNames);
+                    nations.addAll(nationsInRegion);
+                    CACHE.mapNationsToRegion(region, nationsInRegion);
+                }
+            }
+            else
+            {
+                nations.addAll(nationsInRegion);
             }
         }
 
@@ -54,7 +77,7 @@ public class FilterHelper
      * @param tags
      * @return 
      */
-    public static List<String> nationsInRegionsWithTags(List<String> tags)
+    public static Set<String> nationsInRegionsWithTags(Set<String> tags)
     {
         final World w = NSAPI.world(WorldShard.RegionsByTag).regionsWithTags(
                 tags.toArray(new String[tags.size()])).execute();
@@ -63,10 +86,10 @@ public class FilterHelper
         // nevertheless sends back one empty string.
         if (w.RegionsByTag().size() != 1 || !w.RegionsByTag().get(0).isEmpty())
         {
-            return nationsInRegions(w.RegionsByTag());
+            return nationsInRegions(new HashSet<>(w.RegionsByTag()));
         }
         
-        return new ArrayList<>();
+        return new HashSet<>();
     }
     
     /**
@@ -75,7 +98,7 @@ public class FilterHelper
      * @param tags
      * @return 
      */
-    public static List<String> nationsInRegionsWithoutTags(List<String> tags)
+    public static Set<String> nationsInRegionsWithoutTags(Set<String> tags)
     {
         final World w = NSAPI.world(WorldShard.RegionsByTag).regionsWithoutTags(
                 tags.toArray(new String[tags.size()])).execute();
@@ -84,10 +107,10 @@ public class FilterHelper
         // nevertheless sends back one empty string.
         if (w.RegionsByTag().size() != 1 || !w.RegionsByTag().get(0).isEmpty())
         {
-            return nationsInRegions(w.RegionsByTag());
+            return nationsInRegions(new HashSet<>(w.RegionsByTag()));
         }
         
-        return nationsInRegions(w.RegionsByTag());
+        return new HashSet<>();
     }
     
     /**
@@ -95,11 +118,11 @@ public class FilterHelper
      * 
      * @return 
      */
-    public static List<String> ejectedNations()
+    public static Set<String> ejectedNations()
     {
         final World w = NSAPI.world(WorldShard.Happenings)
                 .happeningsFilter(HapFilter.eject).execute();
-        return filterHappenings(w.Happenings, "ejected");
+        return filterHappenings(new HashSet<>(w.Happenings), "ejected");
     }
     
     /**
@@ -107,9 +130,9 @@ public class FilterHelper
      * 
      * @return a list of new nations
      */
-    public static List<String> newNations()
+    public static Set<String> newNations()
     {
-        return NSAPI.world(WorldShard.NewestNations).execute().NewestNations;
+        return new HashSet<>(NSAPI.world(WorldShard.NewestNations).execute().NewestNations);
     }
     
     /**
@@ -117,11 +140,11 @@ public class FilterHelper
      * 
      * @return a list of refounded nations
      */
-    public static List<String> refoundedNations()
+    public static Set<String> refoundedNations()
     {
         final World w = NSAPI.world(WorldShard.Happenings)
                 .happeningsFilter(HapFilter.founding).execute();
-        return filterHappenings(w.Happenings, "refounded");
+        return filterHappenings(new HashSet<>(w.Happenings), "refounded");
     }
     
     /**
@@ -129,11 +152,11 @@ public class FilterHelper
      * 
      * @return a list of nations that are new delegates
      */
-    public static List<String> newDelegates()
+    public static Set<String> newDelegates()
     {
         WorldAssembly w = NSAPI.wa(Council.SECURITY_COUNCIL)
                 .shards(WAShard.RecentHappenings).execute();
-        return filterHappenings(w.RecentHappenings, "became");
+        return filterHappenings(new HashSet<>(w.RecentHappenings), "became");
     }
     
     /**
@@ -141,9 +164,9 @@ public class FilterHelper
      * 
      * @return a list of all delegate nations
      */
-    public static List<String> delegates()
+    public static Set<String> delegates()
     {
-        return NSAPI.wa(Council.SECURITY_COUNCIL).shards(WAShard.Delegates).execute().Delegates;
+        return new HashSet<>(NSAPI.wa(Council.SECURITY_COUNCIL).shards(WAShard.Delegates).execute().Delegates);
     }
     
     /**
@@ -151,9 +174,9 @@ public class FilterHelper
      * 
      * @return a list of all nations that are World Assembly members.
      */
-    public static List<String> worldAssemblyMembers()
+    public static Set<String> worldAssemblyMembers()
     {
-        return NSAPI.wa(Council.SECURITY_COUNCIL).shards(WAShard.Members).execute().Members;
+        return new HashSet<>(NSAPI.wa(Council.SECURITY_COUNCIL).shards(WAShard.Members).execute().Members);
     }
     
     /**
@@ -161,9 +184,9 @@ public class FilterHelper
      * 
      * @return a list of all nations in the world.
      */
-    public static List<String> allNations()
+    public static Set<String> allNations()
     {
-        return NSAPI.world(WorldShard.Nations).execute().Nations;
+        return new HashSet<>(NSAPI.world(WorldShard.Nations).execute().Nations);
     }
     
     /**
@@ -173,9 +196,9 @@ public class FilterHelper
      * @param toApplyTo
      * @return 
      */
-    private static List<String> filterHappenings(List<Happening> happenings, String ifContains)
+    private static Set<String> filterHappenings(Set<Happening> happenings, String ifContains)
     {       
-        final List<String> nations = new ArrayList<>();
+        final Set<String> nations = new HashSet<>();
         
         happenings.forEach(h -> 
         {
