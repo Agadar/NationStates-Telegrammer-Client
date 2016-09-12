@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.text.DefaultCaret;
@@ -33,6 +34,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     private final static String IS_RECRUITMENT = "isRecruitment";
     // Short reference to telegram manager.
     private final TelegramManager tm = TelegramManager.Instance;
+    private Thread worker;  // Thread used for compiling address lists.
     
     public NSTelegramForm()
     {
@@ -502,92 +504,105 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
      */
     private void ButtonAddAddresseeActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_ButtonAddAddresseeActionPerformed
     {//GEN-HEADEREND:event_ButtonAddAddresseeActionPerformed
+        TextOutput.setText("Compiling address list...");    // Inform user, as this might take a while.
+        ButtonAddAddressee.setEnabled(false);
+        
         final DefaultListModel model = ((DefaultListModel)ListAddressees.getModel());
-        List<String> addressees;
-        boolean add = true; // if true, add. if false, remove.
-        final FilterType filter = FilterType.getViaText((String) ComboBoxAddresseeType.getSelectedItem());
-        String type = filter.getText();
-        
-        // Set above variables according to addressees type selected.
-        switch (filter)
+        final FilterType filter = FilterType.getViaText((String) ComboBoxAddresseeType.getSelectedItem());      
+        worker = new Thread(() ->
         {
-            case ALL:
-                addressees = FilterHelper.allNations();        
-                break;
-                
-            case DELEGATES_EXCL:
-                add = false;
-            case DELEGATES_INCL:
-                addressees = FilterHelper.delegates();
-                break;
-                
-            case DELEGATES_NEW:
-                addressees = FilterHelper.newDelegates();
-                break;
-                
-            case NATIONS_EXCL:
-                add = false;
-            case NATIONS_INCL:
-                addressees = stringToStringList(TextFieldAddresseeVar.getText());
-                type += ": " + addressees;
-                break;
-                
-            case NATIONS_NEW:
-                addressees = FilterHelper.newNations();
-                break;
-                
-            case NATIONS_REFOUNDED:
-                addressees = FilterHelper.refoundedNations();
-                break;
-                
-            case REGIONS_EXCL:
-                add = false;
-            case REGIONS_INCL:
-                List<String> regions = stringToStringList(TextFieldAddresseeVar.getText());               
-                addressees = FilterHelper.nationsInRegions(regions);
-                type += ": " + regions;
-                break;
-                
-            case REGIONS_WITH_TAGS_EXCL:
-                add = false;
-            case REGIONS_WITH_TAGS_INCL:
-                List<String> tags = stringToStringList(TextFieldAddresseeVar.getText());
-                addressees = FilterHelper.nationsInRegionsWithTags(tags);
-                type += ": " + tags;
-                break;
-                
-            case REGIONS_WO_TAGS_EXCL:
-                add = false;
-            case REGIONS_WO_TAGS_INCL:
-                tags = stringToStringList(TextFieldAddresseeVar.getText());
-                addressees = FilterHelper.nationsInRegionsWithoutTags(tags);
-                type += ": " + tags;
-                break;
-                
-            case WA_MEMBERS_EXCL:
-                add = false;
-            case WA_MEMBERS_INCL:
-                addressees = FilterHelper.worldAssemblyMembers();
-                break;
-                
-            default:
-                return;
-        }
-        
-        // Add/remove addressees from telegram manager, and set the addressees
-        // listbox model to reflect the new addressees.
-        if (add)
-        {
-            tm.addAddressees(addressees); 
-        }
-        else
-        {
-            tm.removeAddressees(addressees); 
-        }
-        model.addElement(type);
-        
-        // Calculate estimated duration to send telegrams, then set it to output.
-        TextOutput.setText(duration());
+            List<String> addressees;
+            boolean add = true; // if true, add. if false, remove.
+            String type = filter.getText();
+            
+            // Set above variables according to addressees type selected.
+            switch (filter)
+            {
+                case ALL:
+                    addressees = FilterHelper.allNations();        
+                    break;
+
+                case DELEGATES_EXCL:
+                    add = false;
+                case DELEGATES_INCL:
+                    addressees = FilterHelper.delegates();
+                    break;
+
+                case DELEGATES_NEW:
+                    addressees = FilterHelper.newDelegates();
+                    break;
+
+                case NATIONS_EXCL:
+                    add = false;
+                case NATIONS_INCL:
+                    addressees = stringToStringList(TextFieldAddresseeVar.getText());
+                    type += ": " + addressees;
+                    break;
+
+                case NATIONS_NEW:
+                    addressees = FilterHelper.newNations();
+                    break;
+
+                case NATIONS_REFOUNDED:
+                    addressees = FilterHelper.refoundedNations();
+                    break;
+
+                case REGIONS_EXCL:
+                    add = false;
+                case REGIONS_INCL:
+                    List<String> regions = stringToStringList(TextFieldAddresseeVar.getText());               
+                    addressees = FilterHelper.nationsInRegions(regions);
+                    type += ": " + regions;
+                    break;
+
+                case REGIONS_WITH_TAGS_EXCL:
+                    add = false;
+                case REGIONS_WITH_TAGS_INCL:
+                    List<String> tags = stringToStringList(TextFieldAddresseeVar.getText());
+                    addressees = FilterHelper.nationsInRegionsWithTags(tags);
+                    type += ": " + tags;
+                    break;
+
+                case REGIONS_WO_TAGS_EXCL:
+                    add = false;
+                case REGIONS_WO_TAGS_INCL:
+                    tags = stringToStringList(TextFieldAddresseeVar.getText());
+                    addressees = FilterHelper.nationsInRegionsWithoutTags(tags);
+                    type += ": " + tags;
+                    break;
+
+                case WA_MEMBERS_EXCL:
+                    add = false;
+                case WA_MEMBERS_INCL:
+                    addressees = FilterHelper.worldAssemblyMembers();
+                    break;
+
+                default:
+                    return;
+            }
+
+            // Add/remove addressees from telegram manager, and set the addressees
+            // listbox model to reflect the new addressees.
+            if (add)
+            {
+                tm.addAddressees(addressees); 
+            }
+            else
+            {
+                tm.removeAddressees(addressees); 
+            }
+            
+            // Update GUI.
+            final String finalType = type;
+            SwingUtilities.invokeLater(() ->
+            {
+                model.addElement(finalType);
+                // Calculate estimated duration to send telegrams, then set it to output.
+                TextOutput.setText(duration());
+                ButtonAddAddressee.setEnabled(true);
+            });
+        });
+        worker.start();
     }//GEN-LAST:event_ButtonAddAddresseeActionPerformed
 
     /**
