@@ -91,6 +91,18 @@ public class FilterHelper
     }
     
     /**
+     * Gives all nations that have recently been ejected from a region.
+     * 
+     * @return 
+     */
+    public static List<String> ejectedNations()
+    {
+        final World w = NSAPI.world(WorldShard.Happenings)
+                .happeningsFilter(HapFilter.eject).execute();
+        return filterHappenings(w.Happenings, "ejected");
+    }
+    
+    /**
      * Returns a list of new nations.
      * 
      * @return a list of new nations

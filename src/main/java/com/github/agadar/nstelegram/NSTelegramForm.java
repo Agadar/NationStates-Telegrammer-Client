@@ -546,6 +546,10 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
                 case NATIONS_REFOUNDED:
                     addressees = FilterHelper.refoundedNations();
                     break;
+                    
+                case NATIONS_EJECTED:
+                    addressees = FilterHelper.ejectedNations();
+                    break;
 
                 case REGIONS_EXCL:
                     add = false;
