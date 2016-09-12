@@ -422,7 +422,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         // If no addressees were selected, make it known and cancel.
         if (tm.numberOfAddressees() == 0)
         {
-            TextOutput.setText("Please supply at least one addressee!");
+            TextOutput.setText("Please apply at least one filter!");
             return;
         }
         

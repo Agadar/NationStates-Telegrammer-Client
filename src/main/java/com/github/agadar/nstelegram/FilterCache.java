@@ -2,7 +2,6 @@ package com.github.agadar.nstelegram;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,8 +13,8 @@ import java.util.Set;
 public class FilterCache 
 {
     private final Map<String, Set<String>> NationsToRegions;       // nations mapped to regions
-    private final Map<String, Set<String>> RegionsToTagsWith;      // regions mapped to tags they have
-    private final Map<String, Set<String>> RegionsToTagsWithout;   // regions mapped to tags they don't have
+    private final Map<Set<String>, Set<String>> RegionsToTagsWith;      // regions mapped to tags they have
+    private final Map<Set<String>, Set<String>> RegionsToTagsWithout;   // regions mapped to tags they don't have
     private final Set<String> Delegates;   // world assembly delegates
     private final Set<String> WaMembers;   // world assembly members
     private final Set<String> All;         // all nations
@@ -60,37 +59,39 @@ public class FilterCache
      */
     public void mapRegionsToTagsWith(Set<String> tags, Set<String> regions)
     {
-        for (String tag : tags)
-        {
-            final Set<String> regionsInTag = RegionsToTagsWith.get(tag);
-            
-            if (regionsInTag == null)
-            {
-                RegionsToTagsWith.put(tag, regions);
-            }
-            else
-            {
-                regionsInTag.addAll(regions);
-            }
-            
-            
-        }
-    }
-    
-    public List<String> getRegionsToTagsWith(Set<String> tags)
-    {
-        return null;
+        RegionsToTagsWith.put(tags, regions);
     }
     
     /**
-     * Maps regions to a tag those regions do NOT have.
+     * Gets regions that have the supplied tags.
      * 
-     * @param tag
+     * @param tags
+     * @return 
+     */
+    public Set<String> getRegionsToTagsWith(Set<String> tags)
+    {
+        return RegionsToTagsWith.get(tags);
+    }
+    
+    /**
+     * Maps regions to tags those regions DO NOT have.
+     * 
+     * @param tags
      * @param regions 
      */
-    public void mapRegionsToTagsWithout(String tag, Set<String> regions)
+    public void mapRegionsToTagsWithout(Set<String> tags, Set<String> regions)
     {
-        RegionsToTagsWithout.put(tag, regions);
+        RegionsToTagsWithout.put(tags, regions);
     }
    
+    /**
+     * Gets regions that DO NOT have the supplied tags.
+     * 
+     * @param tags
+     * @return 
+     */
+    public Set<String> getRegionsToTagsWithout(Set<String> tags)
+    {
+        return RegionsToTagsWithout.get(tags);
+    }
 }

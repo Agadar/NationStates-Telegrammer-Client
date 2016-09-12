@@ -10,9 +10,7 @@ import com.github.agadar.nsapi.enums.HapFilter;
 import com.github.agadar.nsapi.enums.shard.RegionShard;
 import com.github.agadar.nsapi.enums.shard.WAShard;
 import com.github.agadar.nsapi.enums.shard.WorldShard;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,7 +49,7 @@ public class FilterHelper
                 final Region r = NSAPI.region(region)
                         .shards(RegionShard.NationNames).execute();
                 
-                if (r.NationNames == null)
+                if (r == null || r.NationNames == null)
                 {
                     CACHE.mapNationsToRegion(region, new HashSet<>());
                 }
@@ -79,17 +77,32 @@ public class FilterHelper
      */
     public static Set<String> nationsInRegionsWithTags(Set<String> tags)
     {
-        final World w = NSAPI.world(WorldShard.RegionsByTag).regionsWithTags(
-                tags.toArray(new String[tags.size()])).execute();
-        
-        // This check need be done because when no regions are found, the API
-        // nevertheless sends back one empty string.
-        if (w.RegionsByTag().size() != 1 || !w.RegionsByTag().get(0).isEmpty())
+        // Check if cache already contains the values.
+        Set<String> regions = CACHE.getRegionsToTagsWith(tags);
+
+        // If not, make an API call and add the values to the cache.
+        if (regions == null)
         {
-            return nationsInRegions(new HashSet<>(w.RegionsByTag()));
+            final World w = NSAPI.world(WorldShard.RegionsByTag).regionsWithTags(
+                tags.toArray(new String[tags.size()])).execute();
+
+            // This check need be done because when no regions are found, the API
+            // nevertheless sends back one empty string.
+            if (w != null && w.RegionsByTag() != null && (w.RegionsByTag().size() != 1 || 
+                    !w.RegionsByTag().get(0).isEmpty()))
+            {
+                regions = new HashSet<>(w.RegionsByTag());
+            }
+            else
+            {
+                regions = new HashSet<>();
+            }
+            
+            CACHE.mapRegionsToTagsWith(tags, regions);
         }
         
-        return new HashSet<>();
+        // Find corresponding nations and return.
+        return nationsInRegions(regions);
     }
     
     /**
@@ -100,17 +113,32 @@ public class FilterHelper
      */
     public static Set<String> nationsInRegionsWithoutTags(Set<String> tags)
     {
-        final World w = NSAPI.world(WorldShard.RegionsByTag).regionsWithoutTags(
-                tags.toArray(new String[tags.size()])).execute();
-        
-        // This check need be done because when no regions are found, the API
-        // nevertheless sends back one empty string.
-        if (w.RegionsByTag().size() != 1 || !w.RegionsByTag().get(0).isEmpty())
+        // Check if cache already contains the values.
+        Set<String> regions = CACHE.getRegionsToTagsWithout(tags);
+
+        // If not, make an API call and add the values to the cache.
+        if (regions == null)
         {
-            return nationsInRegions(new HashSet<>(w.RegionsByTag()));
+            final World w = NSAPI.world(WorldShard.RegionsByTag).regionsWithoutTags(
+                tags.toArray(new String[tags.size()])).execute();
+
+            // This check need be done because when no regions are found, the API
+            // nevertheless sends back one empty string.
+            if (w != null && w.RegionsByTag() != null && (w.RegionsByTag().size() != 1 || 
+                    !w.RegionsByTag().get(0).isEmpty()))
+            {
+                regions = new HashSet<>(w.RegionsByTag());
+            }
+            else
+            {
+                regions = new HashSet<>();
+            }
+            
+            CACHE.mapRegionsToTagsWithout(tags, regions);
         }
         
-        return new HashSet<>();
+        // Find corresponding nations and return.
+        return nationsInRegions(regions);
     }
     
     /**
