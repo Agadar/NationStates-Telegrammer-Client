@@ -17,14 +17,15 @@ import java.util.Set;
  */
 public final class TelegramManager 
 {
-    public final static TelegramManager Instance = new TelegramManager(); // Singleton public instance.
+    // User agent string for formatting.
+    private final static String USER_AGENT = "Agadar's Telegrammer using Client "
+            + "Key '%s' (https://github.com/Agadar/NationStates-Telegrammer)";
     
-    private final static String USER_AGENT = "Agadar's Telegrammer using Client Key '%s' (https://github.com/Agadar/NationStates-Telegrammer)";
     private final List<Filter> Filters = new ArrayList<>(); // The filters to apply in chronological order.
     private final Set<String> Addressees = new HashSet<>(); // Presumably most up-to-date addressees list, based on Steps.
     private Thread telegramThread; // The thread on which the TelegramQuery is running.
     
-    private TelegramManager() 
+    public TelegramManager() 
     {
         // Set user agent for the first time.
         NSAPI.setUserAgent("Agadar's Telegrammer (https://github.com/Agadar/NationStates-Telegrammer)");

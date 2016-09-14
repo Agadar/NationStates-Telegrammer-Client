@@ -17,11 +17,9 @@ import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
 import java.awt.event.ItemEvent;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,29 +37,25 @@ import javax.swing.text.DefaultCaret;
  */
 public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentListener
 {
-    // Form title.
-    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.1.0";
-    // Key values etc. for this application's properties.
-    private final static String CLIENT_KEY = "clientKey";
-    private final static String TELEGRAM_ID = "telegramId";
-    private final static String SECRET_KEY = "secretKey";
-    private final static String IS_RECRUITMENT = "isRecruitment";
-    // Short reference to telegram manager.
-    private final TelegramManager tm = TelegramManager.Instance;
+    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.1.0"; // Form title.
+    
+    private final TelegramManager tm = new TelegramManager(); // Manages sending telegrams.
     private Thread worker;  // Thread used for compiling address lists.
     
     public NSTelegramForm()
     {
         initComponents();
+        
         // Sets the output textarea such that it auto-scrolls down.
         ((DefaultCaret) TextOutput.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         
         // Set fields according to values retrieved from properties file.
-        Properties props = PropertiesHelper.loadProperties();
-        TxtFieldClientKey.setText(props.getProperty(CLIENT_KEY));
-        TxtFieldTelegramId.setText(props.getProperty(TELEGRAM_ID));
-        TxtFieldSecretKey.setText(props.getProperty(SECRET_KEY));
-        RadioBtnRecruitment.setSelected(Boolean.valueOf(props.getProperty(IS_RECRUITMENT)));
+        final PropertiesManager ph = new PropertiesManager();
+        ph.loadProperties();
+        TxtFieldClientKey.setText(ph.ClientKey);
+        TxtFieldTelegramId.setText(ph.TelegramId);
+        TxtFieldSecretKey.setText(ph.SecretKey);
+        RadioBtnRecruitment.setSelected(ph.IsRecruitment);
         
         // Set output textarea, for consistency's sake.
         TextOutput.setText(duration());
@@ -643,12 +637,12 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     private void formWindowClosing(java.awt.event.WindowEvent evt)//GEN-FIRST:event_formWindowClosing
     {//GEN-HEADEREND:event_formWindowClosing
         // Store relevant variables to properties file.
-        Properties props = new Properties();
-        props.setProperty(CLIENT_KEY, TxtFieldClientKey.getText());
-        props.setProperty(TELEGRAM_ID, TxtFieldTelegramId.getText());
-        props.setProperty(SECRET_KEY, TxtFieldSecretKey.getText());
-        props.setProperty(IS_RECRUITMENT, Boolean.toString(RadioBtnRecruitment.isSelected()));
-        PropertiesHelper.saveProperties(props);
+        final PropertiesManager ph = new PropertiesManager();
+        ph.ClientKey = TxtFieldClientKey.getText();
+        ph.TelegramId = TxtFieldTelegramId.getText();
+        ph.SecretKey = TxtFieldSecretKey.getText();
+        ph.IsRecruitment = RadioBtnRecruitment.isSelected();
+        ph.saveProperties();
     }//GEN-LAST:event_formWindowClosing
 
     /**
