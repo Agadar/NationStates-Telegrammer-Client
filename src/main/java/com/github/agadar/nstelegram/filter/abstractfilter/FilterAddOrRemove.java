@@ -1,4 +1,4 @@
-package com.github.agadar.nstelegram.filter;
+package com.github.agadar.nstelegram.filter.abstractfilter;
 
 import java.util.Set;
 
@@ -9,7 +9,7 @@ import java.util.Set;
  * 
  * @author Agadar <https://github.com/Agadar/>
  */
-public abstract class FilterAddOrRemove extends FilterAbstract
+public abstract class FilterAddOrRemove extends Filter
 {
     /** 
      * Whether to add (true) or remove (false) this filter's nations to/from
@@ -24,9 +24,10 @@ public abstract class FilterAddOrRemove extends FilterAbstract
     }
 
     @Override
-    public void applyFilter(Set<String> nations)
+    public void applyFilter(Set<String> nations, boolean localCacheOnly)
     {
-        LocalCache = retrieveNations();
+        if (!localCacheOnly)
+            LocalCache = retrieveNations();
         
         if (Add)
             nations.addAll(LocalCache);

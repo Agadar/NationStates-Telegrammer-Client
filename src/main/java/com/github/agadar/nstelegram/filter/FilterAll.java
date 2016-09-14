@@ -1,5 +1,6 @@
 package com.github.agadar.nstelegram.filter;
 
+import com.github.agadar.nstelegram.filter.abstractfilter.FilterAdd;
 import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nsapi.domain.world.World;
 import com.github.agadar.nsapi.enums.shard.WorldShard;

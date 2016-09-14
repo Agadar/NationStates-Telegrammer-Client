@@ -1,4 +1,4 @@
-package com.github.agadar.nstelegram.filter;
+package com.github.agadar.nstelegram.filter.abstractfilter;
 
 import com.github.agadar.nstelegram.FilterCache;
 import java.util.Set;
@@ -8,7 +8,7 @@ import java.util.Set;
  * 
  * @author Agadar <https://github.com/Agadar/>
  */
-public abstract class FilterAbstract 
+public abstract class Filter 
 {
     /** The cache that is to be used by all child filters. */
     protected final static FilterCache GlobalCache = new FilterCache();
@@ -21,8 +21,11 @@ public abstract class FilterAbstract
      * adding nations according to this filter's rules.
      * 
      * @param nations 
+     * @param localCacheOnly if true, explicitly uses the local cache for returning
+     * this filter's nations list instead of using the global cache, daily dump file,
+     * or calls to the server.
      */
-    public abstract void applyFilter(Set<String> nations);
+    public abstract void applyFilter(Set<String> nations, boolean localCacheOnly);
     
     /**
      * Accesses either the local cache, the global cache, a daily dump file, 

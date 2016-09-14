@@ -4,6 +4,7 @@ import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nsapi.NationStatesAPIException;
 import com.github.agadar.nsapi.event.TelegramSentListener;
 import com.github.agadar.nsapi.query.TelegramQuery;
+import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,9 +20,9 @@ public final class TelegramManager
     public final static TelegramManager Instance = new TelegramManager(); // Singleton public instance.
     
     private final static String USER_AGENT = "Agadar's Telegrammer using Client Key '%s' (https://github.com/Agadar/NationStates-Telegrammer)";
-    private final List<Tuple<Boolean, Set<String>>> Steps = new ArrayList<>(); // List of steps. True = add, false = remove.
+    private final List<Filter> Filters = new ArrayList<>(); // The filters to apply in chronological order.
     private final Set<String> Addressees = new HashSet<>(); // Presumably most up-to-date addressees list, based on Steps.
-    private Thread telegramThread; // The thread on which the TelegramQuery is running on.
+    private Thread telegramThread; // The thread on which the TelegramQuery is running.
     
     private TelegramManager() 
     {
@@ -30,34 +31,23 @@ public final class TelegramManager
     }
     
     /**
-     * Resets the address list.
+     * Resets the filters.
      */
-    public void resetAddressees()
+    public void resetFilters()
     {
-        Steps.clear();
-        updateAddressees();
+        Filters.clear();
+        Addressees.clear();
     }
     
     /**
-     * Adds new addressees to the address list.
+     * Adds new filter.
      * 
-     * @param addressees 
+     * @param filter
      */
-    public void addAddressees(Set<String> addressees)
+    public void addFilter(Filter filter)
     {
-        Steps.add(new Tuple(true, addressees));
-        updateAddressees();
-    }
-    
-    /**
-     * Removes addressees from the address list.
-     * 
-     * @param addressees 
-     */
-    public void removeAddressees(Set<String> addressees)
-    {
-        Steps.add(new Tuple(false, addressees));
-        updateAddressees();
+        Filters.add(filter);
+        filter.applyFilter(Addressees, false);
     }
     
     /**
@@ -71,14 +61,15 @@ public final class TelegramManager
     }
     
     /**
-     * Removes the step with the given index.
+     * Removes the filter with the given index.
      * 
      * @param index 
      */
-    public void removeStep(int index)
+    public void removeFilterAt(int index)
     {
-        Steps.remove(index);
-        updateAddressees();
+        Filters.remove(index);
+        Addressees.clear();
+        Filters.forEach((filter) -> { filter.applyFilter(Addressees, true); });
     }
     
     /**
@@ -129,25 +120,5 @@ public final class TelegramManager
         {
             telegramThread.interrupt();
         }
-    }
-    
-    /**
-     * Updates the addressees list according to the supplied steps.
-     */
-    private void updateAddressees()
-    {
-        Addressees.clear();
-        
-        Steps.stream().forEach((step) ->
-        {
-            if (step.x)
-            {
-                Addressees.addAll(step.y);
-            }
-            else
-            {
-                Addressees.removeAll(step.y);
-            }
-        });
     }
 }

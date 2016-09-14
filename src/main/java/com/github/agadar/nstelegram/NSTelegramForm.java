@@ -2,6 +2,18 @@ package com.github.agadar.nstelegram;
 
 import com.github.agadar.nsapi.event.TelegramSentEvent;
 import com.github.agadar.nsapi.event.TelegramSentListener;
+import com.github.agadar.nstelegram.filter.FilterAll;
+import com.github.agadar.nstelegram.filter.FilterDelegates;
+import com.github.agadar.nstelegram.filter.FilterDelegatesNew;
+import com.github.agadar.nstelegram.filter.FilterNations;
+import com.github.agadar.nstelegram.filter.FilterNationsEjected;
+import com.github.agadar.nstelegram.filter.FilterNationsNew;
+import com.github.agadar.nstelegram.filter.FilterNationsRefounded;
+import com.github.agadar.nstelegram.filter.FilterRegions;
+import com.github.agadar.nstelegram.filter.FilterRegionsWithTags;
+import com.github.agadar.nstelegram.filter.FilterRegionsWithoutTags;
+import com.github.agadar.nstelegram.filter.FilterWAMembers;
+import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
 import java.awt.event.ItemEvent;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -508,101 +520,95 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     {//GEN-HEADEREND:event_ButtonAddAddresseeActionPerformed
         TextOutput.setText("Compiling address list...");    // Inform user, as this might take a while.
         ButtonAddAddressee.setEnabled(false);
+        final FilterType filter = FilterType.getViaText((String) ComboBoxAddresseeType.getSelectedItem());  
         
-        final DefaultListModel model = ((DefaultListModel)ListAddressees.getModel());
-        final FilterType filter = FilterType.getViaText((String) ComboBoxAddresseeType.getSelectedItem());      
         worker = new Thread(() ->
         {
-            Set<String> addressees;
-            boolean add = true; // if true, add. if false, remove.
-            String type = filter.getText();
+            String type = filter.getText(); // Used for the text in the visual filter list.
+            Set<String> addressees = null;  // Declared here as multiple cases need a string set.
+            Filter f = null;    // The filter to add to the telegram manager.
             
             // Set above variables according to addressees type selected.
             switch (filter)
             {
                 case ALL:
-                    addressees = FilterHelper.allNations();        
+                    f = new FilterAll();       
                     break;
-
                 case DELEGATES_EXCL:
-                    add = false;
+                    f = new FilterDelegates(false);
+                    break;
                 case DELEGATES_INCL:
-                    addressees = FilterHelper.delegates();
+                    f = new FilterDelegates(true);
                     break;
-
                 case DELEGATES_NEW:
-                    addressees = FilterHelper.newDelegates();
+                    f = new FilterDelegatesNew();
                     break;
-
                 case NATIONS_EXCL:
-                    add = false;
-                case NATIONS_INCL:
                     addressees = stringToStringList(TextFieldAddresseeVar.getText());
+                    f = new FilterNations(addressees, false);
                     type += ": " + addressees;
                     break;
-
+                case NATIONS_INCL:
+                    addressees = stringToStringList(TextFieldAddresseeVar.getText());
+                    f = new FilterNations(addressees, true);
+                    type += ": " + addressees;
+                    break;
                 case NATIONS_NEW:
-                    addressees = FilterHelper.newNations();
+                    f = new FilterNationsNew();
                     break;
-
                 case NATIONS_REFOUNDED:
-                    addressees = FilterHelper.refoundedNations();
-                    break;
-                    
+                    f = new FilterNationsRefounded();
+                    break;                  
                 case NATIONS_EJECTED:
-                    addressees = FilterHelper.ejectedNations();
+                    f = new FilterNationsEjected();
                     break;
-
                 case REGIONS_EXCL:
-                    add = false;
+                    addressees = stringToStringList(TextFieldAddresseeVar.getText());
+                    f = new FilterRegions(addressees, false);
+                    type += ": " + addressees;
+                    break;
                 case REGIONS_INCL:
-                    Set<String> regions = stringToStringList(TextFieldAddresseeVar.getText());               
-                    addressees = FilterHelper.nationsInRegions(regions);
-                    type += ": " + regions;
+                    addressees = stringToStringList(TextFieldAddresseeVar.getText());
+                    f = new FilterRegions(addressees, true);
+                    type += ": " + addressees;
                     break;
-
                 case REGIONS_WITH_TAGS_EXCL:
-                    add = false;
+                    addressees = stringToStringList(TextFieldAddresseeVar.getText());
+                    f = new FilterRegionsWithTags(addressees, false);
+                    type += ": " + addressees;
+                    break;
                 case REGIONS_WITH_TAGS_INCL:
-                    Set<String> tags = stringToStringList(TextFieldAddresseeVar.getText());
-                    addressees = FilterHelper.nationsInRegionsWithTags(tags);
-                    type += ": " + tags;
+                    addressees = stringToStringList(TextFieldAddresseeVar.getText());
+                    f = new FilterRegionsWithTags(addressees, true);
+                    type += ": " + addressees;
                     break;
-
                 case REGIONS_WO_TAGS_EXCL:
-                    add = false;
+                    addressees = stringToStringList(TextFieldAddresseeVar.getText());
+                    f = new FilterRegionsWithoutTags(addressees, false);
+                    type += ": " + addressees;
+                    break;
                 case REGIONS_WO_TAGS_INCL:
-                    tags = stringToStringList(TextFieldAddresseeVar.getText());
-                    addressees = FilterHelper.nationsInRegionsWithoutTags(tags);
-                    type += ": " + tags;
+                    addressees = stringToStringList(TextFieldAddresseeVar.getText());
+                    f = new FilterRegionsWithoutTags(addressees, true);
+                    type += ": " + addressees;
                     break;
-
                 case WA_MEMBERS_EXCL:
-                    add = false;
-                case WA_MEMBERS_INCL:
-                    addressees = FilterHelper.worldAssemblyMembers();
+                    f = new FilterWAMembers(false);
                     break;
-
+                case WA_MEMBERS_INCL:
+                    f = new FilterWAMembers(true);
+                    break;
                 default:
                     return;
             }
-
-            // Add/remove addressees from telegram manager, and set the addressees
-            // listbox model to reflect the new addressees.
-            if (add)
-            {
-                tm.addAddressees(addressees); 
-            }
-            else
-            {
-                tm.removeAddressees(addressees); 
-            }
             
-            // Update GUI.
+            // Update telegram manager and GUI.
+            tm.addFilter(f);
             final String finalType = type;
+            
             SwingUtilities.invokeLater(() ->
             {
-                model.addElement(finalType);
+                ((DefaultListModel)ListAddressees.getModel()).addElement(finalType);
                 // Calculate estimated duration to send telegrams, then set it to output.
                 TextOutput.setText(duration());
                 ButtonAddAddressee.setEnabled(true);
@@ -620,7 +626,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     private void ButtonRemoveAddresseeActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_ButtonRemoveAddresseeActionPerformed
     {//GEN-HEADEREND:event_ButtonRemoveAddresseeActionPerformed
         int index = ListAddressees.getSelectedIndex();
-        tm.removeStep(index);
+        tm.removeFilterAt(index);
         ((DefaultListModel)ListAddressees.getModel()).remove(index);
         
         ButtonRemoveAddressee.setEnabled(false);

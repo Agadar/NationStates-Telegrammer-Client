@@ -1,4 +1,4 @@
-package com.github.agadar.nstelegram.filter;
+package com.github.agadar.nstelegram.filter.abstractfilter;
 
 import com.github.agadar.nsapi.domain.shared.Happening;
 import java.util.HashSet;
@@ -17,14 +17,21 @@ public abstract class FilterHappenings extends FilterAdd
     private final static Pattern PATTERN = Pattern.compile("\\@\\@(.*?)\\@\\@");
     
     /** 
-     * The keyword used for finding the correct happenings in a list of happenings,
-     * e.g. 'became', 'refounded', 'rejected'.
+     * The keyword used for finding the correct happenings in a list of happenings.
      */
-    private final String KeyWord;
-    
-    public FilterHappenings(Set<Happening> happenings, String keyWord)
+    public enum KeyWord
     {
-        this.KeyWord = keyWord;
+        became,     // new delegates
+        refounded,  // refounded nations
+        ejected     // ejected nations
+    }
+    
+    /** This instance's keyword. */
+    private final KeyWord MyKeyWord;
+    
+    public FilterHappenings(KeyWord keyWord)
+    {
+        this.MyKeyWord = keyWord;     
     }
     
     /**
@@ -40,7 +47,7 @@ public abstract class FilterHappenings extends FilterAdd
         
         happenings.forEach(h -> 
         {
-            if (h.Description.contains(KeyWord))
+            if (h.Description.contains(MyKeyWord.toString()))
             {
                 final Matcher matcher = PATTERN.matcher(h.Description);
                 

@@ -10,12 +10,12 @@ import java.util.Map;
  */
 public enum FilterType
 {
-    ALL("All"),//
-    DELEGATES_INCL("Delegates (include)"),//
-    DELEGATES_EXCL("Delegates (exclude)"),//
+    ALL("All"),
+    DELEGATES_INCL("Delegates (include)"),
+    DELEGATES_EXCL("Delegates (exclude)"),
     DELEGATES_NEW("Delegates (new)"),
-    NATIONS_INCL("Nations (include)"),//
-    NATIONS_EXCL("Nations (exclude)"),//
+    NATIONS_INCL("Nations (include)"),
+    NATIONS_EXCL("Nations (exclude)"),
     NATIONS_NEW("Nations (new)"),
     NATIONS_REFOUNDED("Nations (refounded)"),
     NATIONS_EJECTED("Nations (ejected)"),

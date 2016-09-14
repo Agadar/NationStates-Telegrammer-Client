@@ -1,5 +1,6 @@
 package com.github.agadar.nstelegram.filter;
 
+import com.github.agadar.nstelegram.filter.abstractfilter.FilterAddOrRemove;
 import java.util.Set;
 
 /**
