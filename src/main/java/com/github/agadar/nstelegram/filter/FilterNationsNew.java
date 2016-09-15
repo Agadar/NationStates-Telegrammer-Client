@@ -22,7 +22,6 @@ public class FilterNationsNew extends FilterAdd
         
         // Properly set the local and global caches.
         LocalCache = new HashSet<>(w.NewestNations);
-        GlobalCache.updateNationsNew(LocalCache); 
         return LocalCache;
     }
 }

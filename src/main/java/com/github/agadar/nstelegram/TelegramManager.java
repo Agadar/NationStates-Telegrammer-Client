@@ -2,20 +2,23 @@ package com.github.agadar.nstelegram;
 
 import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nsapi.NationStatesAPIException;
+import com.github.agadar.nsapi.event.TelegramSentEvent;
 import com.github.agadar.nsapi.event.TelegramSentListener;
 import com.github.agadar.nsapi.query.TelegramQuery;
 import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages the addressees list and sending telegrams to the former.
  * 
  * @author Agadar <https://github.com/Agadar/>
  */
-public final class TelegramManager 
+public final class TelegramManager implements TelegramSentListener
 {
     // User agent string for formatting.
     private final static String USER_AGENT = "Agadar's Telegrammer using Client "
@@ -23,6 +26,7 @@ public final class TelegramManager
     
     private final List<Filter> Filters = new ArrayList<>(); // The filters to apply in chronological order.
     private final Set<String> Addressees = new HashSet<>(); // Presumably most up-to-date addressees list, based on Steps.
+    private final Map<String, Set<String>> History = new ConcurrentHashMap<>();   // History of recipients, mapped to telegram id's.
     private Thread telegramThread; // The thread on which the TelegramQuery is running.
     
     // Variables that will be used for sending the telegrams. Should be manually
@@ -39,12 +43,13 @@ public final class TelegramManager
     }
     
     /**
-     * Resets the filters.
+     * Refreshes the filters.
      */
-    public void resetFilters()
+    public void refreshFilters()
     {
-        Filters.clear();
         Addressees.clear();
+        Filters.forEach((filter) -> { filter.applyFilter(Addressees, true); });
+        removeOldRecipients();
     }
     
     /**
@@ -56,6 +61,7 @@ public final class TelegramManager
     {
         Filters.add(filter);
         filter.applyFilter(Addressees, false);
+        refreshFilters();
     }
     
     /**
@@ -76,8 +82,7 @@ public final class TelegramManager
     public void removeFilterAt(int index)
     {
         Filters.remove(index);
-        Addressees.clear();
-        Filters.forEach((filter) -> { filter.applyFilter(Addressees, true); });
+        refreshFilters();
     }
     
     /**
@@ -98,12 +103,13 @@ public final class TelegramManager
         if (numberOfAddressees() == 0)
             throw new IllegalArgumentException("Please supply at least one recipient!"); 
 
-        // Update user agent.
-        NSAPI.setUserAgent(String.format(USER_AGENT, ClientKey));
+        NSAPI.setUserAgent(String.format(USER_AGENT, ClientKey)); // Update user agent.
 
-        // Prepare TelegramQuery.
+        // Prepare TelegramQuery, start by applying and updating History map.
+        removeOldRecipients();              
         final TelegramQuery q = NSAPI.telegram(ClientKey, TelegramId, SecretKey, 
-                Addressees.toArray(new String[Addressees.size()])).addListeners(listeners);
+                Addressees.toArray(new String[Addressees.size()]))
+                .addListeners(listeners).addListeners(this);
         
         if (SendAsRecruitment)
         {
@@ -122,7 +128,7 @@ public final class TelegramManager
                 // Ignore error.
             }
         });       
-        //telegramThread.start();
+        telegramThread.start();
     }
     
     /**
@@ -133,6 +139,43 @@ public final class TelegramManager
         if (telegramThread != null)
         {
             telegramThread.interrupt();
+            refreshFilters();
         }
+    }
+    
+    /**
+     * Removes old recipients from Addressees. Called right before executing
+     * the Telegram Query.
+     */
+    private void removeOldRecipients()
+    {
+        Set<String> oldRecipients = History.get(TelegramId);
+        
+        if (oldRecipients == null)
+        {
+            oldRecipients = new HashSet<>();
+            History.put(TelegramId, oldRecipients);
+        }
+        
+        for (String oldRecipient : oldRecipients)
+        {
+            Addressees.remove(oldRecipient);
+        }
+    }
+    
+    @Override
+    public void handleTelegramSent(TelegramSentEvent event)
+    {
+        // Update the History. We're assuming removeOldRecipients is always
+        // called before this and the Telegram Id didn't change in the meantime,
+        // so there is no need to make sure the entry for the current Telegram Id
+        // changed.
+        
+        if (event.Queued)
+            History.get(TelegramId).add(event.Addressee);
+        
+        // If this was the last telegram, then refresh the filters.
+        if (event.PositionInQuery + 1 == numberOfAddressees())
+            refreshFilters();
     }
 }

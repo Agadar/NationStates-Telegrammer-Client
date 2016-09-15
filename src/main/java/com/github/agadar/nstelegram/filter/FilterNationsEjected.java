@@ -1,10 +1,10 @@
 package com.github.agadar.nstelegram.filter;
 
-import com.github.agadar.nstelegram.filter.abstractfilter.FilterHappenings;
 import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nsapi.domain.world.World;
 import com.github.agadar.nsapi.enums.HapFilter;
 import com.github.agadar.nsapi.enums.shard.WorldShard;
+import com.github.agadar.nstelegram.filter.abstractfilter.FilterHappenings;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,8 +28,7 @@ public class FilterNationsEjected extends FilterHappenings
                 .happeningsFilter(HapFilter.eject).execute();
         
         // Derive ejected nations from happenings, and properly set the local and global caches.
-        LocalCache = this.filterHappenings(new HashSet<>(w.Happenings));
-        GlobalCache.updateNationsEjected(LocalCache);        
+        LocalCache = this.filterHappenings(new HashSet<>(w.Happenings));        
         return LocalCache;
     }
 }
