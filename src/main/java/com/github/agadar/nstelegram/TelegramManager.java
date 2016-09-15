@@ -35,6 +35,7 @@ public final class TelegramManager implements TelegramSentListener
     public String TelegramId;
     public String SecretKey;
     public boolean SendAsRecruitment;
+    public boolean IsLooping;
     
     public TelegramManager() 
     {

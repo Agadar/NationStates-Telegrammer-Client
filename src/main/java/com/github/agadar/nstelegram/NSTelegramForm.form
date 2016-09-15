@@ -39,15 +39,15 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="PanelAddressees" max="32767" attributes="0"/>
                   <Component id="PanelTelegram" max="32767" attributes="0"/>
+                  <Component id="PanelFilters" pref="273" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jPanel1" max="32767" attributes="0"/>
-                  <Component id="jPanel2" max="32767" attributes="0"/>
+                  <Component id="PanelActions" max="32767" attributes="0"/>
+                  <Component id="PanelOutput" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -55,16 +55,16 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+              <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <Component id="PanelTelegram" min="-2" max="-2" attributes="0"/>
+                      <Component id="PanelTelegram" min="-2" pref="185" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="PanelAddressees" min="-2" pref="234" max="-2" attributes="0"/>
+                      <Component id="PanelFilters" min="-2" pref="234" max="-2" attributes="0"/>
                   </Group>
-                  <Group type="102" attributes="0">
-                      <Component id="jPanel1" max="32767" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="PanelOutput" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
+                      <Component id="PanelActions" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
@@ -77,7 +77,9 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Telegram"/>
+            <TitledBorder title="Telegram">
+              <Font PropertyName="font" name="Tahoma" size="11" style="1"/>
+            </TitledBorder>
           </Border>
         </Property>
       </Properties>
@@ -85,40 +87,39 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
+              <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                      <Group type="102" alignment="1" attributes="0">
-                          <Component id="LabelTelegramId" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="TxtFieldTelegramId" min="-2" pref="150" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" alignment="1" attributes="0">
-                          <Component id="LabelClientKey" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="32767" attributes="0"/>
-                          <Component id="TxtFieldClientKey" min="-2" pref="150" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" alignment="1" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="LabelSecretKey" min="-2" max="-2" attributes="0"/>
-                              <Component id="LabelSendAs" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="32767" attributes="0"/>
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="RadioBtnNormal" min="-2" max="-2" attributes="0"/>
-                              <Component id="TxtFieldSecretKey" min="-2" pref="150" max="-2" attributes="0"/>
-                              <Component id="RadioBtnRecruitment" alignment="0" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="LabelRecruiting" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="LabelSecretKey" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="LabelTelegramId" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="LabelLoop" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="LabelClientKey" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="TxtFieldClientKey" min="-2" pref="150" max="-2" attributes="0"/>
+                      <Component id="TxtFieldTelegramId" alignment="0" min="-2" pref="150" max="-2" attributes="0"/>
+                      <Group type="102" attributes="0">
+                          <Component id="CheckBoxLoop" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                          <Component id="TextFieldFiller2" min="-2" pref="6" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="1" attributes="0">
+                          <Component id="CheckBoxRecruiting" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                          <Component id="TextFieldFiller1" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Component id="TxtFieldSecretKey" alignment="1" min="-2" pref="150" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace min="0" pref="22" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="LabelClientKey" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="TxtFieldClientKey" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -135,12 +136,17 @@
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="LabelSendAs" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="RadioBtnNormal" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="LabelRecruiting" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="TextFieldFiller1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="CheckBoxRecruiting" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="RadioBtnRecruitment" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="LabelLoop" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="TextFieldFiller2" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="CheckBoxLoop" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -189,23 +195,11 @@
             <Property name="name" type="java.lang.String" value="LabelClientKey" noResource="true"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="LabelSendAs">
+        <Component class="javax.swing.JLabel" name="LabelRecruiting">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Send as..."/>
-            <Property name="name" type="java.lang.String" value="LabelSendAs" noResource="true"/>
+            <Property name="text" type="java.lang.String" value="Recruiting:"/>
+            <Property name="name" type="java.lang.String" value="LabelRecruiting" noResource="true"/>
           </Properties>
-        </Component>
-        <Component class="javax.swing.JRadioButton" name="RadioBtnNormal">
-          <Properties>
-            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-              <ComponentRef name="BtnGrpTelegramType"/>
-            </Property>
-            <Property name="selected" type="boolean" value="true"/>
-            <Property name="text" type="java.lang.String" value="normal telegram"/>
-          </Properties>
-          <Events>
-            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="RadioBtnNormalItemStateChanged"/>
-          </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="TxtFieldClientKey">
           <Properties>
@@ -215,24 +209,63 @@
             <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="TxtFieldClientKeyKeyReleased"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JRadioButton" name="RadioBtnRecruitment">
+        <Component class="javax.swing.JLabel" name="LabelLoop">
           <Properties>
-            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-              <ComponentRef name="BtnGrpTelegramType"/>
+            <Property name="text" type="java.lang.String" value="Looping:"/>
+            <Property name="name" type="java.lang.String" value="LabelSendAs" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="TextFieldFiller2">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+            <Property name="enabled" type="boolean" value="false" postCode="TextFieldFiller2.setVisible(false);"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="name" type="java.lang.String" value="TxtFieldSecretKey" noResource="true"/>
+            <Property name="requestFocusEnabled" type="boolean" value="false"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="TextFieldFiller1">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+            <Property name="enabled" type="boolean" value="false" postCode="TextFieldFiller1.setVisible(false);"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="name" type="java.lang.String" value="TxtFieldSecretKey" noResource="true"/>
+            <Property name="requestFocusEnabled" type="boolean" value="false"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="CheckBoxLoop">
+          <Properties>
+            <Property name="text" type="java.lang.String" value=" "/>
+            <Property name="focusPainted" type="boolean" value="false"/>
+            <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+              <Insets value="[0, -1, 0, 2]"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="recruitment telegram"/>
           </Properties>
           <Events>
-            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="RadioBtnRecruitmentItemStateChanged"/>
+            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="CheckBoxLoopStateChanged"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="CheckBoxRecruiting">
+          <Properties>
+            <Property name="text" type="java.lang.String" value=" "/>
+            <Property name="focusPainted" type="boolean" value="false"/>
+            <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+              <Insets value="[0, -1, 0, 2]"/>
+            </Property>
+          </Properties>
+          <Events>
+            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="CheckBoxRecruitingStateChanged"/>
           </Events>
         </Component>
       </SubComponents>
     </Container>
-    <Container class="javax.swing.JPanel" name="PanelAddressees">
+    <Container class="javax.swing.JPanel" name="PanelFilters">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Filters"/>
+            <TitledBorder title="Filters">
+              <Font PropertyName="font" name="Tahoma" size="11" style="1"/>
+            </TitledBorder>
           </Border>
         </Property>
         <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -246,14 +279,14 @@
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="ComboBoxAddresseeType" max="32767" attributes="0"/>
-                      <Component id="ScrollPaneAddressees" pref="257" max="32767" attributes="0"/>
+                      <Component id="ComboBoxFilterType" max="32767" attributes="0"/>
+                      <Component id="ScrollPaneFilters" pref="0" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="ButtonRemoveAddressee" min="-2" pref="120" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="ButtonAddAddressee" pref="119" max="32767" attributes="0"/>
+                          <Component id="ButtonRemoveFilter" min="-2" pref="116" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="ButtonAddFilter" max="32767" attributes="0"/>
                       </Group>
-                      <Component id="TextFieldAddresseeVar" alignment="0" max="32767" attributes="0"/>
+                      <Component id="TextFieldFilterValues" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -263,15 +296,15 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="ScrollPaneAddressees" min="-2" pref="93" max="-2" attributes="0"/>
+                  <Component id="ScrollPaneFilters" min="-2" pref="93" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="ComboBoxAddresseeType" min="-2" max="-2" attributes="0"/>
+                  <Component id="ComboBoxFilterType" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="TextFieldAddresseeVar" min="-2" max="-2" attributes="0"/>
+                  <Component id="TextFieldFilterValues" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="ButtonRemoveAddressee" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="ButtonAddAddressee" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="ButtonRemoveFilter" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="ButtonAddFilter" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -279,9 +312,9 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Container class="javax.swing.JScrollPane" name="ScrollPaneAddressees">
+        <Container class="javax.swing.JScrollPane" name="ScrollPaneFilters">
           <Properties>
-            <Property name="name" type="java.lang.String" value="ScrollPaneAddressees" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="ScrollPaneFilters" noResource="true"/>
           </Properties>
           <AuxValues>
             <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
@@ -289,15 +322,15 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
           <SubComponents>
-            <Component class="javax.swing.JList" name="ListAddressees">
+            <Component class="javax.swing.JList" name="JListFilters">
               <Properties>
                 <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="new DefaultListModel()" type="code"/>
                 </Property>
-                <Property name="name" type="java.lang.String" value="ListAddressees" noResource="true"/>
+                <Property name="name" type="java.lang.String" value="JListFilters" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="valueChanged" listener="javax.swing.event.ListSelectionListener" parameters="javax.swing.event.ListSelectionEvent" handler="ListAddresseesValueChanged"/>
+                <EventHandler event="valueChanged" listener="javax.swing.event.ListSelectionListener" parameters="javax.swing.event.ListSelectionEvent" handler="JListFiltersValueChanged"/>
               </Events>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
@@ -305,52 +338,54 @@
             </Component>
           </SubComponents>
         </Container>
-        <Component class="javax.swing.JButton" name="ButtonRemoveAddressee">
+        <Component class="javax.swing.JButton" name="ButtonRemoveFilter">
           <Properties>
             <Property name="text" type="java.lang.String" value="Remove filter"/>
             <Property name="enabled" type="boolean" value="false"/>
-            <Property name="name" type="java.lang.String" value="ButtonRemoveAddressee" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="ButtonRemoveFilter" noResource="true"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ButtonRemoveAddresseeActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ButtonRemoveFilterActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JComboBox" name="ComboBoxAddresseeType">
+        <Component class="javax.swing.JComboBox" name="ComboBoxFilterType">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
               <Connection code="new DefaultComboBoxModel(com.github.agadar.nstelegram.FilterType.getTexts())" type="code"/>
             </Property>
-            <Property name="name" type="java.lang.String" value="ComboBoxAddresseeType" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="ComboBoxFilterType" noResource="true"/>
           </Properties>
           <Events>
-            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="ComboBoxAddresseeTypeItemStateChanged"/>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="ComboBoxFilterTypeItemStateChanged"/>
           </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
         </Component>
-        <Component class="javax.swing.JTextField" name="TextFieldAddresseeVar">
+        <Component class="javax.swing.JTextField" name="TextFieldFilterValues">
           <Properties>
             <Property name="editable" type="boolean" value="false"/>
-            <Property name="name" type="java.lang.String" value="TextFieldAddresseeVar" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="TextFieldFilterValues" noResource="true"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JButton" name="ButtonAddAddressee">
+        <Component class="javax.swing.JButton" name="ButtonAddFilter">
           <Properties>
             <Property name="text" type="java.lang.String" value="Add filter"/>
-            <Property name="name" type="java.lang.String" value="ButtonAddAddressee" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="ButtonAddFilter" noResource="true"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ButtonAddAddresseeActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ButtonAddFilterActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
     </Container>
-    <Container class="javax.swing.JPanel" name="jPanel1">
+    <Container class="javax.swing.JPanel" name="PanelOutput">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Output"/>
+            <TitledBorder title="Output">
+              <Font PropertyName="font" name="Tahoma" size="11" style="1"/>
+            </TitledBorder>
           </Border>
         </Property>
       </Properties>
@@ -360,7 +395,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jScrollPane1" max="32767" attributes="0"/>
+                  <Component id="ScrollPaneOutput" pref="318" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -369,21 +404,21 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jScrollPane1" max="32767" attributes="0"/>
+                  <Component id="ScrollPaneOutput" pref="306" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Container class="javax.swing.JScrollPane" name="jScrollPane1">
+        <Container class="javax.swing.JScrollPane" name="ScrollPaneOutput">
           <AuxValues>
             <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
           </AuxValues>
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
           <SubComponents>
-            <Component class="javax.swing.JTextArea" name="TextOutput">
+            <Component class="javax.swing.JTextArea" name="TextAreaOutput">
               <Properties>
                 <Property name="columns" type="int" value="20"/>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
@@ -396,11 +431,13 @@
         </Container>
       </SubComponents>
     </Container>
-    <Container class="javax.swing.JPanel" name="jPanel2">
+    <Container class="javax.swing.JPanel" name="PanelActions">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Actions"/>
+            <TitledBorder title="Actions">
+              <Font PropertyName="font" name="Tahoma" size="11" style="1"/>
+            </TitledBorder>
           </Border>
         </Property>
       </Properties>
@@ -410,9 +447,9 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="BtnStart" min="-2" pref="120" max="-2" attributes="0"/>
-                  <EmptySpace pref="47" max="32767" attributes="0"/>
-                  <Component id="BtnStop" min="-2" pref="120" max="-2" attributes="0"/>
+                  <Component id="BtnStart" min="-2" pref="140" max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
+                  <Component id="BtnStop" min="-2" pref="140" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
