@@ -22,8 +22,8 @@ public abstract class Filter
      * 
      * @param nations 
      * @param localCacheOnly if true, explicitly uses the local cache for returning
-     * this filter's nations list instead of using the global cache, daily dump file,
-     * or calls to the server.
+     * this filter's nations list instead of allowing the possibility for using 
+     * the global cache, daily dump file, or calls to the server.
      */
     public abstract void applyFilter(Set<String> nations, boolean localCacheOnly);
     

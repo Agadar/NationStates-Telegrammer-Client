@@ -182,22 +182,22 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         CheckBoxLoop.setText(" ");
         CheckBoxLoop.setFocusPainted(false);
         CheckBoxLoop.setMargin(new java.awt.Insets(0, -1, 0, 2));
-        CheckBoxLoop.addChangeListener(new javax.swing.event.ChangeListener()
+        CheckBoxLoop.addItemListener(new java.awt.event.ItemListener()
         {
-            public void stateChanged(javax.swing.event.ChangeEvent evt)
+            public void itemStateChanged(java.awt.event.ItemEvent evt)
             {
-                CheckBoxLoopStateChanged(evt);
+                CheckBoxLoopItemStateChanged(evt);
             }
         });
 
         CheckBoxRecruiting.setText(" ");
         CheckBoxRecruiting.setFocusPainted(false);
         CheckBoxRecruiting.setMargin(new java.awt.Insets(0, -1, 0, 2));
-        CheckBoxRecruiting.addChangeListener(new javax.swing.event.ChangeListener()
+        CheckBoxRecruiting.addItemListener(new java.awt.event.ItemListener()
         {
-            public void stateChanged(javax.swing.event.ChangeEvent evt)
+            public void itemStateChanged(java.awt.event.ItemEvent evt)
             {
-                CheckBoxRecruitingStateChanged(evt);
+                CheckBoxRecruitingItemStateChanged(evt);
             }
         });
 
@@ -340,6 +340,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
 
         PanelOutput.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Output", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
 
+        TextAreaOutput.setEditable(false);
         TextAreaOutput.setColumns(20);
         TextAreaOutput.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
         TextAreaOutput.setRows(5);
@@ -450,7 +451,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     {//GEN-HEADEREND:event_BtnStartActionPerformed
         updateGui(true);    // update GUI
         TextAreaOutput.setText(duration());
-        
+
         try
         {
             tm.startSending(this);  // start sending telegrams
@@ -715,22 +716,21 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
      * 
      * @param evt 
      */
-    private void CheckBoxRecruitingStateChanged(javax.swing.event.ChangeEvent evt)//GEN-FIRST:event_CheckBoxRecruitingStateChanged
-    {//GEN-HEADEREND:event_CheckBoxRecruitingStateChanged
+    private void CheckBoxRecruitingItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_CheckBoxRecruitingItemStateChanged
+    {//GEN-HEADEREND:event_CheckBoxRecruitingItemStateChanged
         tm.SendAsRecruitment = CheckBoxRecruiting.isSelected();
-        TextAreaOutput.setText(duration());
-        
-    }//GEN-LAST:event_CheckBoxRecruitingStateChanged
+        TextAreaOutput.setText(duration());  
+    }//GEN-LAST:event_CheckBoxRecruitingItemStateChanged
 
     /**
      * Called when selected status of looping checkbox has changed.
      * 
      * @param evt 
      */
-    private void CheckBoxLoopStateChanged(javax.swing.event.ChangeEvent evt)//GEN-FIRST:event_CheckBoxLoopStateChanged
-    {//GEN-HEADEREND:event_CheckBoxLoopStateChanged
+    private void CheckBoxLoopItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_CheckBoxLoopItemStateChanged
+    {//GEN-HEADEREND:event_CheckBoxLoopItemStateChanged
         tm.IsLooping = CheckBoxLoop.isSelected();
-    }//GEN-LAST:event_CheckBoxLoopStateChanged
+    }//GEN-LAST:event_CheckBoxLoopItemStateChanged
 
     /**
      * @param args the command line arguments
@@ -812,7 +812,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         TextAreaOutput.append(message);
         
         // If all telegrams were sent, reset the buttons.
-        if (event.PositionInQuery + 1 == tm.numberOfAddressees())
+        if (!tm.IsLooping && event.PositionInQuery + 1 == tm.numberOfAddressees())
         {
             updateGui(false);
             TextAreaOutput.append("\nFinished!\n");
@@ -837,6 +837,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             TxtFieldClientKey.setEditable(false);
             TxtFieldTelegramId.setEditable(false);
             TxtFieldSecretKey.setEditable(false);
+            TextFieldFilterValues.setEditable(false);
             CheckBoxRecruiting.setEnabled(false);
             CheckBoxLoop.setEnabled(false);
             ComboBoxFilterType.setEnabled(false);
@@ -850,6 +851,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             TxtFieldClientKey.setEditable(true);
             TxtFieldTelegramId.setEditable(true);
             TxtFieldSecretKey.setEditable(true);
+            TextFieldFilterValues.setEditable(true);
             CheckBoxRecruiting.setEnabled(true);
             CheckBoxLoop.setEnabled(true);
             ComboBoxFilterType.setEnabled(true);
@@ -865,7 +867,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     private String duration()
     {
         int estimatedDuration = Math.max(tm.numberOfAddressees() - 1, 0) 
-                                * (CheckBoxRecruiting.isSelected() ? 31 : 181);
+                                * (CheckBoxRecruiting.isSelected() ? 181 : 31);
         int hours = estimatedDuration / 3600;
         int minutes = estimatedDuration % 3600 / 60;
         int seconds = estimatedDuration % 3600 % 60;

@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manages the addressees list and sending telegrams to the former.
@@ -45,11 +47,15 @@ public final class TelegramManager implements TelegramSentListener
     
     /**
      * Refreshes the filters.
+     * 
+     * @param localCacheOnly if true, explicitly uses the local caches for returning
+     * the filters' nations lists instead of allowing the possibility for using 
+     * the global cache, daily dump file, or calls to the server.
      */
-    public void refreshFilters()
+    public void refreshFilters(boolean localCacheOnly)
     {
         Addressees.clear();
-        Filters.forEach((filter) -> { filter.applyFilter(Addressees, true); });
+        Filters.forEach((filter) -> { filter.applyFilter(Addressees, localCacheOnly); });
         removeOldRecipients();
     }
     
@@ -62,7 +68,7 @@ public final class TelegramManager implements TelegramSentListener
     {
         Filters.add(filter);
         filter.applyFilter(Addressees, false);
-        refreshFilters();
+        refreshFilters(true);
     }
     
     /**
@@ -83,7 +89,7 @@ public final class TelegramManager implements TelegramSentListener
     public void removeFilterAt(int index)
     {
         Filters.remove(index);
-        refreshFilters();
+        refreshFilters(true);
     }
     
     /**
@@ -105,30 +111,46 @@ public final class TelegramManager implements TelegramSentListener
             throw new IllegalArgumentException("Please supply at least one recipient!"); 
 
         NSAPI.setUserAgent(String.format(USER_AGENT, ClientKey)); // Update user agent.
-
-        // Prepare TelegramQuery, start by applying and updating History map.
-        removeOldRecipients();              
-        final TelegramQuery q = NSAPI.telegram(ClientKey, TelegramId, SecretKey, 
-                Addressees.toArray(new String[Addressees.size()]))
-                .addListeners(listeners).addListeners(this);
-        
-        if (SendAsRecruitment)
-        {
-            q.isRecruitment();
-        }
         
         // Prepare thread, then run it.
         telegramThread = new Thread(() ->
         {
             try
             {
-                q.execute(null);
+                do
+                {
+                    // Prepare query.
+                    final TelegramQuery q = NSAPI.telegram(ClientKey, TelegramId, SecretKey, 
+                        Addressees.toArray(new String[Addressees.size()]))
+                            .addListeners(listeners).addListeners(this);
+
+                    if (SendAsRecruitment)
+                        q.isRecruitment();
+
+                    q.execute(null);    // send the telegrams
+                    refreshFilters(false);  // Update addressees until there's addressees available.
+                        System.out.println(IsLooping);
+                    while (IsLooping && Addressees.isEmpty())
+                    {
+                        System.out.println("No addressees found, sleeping for 60 seconds...");
+                        Thread.sleep(1000 * 60);    // sleep 60 seconds
+                        refreshFilters(false);
+                    }
+                } 
+                while (IsLooping);
             }
-            catch (NationStatesAPIException ex)
+            catch (Exception ex)
             {
-                // Ignore error.
+                // We've broken from the loop which is what we want, so we're
+                // cool with not handling this exception.
+                System.out.println(ex);
             }
-        });       
+            finally
+            {
+                refreshFilters(false); // refresh filters one last time for printing info
+            }
+        });
+        
         telegramThread.start();
     }
     
@@ -140,7 +162,7 @@ public final class TelegramManager implements TelegramSentListener
         if (telegramThread != null)
         {
             telegramThread.interrupt();
-            refreshFilters();
+            refreshFilters(false);
         }
     }
     
@@ -159,9 +181,7 @@ public final class TelegramManager implements TelegramSentListener
         }
         
         for (String oldRecipient : oldRecipients)
-        {
             Addressees.remove(oldRecipient);
-        }
     }
     
     @Override
@@ -176,7 +196,9 @@ public final class TelegramManager implements TelegramSentListener
             History.get(TelegramId).add(event.Addressee);
         
         // If this was the last telegram, then refresh the filters.
-        if (event.PositionInQuery + 1 == numberOfAddressees())
-            refreshFilters();
+        //if (event.PositionInQuery + 1 >= numberOfAddressees())
+        //    refreshFilters(false);
+        
+        // TODO: publish event that is handled by GUI.
     }
 }
