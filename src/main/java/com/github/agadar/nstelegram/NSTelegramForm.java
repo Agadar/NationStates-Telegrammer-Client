@@ -516,8 +516,8 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         worker = new Thread(() ->
         {
             String type = filter.getText(); // Used for the text in the visual filter list.
-            Set<String> addressees = null;  // Declared here as multiple cases need a string set.
-            Filter f = null;    // The filter to add to the telegram manager.
+            Set<String> addressees;  // Declared here as multiple cases need a string set.
+            Filter f;    // The filter to add to the telegram manager.
             
             // Set above variables according to addressees type selected.
             switch (filter)
