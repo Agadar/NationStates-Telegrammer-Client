@@ -52,10 +52,10 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         // Set fields according to values retrieved from properties file.
         final PropertiesManager ph = new PropertiesManager();
         ph.loadProperties();
-        TxtFieldClientKey.setText(ph.ClientKey);
-        TxtFieldTelegramId.setText(ph.TelegramId);
-        TxtFieldSecretKey.setText(ph.SecretKey);
-        RadioBtnRecruitment.setSelected(ph.IsRecruitment);
+        TxtFieldClientKey.setText(tm.ClientKey = ph.ClientKey);
+        TxtFieldTelegramId.setText(tm.TelegramId = ph.TelegramId);
+        TxtFieldSecretKey.setText(tm.SecretKey = ph.SecretKey);
+        RadioBtnRecruitment.setSelected(tm.SendAsRecruitment = ph.IsRecruitment);
         
         // Set output textarea, for consistency's sake.
         TextOutput.setText(duration());
@@ -122,12 +122,26 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         LabelTelegramId.setName("LabelTelegramId"); // NOI18N
 
         TxtFieldTelegramId.setName("TxtFieldTelegramId"); // NOI18N
+        TxtFieldTelegramId.addKeyListener(new java.awt.event.KeyAdapter()
+        {
+            public void keyReleased(java.awt.event.KeyEvent evt)
+            {
+                TxtFieldTelegramIdKeyReleased(evt);
+            }
+        });
 
         LabelSecretKey.setLabelFor(TxtFieldSecretKey);
         LabelSecretKey.setText("Secret Key:");
         LabelSecretKey.setName("LabelSecretKey"); // NOI18N
 
         TxtFieldSecretKey.setName("TxtFieldSecretKey"); // NOI18N
+        TxtFieldSecretKey.addKeyListener(new java.awt.event.KeyAdapter()
+        {
+            public void keyReleased(java.awt.event.KeyEvent evt)
+            {
+                TxtFieldSecretKeyKeyReleased(evt);
+            }
+        });
 
         LabelClientKey.setLabelFor(TxtFieldClientKey);
         LabelClientKey.setText("Client Key:");
@@ -148,6 +162,13 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         });
 
         TxtFieldClientKey.setName("TxtFieldClientKey"); // NOI18N
+        TxtFieldClientKey.addKeyListener(new java.awt.event.KeyAdapter()
+        {
+            public void keyReleased(java.awt.event.KeyEvent evt)
+            {
+                TxtFieldClientKeyKeyReleased(evt);
+            }
+        });
 
         BtnGrpTelegramType.add(RadioBtnRecruitment);
         RadioBtnRecruitment.setText("recruitment telegram");
@@ -236,7 +257,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             }
         });
 
-        ComboBoxAddresseeType.setModel(new DefaultComboBoxModel(FilterType.getTexts()));
+        ComboBoxAddresseeType.setModel(new DefaultComboBoxModel(com.github.agadar.nstelegram.FilterType.getTexts()));
         ComboBoxAddresseeType.setName("ComboBoxAddresseeType"); // NOI18N
         ComboBoxAddresseeType.addItemListener(new java.awt.event.ItemListener()
         {
@@ -394,50 +415,26 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     }// </editor-fold>//GEN-END:initComponents
 
     /**
-     * Called by the Start button. Retrieves values from textboxes, sets the GUI
-     * components properly, and tells the TelegramManager to start sending.
+     * Called by the Start button. Sets the GUI components properly and tells 
+     * the TelegramManager to start sending.
      * 
      * @param evt 
      */
     private void BtnStartActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_BtnStartActionPerformed
     {//GEN-HEADEREND:event_BtnStartActionPerformed
-      
-        // Retrieve values from textboxes.
-        String clientKey = TxtFieldClientKey.getText().trim();
-        String telegramId = TxtFieldTelegramId.getText().trim();
-        String secretKey = TxtFieldSecretKey.getText().trim();
-        boolean isRecruitment = RadioBtnRecruitment.isSelected();
-        
-        // Do null/empy checks on retrieved values.
-        if (clientKey == null || clientKey.isEmpty())
-        {
-            TextOutput.setText("Please supply a Client Key!");
-            return;
-        }        
-        if (telegramId == null || telegramId.isEmpty())
-        {
-            TextOutput.setText("Please supply a Telegram Id!");
-            return;
-        }        
-        if (secretKey == null || secretKey.isEmpty())
-        {
-            TextOutput.setText("Please supply a Secret Key!");
-            return;
-        }
-        
-        // If no addressees were selected, make it known and cancel.
-        if (tm.numberOfAddressees() == 0)
-        {
-            TextOutput.setText("Please apply at least one filter!");
-            return;
-        }
-        
-        // Set GUI components.
-        updateGui(true);
+        updateGui(true);    // update GUI
         TextOutput.setText(duration());
         
-        // Call telegram manager to start sending.
-        tm.startSending(clientKey, telegramId, secretKey, isRecruitment, this);
+        try
+        {
+            tm.startSending(this);  // start sending telegrams
+        }
+        catch (Exception ex)
+        {
+            // if something went wrong while starting sending telegrams, reset GUI
+            TextOutput.setText(ex.getMessage());
+            updateGui(false);
+        }
     }//GEN-LAST:event_BtnStartActionPerformed
 
     /**
@@ -638,10 +635,10 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     {//GEN-HEADEREND:event_formWindowClosing
         // Store relevant variables to properties file.
         final PropertiesManager ph = new PropertiesManager();
-        ph.ClientKey = TxtFieldClientKey.getText();
-        ph.TelegramId = TxtFieldTelegramId.getText();
-        ph.SecretKey = TxtFieldSecretKey.getText();
-        ph.IsRecruitment = RadioBtnRecruitment.isSelected();
+        ph.ClientKey = tm.ClientKey;
+        ph.TelegramId = tm.TelegramId;
+        ph.SecretKey = tm.SecretKey;
+        ph.IsRecruitment = tm.SendAsRecruitment;
         ph.saveProperties();
     }//GEN-LAST:event_formWindowClosing
 
@@ -668,6 +665,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     private void RadioBtnRecruitmentItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_RadioBtnRecruitmentItemStateChanged
     {//GEN-HEADEREND:event_RadioBtnRecruitmentItemStateChanged
         TextOutput.setText(duration());
+        tm.SendAsRecruitment = RadioBtnRecruitment.isSelected();
     }//GEN-LAST:event_RadioBtnRecruitmentItemStateChanged
 
     /**
@@ -679,7 +677,38 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     private void RadioBtnNormalItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_RadioBtnNormalItemStateChanged
     {//GEN-HEADEREND:event_RadioBtnNormalItemStateChanged
         TextOutput.setText(duration());
+        tm.SendAsRecruitment = RadioBtnRecruitment.isSelected();
     }//GEN-LAST:event_RadioBtnNormalItemStateChanged
+
+    /**
+     * Updates Client Key value on key release.
+     * 
+     * @param evt 
+     */
+    private void TxtFieldTelegramIdKeyReleased(java.awt.event.KeyEvent evt)//GEN-FIRST:event_TxtFieldTelegramIdKeyReleased
+    {//GEN-HEADEREND:event_TxtFieldTelegramIdKeyReleased
+        tm.TelegramId = TxtFieldTelegramId.getText();
+    }//GEN-LAST:event_TxtFieldTelegramIdKeyReleased
+
+    /**
+     * Updates Telegram Id value on key release.
+     * 
+     * @param evt 
+     */
+    private void TxtFieldClientKeyKeyReleased(java.awt.event.KeyEvent evt)//GEN-FIRST:event_TxtFieldClientKeyKeyReleased
+    {//GEN-HEADEREND:event_TxtFieldClientKeyKeyReleased
+        tm.ClientKey = TxtFieldClientKey.getText();
+    }//GEN-LAST:event_TxtFieldClientKeyKeyReleased
+
+    /**
+     * Updates Secret Key value on key release.
+     * 
+     * @param evt 
+     */
+    private void TxtFieldSecretKeyKeyReleased(java.awt.event.KeyEvent evt)//GEN-FIRST:event_TxtFieldSecretKeyKeyReleased
+    {//GEN-HEADEREND:event_TxtFieldSecretKeyKeyReleased
+        tm.SecretKey = TxtFieldSecretKey.getText();
+    }//GEN-LAST:event_TxtFieldSecretKeyKeyReleased
 
     /**
      * @param args the command line arguments

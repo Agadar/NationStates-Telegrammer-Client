@@ -159,6 +159,9 @@
           <Properties>
             <Property name="name" type="java.lang.String" value="TxtFieldTelegramId" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="TxtFieldTelegramIdKeyReleased"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="LabelSecretKey">
           <Properties>
@@ -173,6 +176,9 @@
           <Properties>
             <Property name="name" type="java.lang.String" value="TxtFieldSecretKey" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="TxtFieldSecretKeyKeyReleased"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="LabelClientKey">
           <Properties>
@@ -205,6 +211,9 @@
           <Properties>
             <Property name="name" type="java.lang.String" value="TxtFieldClientKey" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="TxtFieldClientKeyKeyReleased"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JRadioButton" name="RadioBtnRecruitment">
           <Properties>

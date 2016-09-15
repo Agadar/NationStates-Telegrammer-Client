@@ -25,6 +25,13 @@ public final class TelegramManager
     private final Set<String> Addressees = new HashSet<>(); // Presumably most up-to-date addressees list, based on Steps.
     private Thread telegramThread; // The thread on which the TelegramQuery is running.
     
+    // Variables that will be used for sending the telegrams. Should be manually
+    // updated by a form or where-ever these values are defined.
+    public String ClientKey;
+    public String TelegramId;
+    public String SecretKey;
+    public boolean SendAsRecruitment;
+    
     public TelegramManager() 
     {
         // Set user agent for the first time.
@@ -75,24 +82,30 @@ public final class TelegramManager
     
     /**
      * Starts sending the telegram to the addressees in a new thread.
+     * Throws IllegalArgumentException if the variables are not properly set.
      * 
-     * @param clientKey
-     * @param telegramId
-     * @param secretKey
-     * @param isRecruitment
      * @param listeners
      */
-    public void startSending(String clientKey, String telegramId, 
-            String secretKey, boolean isRecruitment, TelegramSentListener... listeners)
+    public void startSending(TelegramSentListener... listeners)
     {
+        // Make sure all inputs are valid.
+        if (ClientKey == null || ClientKey.isEmpty())
+            throw new IllegalArgumentException("Please supply a Client Key!");      
+        if (TelegramId == null || TelegramId.isEmpty())
+            throw new IllegalArgumentException("Please supply a Telegram Id!");      
+        if (SecretKey == null || SecretKey.isEmpty())
+            throw new IllegalArgumentException("Please supply a Secret Key!"); 
+        if (numberOfAddressees() == 0)
+            throw new IllegalArgumentException("Please supply at least one recipient!"); 
+
         // Update user agent.
-        NSAPI.setUserAgent(String.format(USER_AGENT, clientKey));
+        NSAPI.setUserAgent(String.format(USER_AGENT, ClientKey));
 
         // Prepare TelegramQuery.
-        final TelegramQuery q = NSAPI.telegram(clientKey, telegramId, secretKey, 
+        final TelegramQuery q = NSAPI.telegram(ClientKey, TelegramId, SecretKey, 
                 Addressees.toArray(new String[Addressees.size()])).addListeners(listeners);
         
-        if (isRecruitment)
+        if (SendAsRecruitment)
         {
             q.isRecruitment();
         }
@@ -109,7 +122,7 @@ public final class TelegramManager
                 // Ignore error.
             }
         });       
-        telegramThread.start();
+        //telegramThread.start();
     }
     
     /**
