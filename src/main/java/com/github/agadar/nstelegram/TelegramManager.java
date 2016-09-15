@@ -129,10 +129,10 @@ public final class TelegramManager implements TelegramSentListener
 
                     q.execute(null);    // send the telegrams
                     refreshFilters(false);  // Update addressees until there's addressees available.
-                        System.out.println(IsLooping);
+                    
                     while (IsLooping && Addressees.isEmpty())
                     {
-                        System.out.println("No addressees found, sleeping for 60 seconds...");
+                        System.out.println("No new addressees found, sleeping for 60 seconds...");
                         Thread.sleep(1000 * 60);    // sleep 60 seconds
                         refreshFilters(false);
                     }
@@ -143,7 +143,6 @@ public final class TelegramManager implements TelegramSentListener
             {
                 // We've broken from the loop which is what we want, so we're
                 // cool with not handling this exception.
-                System.out.println(ex);
             }
             finally
             {

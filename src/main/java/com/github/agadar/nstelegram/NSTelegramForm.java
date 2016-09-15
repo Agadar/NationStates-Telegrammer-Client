@@ -56,6 +56,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         TxtFieldTelegramId.setText(tm.TelegramId = ph.TelegramId);
         TxtFieldSecretKey.setText(tm.SecretKey = ph.SecretKey);
         CheckBoxRecruiting.setSelected(tm.SendAsRecruitment = ph.IsRecruitment);
+        CheckBoxLoop.setSelected(tm.IsLooping = ph.IsLooping);
         
         // Set output textarea, for consistency's sake.
         TextAreaOutput.setText(duration());
@@ -666,6 +667,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         ph.TelegramId = tm.TelegramId;
         ph.SecretKey = tm.SecretKey;
         ph.IsRecruitment = tm.SendAsRecruitment;
+        ph.IsLooping = tm.IsLooping;
         ph.saveProperties();
     }//GEN-LAST:event_formWindowClosing
 

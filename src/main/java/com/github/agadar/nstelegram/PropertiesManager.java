@@ -22,6 +22,7 @@ public class PropertiesManager
     public String TelegramId;
     public String SecretKey;
     public boolean IsRecruitment;
+    public boolean IsLooping;
 
     /**
      * Saves the application's properties to the file.
@@ -34,6 +35,7 @@ public class PropertiesManager
         props.setProperty("TelegramId", TelegramId);
         props.setProperty("SecretKey", SecretKey);
         props.setProperty("IsRecruitment", Boolean.toString(IsRecruitment));
+        props.setProperty("IsLooping", Boolean.toString(IsLooping));
         
         // Save to file.
         try (OutputStream output = new FileOutputStream(fileName))
@@ -69,5 +71,6 @@ public class PropertiesManager
         TelegramId = props.getProperty("TelegramId");
         SecretKey = props.getProperty("SecretKey");
         IsRecruitment = Boolean.valueOf(props.getProperty("IsRecruitment"));
+        IsLooping = Boolean.valueOf(props.getProperty("IsLooping"));
     }
 }
