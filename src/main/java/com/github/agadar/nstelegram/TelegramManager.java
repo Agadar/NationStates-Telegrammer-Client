@@ -103,7 +103,10 @@ public final class TelegramManager implements TelegramSentListener
         if (TelegramId == null || TelegramId.isEmpty())
             throw new IllegalArgumentException("Please supply a Telegram Id!");      
         if (SecretKey == null || SecretKey.isEmpty())
-            throw new IllegalArgumentException("Please supply a Secret Key!"); 
+            throw new IllegalArgumentException("Please supply a Secret Key!");
+        
+        refreshFilters(true);   // Refresh filters one last time before checking # of addressees.
+        
         if (numberOfAddressees() == 0)
             throw new IllegalArgumentException("Please supply at least one recipient!"); 
 
@@ -125,21 +128,25 @@ public final class TelegramManager implements TelegramSentListener
                         q.isRecruitment();
 
                     q.execute(null);    // send the telegrams
-                    refreshFilters(false);  // Update addressees until there's addressees available.
                     
-                    while (IsLooping && Addressees.isEmpty())
+                    // If looping, update addressees until there's addressees available.
+                    if (IsLooping)
                     {
-                        System.out.println("No new addressees found, sleeping for 60 seconds...");
-                        Thread.sleep(1000 * 60);    // sleep 60 seconds
                         refreshFilters(false);
+                        
+                        while (Addressees.isEmpty())
+                        {
+                            System.out.println("No new addressees found, sleeping for 60 seconds...");
+                            Thread.sleep(1000 * 60);    // sleep 60 seconds
+                            refreshFilters(false);
+                        }
                     }
                 } 
-                while (IsLooping);
+                while (IsLooping && !Thread.interrupted());
             }
-            catch (Exception ex)
+            catch (InterruptedException ex)
             {
-                // We've broken from the loop which is what we want, so we're
-                // cool with not handling this exception.
+                Thread.currentThread().interrupt();
             }
         });
         
@@ -152,10 +159,7 @@ public final class TelegramManager implements TelegramSentListener
     public void stopSending()
     {
         if (telegramThread != null)
-        {
             telegramThread.interrupt();
-            refreshFilters(false); // refresh filters one last time for printing info
-        }
     }
     
     /**

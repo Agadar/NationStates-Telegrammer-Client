@@ -491,28 +491,10 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     {//GEN-HEADEREND:event_ComboBoxFilterTypeItemStateChanged
         // Only run this code if something was SELECTED.
         if (evt.getStateChange() != ItemEvent.SELECTED) 
-        {
             return;
-        }
         
         TextFieldFilterValues.setText("");  // Clear the textfield in question.
-        
-        // According to which item was selected, enable or disable the textfield.
-        switch (FilterType.getViaText((String) evt.getItem()))
-        {
-            case NATIONS_INCL:
-            case NATIONS_EXCL:
-            case REGIONS_INCL:
-            case REGIONS_EXCL:
-            case REGIONS_WITH_TAGS_INCL:
-            case REGIONS_WITH_TAGS_EXCL:
-            case REGIONS_WO_TAGS_INCL:
-            case REGIONS_WO_TAGS_EXCL:
-                TextFieldFilterValues.setEditable(true);
-                break;
-            default:
-                TextFieldFilterValues.setEditable(false);     
-        }
+        setFilterComboBoxEnabled(FilterType.getViaText((String) evt.getItem()));
     }//GEN-LAST:event_ComboBoxFilterTypeItemStateChanged
 
     /**
@@ -842,7 +824,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             TextFieldFilterValues.setEditable(false);
             CheckBoxRecruiting.setEnabled(false);
             CheckBoxLoop.setEnabled(false);
-            ComboBoxFilterType.setEnabled(false);
+            setFilterComboBoxEnabled(null);
         }
         else
         {
@@ -856,7 +838,40 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             TextFieldFilterValues.setEditable(true);
             CheckBoxRecruiting.setEnabled(true);
             CheckBoxLoop.setEnabled(true);
-            ComboBoxFilterType.setEnabled(true);
+            setFilterComboBoxEnabled(FilterType.getViaText((String) ComboBoxFilterType.getSelectedItem()));
+        }
+    }
+    
+    /**
+     * Enables or disables the filters combo box according to the supplied type.
+     * If the supplied type is null, then it is always disabled.
+     * 
+     * @param type 
+     */
+    private void setFilterComboBoxEnabled(FilterType type)
+    {
+        // If type is null, always disable.
+        if (type == null)
+        {
+            TextFieldFilterValues.setEditable(false);
+            return;
+        }
+        
+        // Else, enable/disable according to type.
+        switch (type)
+        {
+            case NATIONS_INCL:
+            case NATIONS_EXCL:
+            case REGIONS_INCL:
+            case REGIONS_EXCL:
+            case REGIONS_WITH_TAGS_INCL:
+            case REGIONS_WITH_TAGS_EXCL:
+            case REGIONS_WO_TAGS_INCL:
+            case REGIONS_WO_TAGS_EXCL:
+                TextFieldFilterValues.setEditable(true);
+                break;
+            default:
+                TextFieldFilterValues.setEditable(false);     
         }
     }
     
