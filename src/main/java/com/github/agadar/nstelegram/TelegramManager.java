@@ -141,10 +141,6 @@ public final class TelegramManager implements TelegramSentListener
                 // We've broken from the loop which is what we want, so we're
                 // cool with not handling this exception.
             }
-            finally
-            {
-                refreshFilters(false); // refresh filters one last time for printing info
-            }
         });
         
         telegramThread.start();
@@ -156,7 +152,10 @@ public final class TelegramManager implements TelegramSentListener
     public void stopSending()
     {
         if (telegramThread != null)
+        {
             telegramThread.interrupt();
+            refreshFilters(false); // refresh filters one last time for printing info
+        }
     }
     
     /**
