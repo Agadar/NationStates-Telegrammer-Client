@@ -1,6 +1,6 @@
 package com.github.agadar.nstelegram.filter.abstractfilter;
 
-import com.github.agadar.nstelegram.FilterCache;
+import com.github.agadar.nstelegram.util.FilterCache;
 import java.util.Set;
 
 /**

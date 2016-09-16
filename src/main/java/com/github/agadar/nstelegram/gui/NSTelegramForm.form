@@ -351,7 +351,7 @@
         <Component class="javax.swing.JComboBox" name="ComboBoxFilterType">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="new DefaultComboBoxModel(com.github.agadar.nstelegram.FilterType.getTexts())" type="code"/>
+              <Connection code="new DefaultComboBoxModel(com.github.agadar.nstelegram.util.FilterType.getTexts())" type="code"/>
             </Property>
             <Property name="name" type="java.lang.String" value="ComboBoxFilterType" noResource="true"/>
           </Properties>

@@ -1,4 +1,4 @@
-package com.github.agadar.nstelegram;
+package com.github.agadar.nstelegram.util;
 
 import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nsapi.event.TelegramSentEvent;

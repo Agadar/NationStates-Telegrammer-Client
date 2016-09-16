@@ -1,4 +1,4 @@
-package com.github.agadar.nstelegram;
+package com.github.agadar.nstelegram.util;
 
 import java.util.HashMap;
 import java.util.Map;

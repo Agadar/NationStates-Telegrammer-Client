@@ -1,6 +1,9 @@
-package com.github.agadar.nstelegram;
+package com.github.agadar.nstelegram.gui;
 
 import com.github.agadar.nsapi.event.TelegramSentEvent;
+import com.github.agadar.nstelegram.util.FilterType;
+import com.github.agadar.nstelegram.util.PropertiesManager;
+import com.github.agadar.nstelegram.util.TelegramManager;
 import com.github.agadar.nstelegram.event.NoAddresseesEvent;
 import com.github.agadar.nstelegram.event.StoppedEvent;
 import com.github.agadar.nstelegram.event.TelegramManagerListener;
@@ -289,7 +292,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
             }
         });
 
-        ComboBoxFilterType.setModel(new DefaultComboBoxModel(com.github.agadar.nstelegram.FilterType.getTexts()));
+        ComboBoxFilterType.setModel(new DefaultComboBoxModel(com.github.agadar.nstelegram.util.FilterType.getTexts()));
         ComboBoxFilterType.setName("ComboBoxFilterType"); // NOI18N
         ComboBoxFilterType.addItemListener(new java.awt.event.ItemListener()
         {
