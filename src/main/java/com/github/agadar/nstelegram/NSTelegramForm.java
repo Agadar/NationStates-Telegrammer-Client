@@ -1,7 +1,9 @@
 package com.github.agadar.nstelegram;
 
 import com.github.agadar.nsapi.event.TelegramSentEvent;
-import com.github.agadar.nsapi.event.TelegramSentListener;
+import com.github.agadar.nstelegram.event.NoAddresseesEvent;
+import com.github.agadar.nstelegram.event.StoppedEvent;
+import com.github.agadar.nstelegram.event.TelegramManagerListener;
 import com.github.agadar.nstelegram.filter.FilterAll;
 import com.github.agadar.nstelegram.filter.FilterDelegates;
 import com.github.agadar.nstelegram.filter.FilterDelegatesNew;
@@ -35,7 +37,7 @@ import javax.swing.text.DefaultCaret;
  *
  * @author Agadar <https://github.com/Agadar/>
  */
-public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentListener
+public class NSTelegramForm extends javax.swing.JFrame implements TelegramManagerListener
 {
     public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.1.0"; // Form title.
     
@@ -60,6 +62,9 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
         
         // Set output textarea, for consistency's sake.
         TextAreaOutput.setText(duration());
+        
+        // Subscribe to telegram manager.
+        tm.addListeners(this);
     }
     
     /**
@@ -451,11 +456,11 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     private void BtnStartActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_BtnStartActionPerformed
     {//GEN-HEADEREND:event_BtnStartActionPerformed
         updateGui(true);    // update GUI
-        TextAreaOutput.setText(duration());
 
         try
         {
-            tm.startSending(this);  // start sending telegrams
+            tm.startSending();  // start sending telegrams
+            TextAreaOutput.setText(duration());
         }
         catch (Exception ex)
         {
@@ -473,12 +478,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
      */
     private void BtnStopActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_BtnStopActionPerformed
     {//GEN-HEADEREND:event_BtnStopActionPerformed
-        // Call telegram manager to stop sending.
-        tm.stopSending();
-        
-        // Set GUI components.
-        updateGui(false);        
-        TextAreaOutput.append("\nStopped!\n");
+        tm.stopSending(); // Call telegram manager to stop sending.
     }//GEN-LAST:event_BtnStopActionPerformed
 
     /**
@@ -529,91 +529,108 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             Set<String> addressees;  // Declared here as multiple cases need a string set.
             Filter f;    // The filter to add to the telegram manager.
             
-            // Set above variables according to addressees type selected.
-            switch (filter)
+            try
             {
-                case ALL:
-                    f = new FilterAll();       
-                    break;
-                case DELEGATES_EXCL:
-                    f = new FilterDelegates(false);
-                    break;
-                case DELEGATES_INCL:
-                    f = new FilterDelegates(true);
-                    break;
-                case DELEGATES_NEW:
-                    f = new FilterDelegatesNew();
-                    break;
-                case NATIONS_EXCL:
-                    addressees = stringToStringList(TextFieldFilterValues.getText());
-                    f = new FilterNations(addressees, false);
-                    type += ": " + addressees;
-                    break;
-                case NATIONS_INCL:
-                    addressees = stringToStringList(TextFieldFilterValues.getText());
-                    f = new FilterNations(addressees, true);
-                    type += ": " + addressees;
-                    break;
-                case NATIONS_NEW:
-                    f = new FilterNationsNew();
-                    break;
-                case NATIONS_REFOUNDED:
-                    f = new FilterNationsRefounded();
-                    break;                  
-                case NATIONS_EJECTED:
-                    f = new FilterNationsEjected();
-                    break;
-                case REGIONS_EXCL:
-                    addressees = stringToStringList(TextFieldFilterValues.getText());
-                    f = new FilterRegions(addressees, false);
-                    type += ": " + addressees;
-                    break;
-                case REGIONS_INCL:
-                    addressees = stringToStringList(TextFieldFilterValues.getText());
-                    f = new FilterRegions(addressees, true);
-                    type += ": " + addressees;
-                    break;
-                case REGIONS_WITH_TAGS_EXCL:
-                    addressees = stringToStringList(TextFieldFilterValues.getText());
-                    f = new FilterRegionsWithTags(addressees, false);
-                    type += ": " + addressees;
-                    break;
-                case REGIONS_WITH_TAGS_INCL:
-                    addressees = stringToStringList(TextFieldFilterValues.getText());
-                    f = new FilterRegionsWithTags(addressees, true);
-                    type += ": " + addressees;
-                    break;
-                case REGIONS_WO_TAGS_EXCL:
-                    addressees = stringToStringList(TextFieldFilterValues.getText());
-                    f = new FilterRegionsWithoutTags(addressees, false);
-                    type += ": " + addressees;
-                    break;
-                case REGIONS_WO_TAGS_INCL:
-                    addressees = stringToStringList(TextFieldFilterValues.getText());
-                    f = new FilterRegionsWithoutTags(addressees, true);
-                    type += ": " + addressees;
-                    break;
-                case WA_MEMBERS_EXCL:
-                    f = new FilterWAMembers(false);
-                    break;
-                case WA_MEMBERS_INCL:
-                    f = new FilterWAMembers(true);
-                    break;
-                default:
-                    return;
+                // Set above variables according to addressees type selected.
+                switch (filter)
+                {
+                    case ALL:
+                        f = new FilterAll();       
+                        break;
+                    case DELEGATES_EXCL:
+                        f = new FilterDelegates(false);
+                        break;
+                    case DELEGATES_INCL:
+                        f = new FilterDelegates(true);
+                        break;
+                    case DELEGATES_NEW:
+                        f = new FilterDelegatesNew();
+                        break;
+                    case NATIONS_EXCL:
+                        addressees = stringToStringList(TextFieldFilterValues.getText());
+                        f = new FilterNations(addressees, false);
+                        type += ": " + addressees;
+                        break;
+                    case NATIONS_INCL:
+                        addressees = stringToStringList(TextFieldFilterValues.getText());
+                        f = new FilterNations(addressees, true);
+                        type += ": " + addressees;
+                        break;
+                    case NATIONS_NEW:
+                        f = new FilterNationsNew();
+                        break;
+                    case NATIONS_REFOUNDED:
+                        f = new FilterNationsRefounded();
+                        break;                  
+                    case NATIONS_EJECTED:
+                        f = new FilterNationsEjected();
+                        break;
+                    case REGIONS_EXCL:
+                        addressees = stringToStringList(TextFieldFilterValues.getText());
+                        f = new FilterRegions(addressees, false);
+                        type += ": " + addressees;
+                        break;
+                    case REGIONS_INCL:
+                        addressees = stringToStringList(TextFieldFilterValues.getText());
+                        f = new FilterRegions(addressees, true);
+                        type += ": " + addressees;
+                        break;
+                    case REGIONS_WITH_TAGS_EXCL:
+                        addressees = stringToStringList(TextFieldFilterValues.getText());
+                        f = new FilterRegionsWithTags(addressees, false);
+                        type += ": " + addressees;
+                        break;
+                    case REGIONS_WITH_TAGS_INCL:
+                        addressees = stringToStringList(TextFieldFilterValues.getText());
+                        f = new FilterRegionsWithTags(addressees, true);
+                        type += ": " + addressees;
+                        break;
+                    case REGIONS_WO_TAGS_EXCL:
+                        addressees = stringToStringList(TextFieldFilterValues.getText());
+                        f = new FilterRegionsWithoutTags(addressees, false);
+                        type += ": " + addressees;
+                        break;
+                    case REGIONS_WO_TAGS_INCL:
+                        addressees = stringToStringList(TextFieldFilterValues.getText());
+                        f = new FilterRegionsWithoutTags(addressees, true);
+                        type += ": " + addressees;
+                        break;
+                    case WA_MEMBERS_EXCL:
+                        f = new FilterWAMembers(false);
+                        break;
+                    case WA_MEMBERS_INCL:
+                        f = new FilterWAMembers(true);
+                        break;
+                    default:
+                        return;
+                }
+
+                // Add filter to telegram manager, then update GUI.
+                tm.addFilter(f);
+                final String finalType = type;                
+                SwingUtilities.invokeLater(() ->
+                {
+                    ((DefaultListModel)JListFilters.getModel()).addElement(finalType);
+                    TextAreaOutput.setText(duration());
+                });
+            
+            } 
+            catch (Exception ex)
+            {
+                // If an exception occured, print it to the output textarea.
+                SwingUtilities.invokeLater(() ->
+                {
+                    TextAreaOutput.setText("A fatal error occured: \n" + ex.getMessage());
+                });
             }
-            
-            // Update telegram manager and GUI.
-            tm.addFilter(f);
-            final String finalType = type;
-            
-            SwingUtilities.invokeLater(() ->
+            finally
             {
-                ((DefaultListModel)JListFilters.getModel()).addElement(finalType);
-                // Calculate estimated duration to send telegrams, then set it to output.
-                TextAreaOutput.setText(duration());
-                ButtonAddFilter.setEnabled(true);
-            });
+                // Always re-enable the 'add filter' button.
+                SwingUtilities.invokeLater(() ->
+                {
+                    ButtonAddFilter.setEnabled(true);
+                });
+            }
         });
         worker.start();
     }//GEN-LAST:event_ButtonAddFilterActionPerformed
@@ -773,37 +790,6 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     // End of variables declaration//GEN-END:variables
 
     /**
-     * Called when the telegram manager has sent a telegram. Prints information
-     * to the output textarea. If the telegram manager has sent the final telegram,
-     * then the GUI is updated to reflect this.
-     * 
-     * @param event 
-     */
-    @Override
-    public void handleTelegramSent(TelegramSentEvent event)
-    {
-        // Print info to output.
-        String message = "[" + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + "]";        
-        if (event.Queued)
-        {
-            message += " queued telegram for '" + event.Addressee + "'\n";
-        }
-        else
-        {
-            message += " failed to queue telegram for '" + event.Addressee + "'\n"
-                    + event.ErrorMessage + "\n";
-        }       
-        TextAreaOutput.append(message);
-        
-        // If all telegrams were sent, reset the buttons.
-        if (!tm.IsLooping && event.PositionInQuery + 1 == tm.numberOfAddressees())
-        {
-            updateGui(false);
-            TextAreaOutput.append("\nFinished!\n");
-        }
-    }
-    
-    /**
      * Updates the GUI according to whether we've begun sending telegrams, or
      * stopped sending telegrams.
      * 
@@ -838,7 +824,8 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
             TextFieldFilterValues.setEditable(true);
             CheckBoxRecruiting.setEnabled(true);
             CheckBoxLoop.setEnabled(true);
-            setFilterComboBoxEnabled(FilterType.getViaText((String) ComboBoxFilterType.getSelectedItem()));
+            setFilterComboBoxEnabled(FilterType.getViaText(
+                    (String) ComboBoxFilterType.getSelectedItem()));
         }
     }
     
@@ -903,5 +890,52 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramSentLi
     {
         List<String> asList = Arrays.asList(string.trim().split("\\s*,\\s*"));
         return asList.size() == 1 && asList.get(0).isEmpty() ? new HashSet<>() : new HashSet<>(asList);
+    }
+
+    @Override
+    public void handleTelegramSent(TelegramSentEvent event)
+    {
+        // Print info to output.
+        SwingUtilities.invokeLater(() ->
+        {
+            String message = "[" + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + "]";        
+            if (event.Queued)
+            {
+                message += " queued telegram for '" + event.Addressee + "'\n";
+            }
+            else
+            {
+                message += " failed to queue telegram for '" + event.Addressee + "'\n"
+                        + event.ErrorMessage + "\n";
+            }       
+            TextAreaOutput.append(message);
+        });
+    }
+    
+    @Override
+    public void handleNoAddresseesEvent(NoAddresseesEvent event)
+    {
+        SwingUtilities.invokeLater(() ->
+        {
+            TextAreaOutput.append("\nNo new addressees found, trying again in " 
+                    + event.TimeOut / 1000 + " seconds\n\n");
+        });
+    }
+
+    @Override
+    public void handleStoppedEvent(StoppedEvent event)
+    {
+        SwingUtilities.invokeLater(() ->
+        {
+            updateGui(false);
+
+            String message = "\nFinished" + (event.CausedByError ? " with error: " 
+                    + event.ErrorMsg + "\n" : " without fatal errors\n") + 
+                    "Queued succesfully: " + event.QueuedSucces + "\n" +
+                    "Failed to queue: " + event.QueuedFailed + "\n" + 
+                    "Not queued: " + event.QueuedNot + "\n";
+
+            TextAreaOutput.append(message);
+        });
     }
 }
