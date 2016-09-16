@@ -1,7 +1,6 @@
 package com.github.agadar.nstelegram;
 
 import com.github.agadar.nsapi.NSAPI;
-import com.github.agadar.nsapi.NationStatesAPIException;
 import com.github.agadar.nsapi.event.TelegramSentEvent;
 import com.github.agadar.nsapi.event.TelegramSentListener;
 import com.github.agadar.nsapi.query.TelegramQuery;
@@ -12,8 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Manages the addressees list and sending telegrams to the former.
@@ -159,10 +156,7 @@ public final class TelegramManager implements TelegramSentListener
     public void stopSending()
     {
         if (telegramThread != null)
-        {
             telegramThread.interrupt();
-            refreshFilters(false);
-        }
     }
     
     /**
