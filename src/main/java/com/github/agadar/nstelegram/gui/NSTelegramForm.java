@@ -5,6 +5,9 @@ import com.github.agadar.nstelegram.util.FilterType;
 import com.github.agadar.nstelegram.util.PropertiesManager;
 import com.github.agadar.nstelegram.util.TelegramManager;
 import com.github.agadar.nstelegram.event.NoAddresseesEvent;
+import com.github.agadar.nstelegram.event.RefreshingRecipientsEvent;
+import com.github.agadar.nstelegram.event.RemovedAddresseeEvent;
+import com.github.agadar.nstelegram.event.RemovedAddresseeEvent.Reason;
 import com.github.agadar.nstelegram.event.StoppedEvent;
 import com.github.agadar.nstelegram.event.TelegramManagerListener;
 import com.github.agadar.nstelegram.filter.FilterAll;
@@ -361,7 +364,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
             PanelOutputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelOutputLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(ScrollPaneOutput, javax.swing.GroupLayout.DEFAULT_SIZE, 318, Short.MAX_VALUE)
+                .addComponent(ScrollPaneOutput)
                 .addContainerGap())
         );
         PanelOutputLayout.setVerticalGroup(
@@ -402,7 +405,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
             .addGroup(PanelActionsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(BtnStart, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
                 .addComponent(BtnStop, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -427,9 +430,9 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
                     .addComponent(PanelFilters, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(PanelActions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(PanelOutput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(PanelOutput, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(PanelActions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -522,7 +525,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      */
     private void ButtonAddFilterActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_ButtonAddFilterActionPerformed
     {//GEN-HEADEREND:event_ButtonAddFilterActionPerformed
-        TextAreaOutput.setText("Compiling address list...");    // Inform user, as this might take a while.
+        TextAreaOutput.setText("compiling address list...");    // Inform user, as this might take a while.
         ButtonAddFilter.setEnabled(false);
         final FilterType filter = FilterType.getViaText((String) ComboBoxFilterType.getSelectedItem());  
         
@@ -623,7 +626,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
                 // If an exception occured, print it to the output textarea.
                 SwingUtilities.invokeLater(() ->
                 {
-                    TextAreaOutput.setText("A fatal error occured: \n" + ex.getMessage());
+                    printToOutput("a fatal error occured:\n" + ex.getMessage(), false);
                 });
             }
             finally
@@ -870,7 +873,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         int hours = estimatedDuration / 3600;
         int minutes = estimatedDuration % 3600 / 60;
         int seconds = estimatedDuration % 3600 % 60;
-        return String.format("Addressees selected: %s%nEstimated duration: "
+        return String.format("addressees selected: %s%nestimated duration: "
                 + "%s hours, %s minutes, %s seconds\n\n"
                 , tm.numberOfAddressees(), hours, minutes, seconds);
     }
@@ -886,24 +889,37 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         List<String> asList = Arrays.asList(string.trim().split("\\s*,\\s*"));
         return asList.size() == 1 && asList.get(0).isEmpty() ? new HashSet<>() : new HashSet<>(asList);
     }
+    
+    /**
+     * Utility function for printing messages to the output textarea that are
+     * prefixed with a timestamp and suffixed with a newline. If called outside
+     * the GUI thread, wrap this in SwingUtilities.invokeLater(...).
+     * 
+     * @param msg
+     * @param clear 
+     */
+    private void printToOutput(String msg, boolean clear)
+    {
+        msg = "[" + LocalTime.now().format(DateTimeFormatter
+                .ofPattern("HH:mm:ss")) + "] " + msg + "\n";
+        
+        if (clear)
+            TextAreaOutput.setText(msg);
+        else
+            TextAreaOutput.append(msg);
+    }
 
     @Override
     public void handleTelegramSent(TelegramSentEvent event)
     {
         // Print info to output.
         SwingUtilities.invokeLater(() ->
-        {
-            String message = "[" + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + "]";        
+        {       
             if (event.Queued)
-            {
-                message += " queued telegram for '" + event.Addressee + "'\n";
-            }
+                printToOutput("queued telegram for '" + event.Addressee + "'", false);
             else
-            {
-                message += " failed to queue telegram for '" + event.Addressee + "'\n"
-                        + event.ErrorMessage + "\n";
-            }       
-            TextAreaOutput.append(message);
+                printToOutput("failed to queue telegram for '" + event.Addressee + "':\n"
+                        + event.ErrorMessage, false);   
         });
     }
     
@@ -912,8 +928,8 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     {
         SwingUtilities.invokeLater(() ->
         {
-            TextAreaOutput.append("\nNo new addressees found, trying again in " 
-                    + event.TimeOut / 1000 + " seconds\n\n");
+            printToOutput("no new recipients found, timing out for " 
+                    + event.TimeOut / 1000 + " seconds...", false);
         });
     }
 
@@ -924,13 +940,34 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         {
             updateGui(false);
 
-            String message = "\nFinished" + (event.CausedByError ? " with error: " 
+            String message = "\nfinished" + (event.CausedByError ? " with error: " 
                     + event.ErrorMsg + "\n" : " without fatal errors\n") + 
-                    "Queued succesfully: " + event.QueuedSucces + "\n" +
-                    "Failed to queue: " + event.QueuedFailed + "\n" + 
-                    "Not queued: " + event.QueuedNot + "\n";
+                    "telegrams queued: " + event.QueuedSucces + "\n" +
+                    "failed to queue: " + event.QueuedFailed + "\n" + 
+                    "not yet queued: " + event.QueuedNot + "\n\n";
 
             TextAreaOutput.append(message);
+        });
+    }
+
+    @Override
+    public void handleRecipientRemoved(RemovedAddresseeEvent event)
+    {
+        SwingUtilities.invokeLater(() ->
+        {
+            String message = "removed '" + event.Recipient + "' from recipients list: "
+                    + (event.Reason == Reason.AlreadyReceivedBefore ? 
+                        "already received this telegram" : "recipient is blocking telegram");
+            printToOutput(message, false);
+        });
+    }
+
+    @Override
+    public void handleRefreshingRecipients(RefreshingRecipientsEvent event)
+    {
+        SwingUtilities.invokeLater(() ->
+        {
+            printToOutput("finished loop, refreshing recipients for next loop", false);
         });
     }
 }

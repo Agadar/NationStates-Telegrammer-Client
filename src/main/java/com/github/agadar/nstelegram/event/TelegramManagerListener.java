@@ -12,4 +12,6 @@ public interface TelegramManagerListener
     void handleTelegramSent(TelegramSentEvent event);    
     void handleNoAddresseesEvent(NoAddresseesEvent event);  
     void handleStoppedEvent(StoppedEvent event);
+    void handleRecipientRemoved(RemovedAddresseeEvent event);
+    void handleRefreshingRecipients(RefreshingRecipientsEvent event);
 }
