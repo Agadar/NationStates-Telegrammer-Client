@@ -528,6 +528,8 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         TextAreaOutput.setText("compiling address list...");    // Inform user, as this might take a while.
         ButtonAddFilter.setEnabled(false);
         final FilterType filter = FilterType.getViaText((String) ComboBoxFilterType.getSelectedItem());  
+        final String filterValues = TextFieldFilterValues.getText();
+        TextFieldFilterValues.setText("");
         
         worker = new Thread(() ->
         {
@@ -553,12 +555,12 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
                         f = new FilterDelegatesNew();
                         break;
                     case NATIONS_EXCL:
-                        addressees = stringToStringList(TextFieldFilterValues.getText());
+                        addressees = stringToStringList(filterValues);
                         f = new FilterNations(addressees, false);
                         type += ": " + addressees;
                         break;
                     case NATIONS_INCL:
-                        addressees = stringToStringList(TextFieldFilterValues.getText());
+                        addressees = stringToStringList(filterValues);
                         f = new FilterNations(addressees, true);
                         type += ": " + addressees;
                         break;
@@ -572,32 +574,32 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
                         f = new FilterNationsEjected();
                         break;
                     case REGIONS_EXCL:
-                        addressees = stringToStringList(TextFieldFilterValues.getText());
+                        addressees = stringToStringList(filterValues);
                         f = new FilterRegions(addressees, false);
                         type += ": " + addressees;
                         break;
                     case REGIONS_INCL:
-                        addressees = stringToStringList(TextFieldFilterValues.getText());
+                        addressees = stringToStringList(filterValues);
                         f = new FilterRegions(addressees, true);
                         type += ": " + addressees;
                         break;
                     case REGIONS_WITH_TAGS_EXCL:
-                        addressees = stringToStringList(TextFieldFilterValues.getText());
+                        addressees = stringToStringList(filterValues);
                         f = new FilterRegionsWithTags(addressees, false);
                         type += ": " + addressees;
                         break;
                     case REGIONS_WITH_TAGS_INCL:
-                        addressees = stringToStringList(TextFieldFilterValues.getText());
+                        addressees = stringToStringList(filterValues);
                         f = new FilterRegionsWithTags(addressees, true);
                         type += ": " + addressees;
                         break;
                     case REGIONS_WO_TAGS_EXCL:
-                        addressees = stringToStringList(TextFieldFilterValues.getText());
+                        addressees = stringToStringList(filterValues);
                         f = new FilterRegionsWithoutTags(addressees, false);
                         type += ": " + addressees;
                         break;
                     case REGIONS_WO_TAGS_INCL:
-                        addressees = stringToStringList(TextFieldFilterValues.getText());
+                        addressees = stringToStringList(filterValues);
                         f = new FilterRegionsWithoutTags(addressees, true);
                         type += ": " + addressees;
                         break;
@@ -649,12 +651,16 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      */
     private void ButtonRemoveFilterActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_ButtonRemoveFilterActionPerformed
     {//GEN-HEADEREND:event_ButtonRemoveFilterActionPerformed
+        // Retrieve selected index, remove filter from telegram manager.
         int index = JListFilters.getSelectedIndex();
         tm.removeFilterAt(index);
-        ((DefaultListModel)JListFilters.getModel()).remove(index);
         
-        ButtonRemoveFilter.setEnabled(false);
-        JListFilters.clearSelection();
+        // Remove filter from GUI, try select preceding filter.
+        ((DefaultListModel)JListFilters.getModel()).remove(index);
+        JListFilters.setSelectedIndex(Math.max(0, --index));
+        
+        // Update rest of GUI.
+        ButtonRemoveFilter.setEnabled(!JListFilters.isSelectionEmpty());
         TextAreaOutput.setText(duration());
     }//GEN-LAST:event_ButtonRemoveFilterActionPerformed
 
