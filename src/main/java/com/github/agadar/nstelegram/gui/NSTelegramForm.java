@@ -4,11 +4,11 @@ import com.github.agadar.nsapi.event.TelegramSentEvent;
 import com.github.agadar.nstelegram.util.FilterType;
 import com.github.agadar.nstelegram.util.PropertiesManager;
 import com.github.agadar.nstelegram.util.TelegramManager;
-import com.github.agadar.nstelegram.event.NoAddresseesEvent;
-import com.github.agadar.nstelegram.event.RefreshingRecipientsEvent;
-import com.github.agadar.nstelegram.event.RemovedAddresseeEvent;
-import com.github.agadar.nstelegram.event.RemovedAddresseeEvent.Reason;
-import com.github.agadar.nstelegram.event.StoppedEvent;
+import com.github.agadar.nstelegram.event.NoRecipientsFoundEvent;
+import com.github.agadar.nstelegram.event.RecipientsRefreshedEvent;
+import com.github.agadar.nstelegram.event.RecipientRemovedEvent;
+import com.github.agadar.nstelegram.event.RecipientRemovedEvent.Reason;
+import com.github.agadar.nstelegram.event.StoppedSendingEvent;
 import com.github.agadar.nstelegram.event.TelegramManagerListener;
 import com.github.agadar.nstelegram.filter.FilterAll;
 import com.github.agadar.nstelegram.filter.FilterDelegates;
@@ -930,7 +930,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     }
     
     @Override
-    public void handleNoAddresseesEvent(NoAddresseesEvent event)
+    public void handleNoRecipientsFound(NoRecipientsFoundEvent event)
     {
         SwingUtilities.invokeLater(() ->
         {
@@ -940,7 +940,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     }
 
     @Override
-    public void handleStoppedEvent(StoppedEvent event)
+    public void handleStoppedSending(StoppedSendingEvent event)
     {
         SwingUtilities.invokeLater(() ->
         {
@@ -957,7 +957,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     }
 
     @Override
-    public void handleRecipientRemoved(RemovedAddresseeEvent event)
+    public void handleRecipientRemoved(RecipientRemovedEvent event)
     {
         SwingUtilities.invokeLater(() ->
         {
@@ -969,7 +969,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     }
 
     @Override
-    public void handleRefreshingRecipients(RefreshingRecipientsEvent event)
+    public void handleRecipientsRefreshed(RecipientsRefreshedEvent event)
     {
         SwingUtilities.invokeLater(() ->
         {

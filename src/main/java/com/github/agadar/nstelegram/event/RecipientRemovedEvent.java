@@ -7,7 +7,7 @@ import java.util.EventObject;
  *
  * @author Agadar
  */
-public class RemovedAddresseeEvent extends EventObject
+public class RecipientRemovedEvent extends EventObject
 {
     /** Enum for reasons why the recipient was removed. */
     public enum Reason
@@ -25,7 +25,7 @@ public class RemovedAddresseeEvent extends EventObject
     /** The reason why the recipient was removed. */
     public final Reason Reason;
     
-    public RemovedAddresseeEvent(Object source, String recipient, Reason reason)
+    public RecipientRemovedEvent(Object source, String recipient, Reason reason)
     {
         super(source);
         this.Recipient = recipient;

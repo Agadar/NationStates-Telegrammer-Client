@@ -10,8 +10,8 @@ import com.github.agadar.nsapi.event.TelegramSentEvent;
 public interface TelegramManagerListener
 {
     void handleTelegramSent(TelegramSentEvent event);    
-    void handleNoAddresseesEvent(NoAddresseesEvent event);  
-    void handleStoppedEvent(StoppedEvent event);
-    void handleRecipientRemoved(RemovedAddresseeEvent event);
-    void handleRefreshingRecipients(RefreshingRecipientsEvent event);
+    void handleNoRecipientsFound(NoRecipientsFoundEvent event);  
+    void handleStoppedSending(StoppedSendingEvent event);
+    void handleRecipientRemoved(RecipientRemovedEvent event);
+    void handleRecipientsRefreshed(RecipientsRefreshedEvent event);
 }

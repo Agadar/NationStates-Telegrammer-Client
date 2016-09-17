@@ -8,9 +8,9 @@ import java.util.EventObject;
  *
  * @author Agadar
  */
-public class RefreshingRecipientsEvent extends EventObject
+public class RecipientsRefreshedEvent extends EventObject
 {
-    public RefreshingRecipientsEvent(Object source)
+    public RecipientsRefreshedEvent(Object source)
     {
         super(source);
     }

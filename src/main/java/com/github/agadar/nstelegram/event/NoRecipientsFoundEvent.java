@@ -8,7 +8,7 @@ import java.util.EventObject;
  *
  * @author Agadar
  */
-public class NoAddresseesEvent extends EventObject
+public class NoRecipientsFoundEvent extends EventObject
 {
     /** Duration of the time-out in milliseconds. */
     public final int TimeOut;
@@ -17,7 +17,7 @@ public class NoAddresseesEvent extends EventObject
      * @param source
      * @param timeout Duration of the time-out in milliseconds.
      */
-    public NoAddresseesEvent(Object source, int timeout)
+    public NoRecipientsFoundEvent(Object source, int timeout)
     {
         super(source);
         this.TimeOut = timeout;

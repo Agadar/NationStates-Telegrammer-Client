@@ -7,7 +7,7 @@ import java.util.EventObject;
  *
  * @author Agadar
  */
-public class StoppedEvent extends EventObject
+public class StoppedSendingEvent extends EventObject
 {
     /** True if the manager stopped as result of an error. */
     public final boolean CausedByError;
@@ -20,7 +20,7 @@ public class StoppedEvent extends EventObject
     /** Number of telegrams that were never queued. */
     public final int QueuedNot;
     
-    public StoppedEvent(Object source, boolean causedByError, String errorMsg,
+    public StoppedSendingEvent(Object source, boolean causedByError, String errorMsg,
             int queuedSucces, int queuedFailed, int queuedNot)
     {
         super(source);
