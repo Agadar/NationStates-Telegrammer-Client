@@ -800,33 +800,25 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      */
     private void updateGui(boolean sending)
     {
+        BtnStart.setEnabled(!sending);
+        JListFilters.setEnabled(!sending);
+        ButtonAddFilter.setEnabled(!sending);
+        TxtFieldClientKey.setEditable(!sending);
+        TxtFieldTelegramId.setEditable(!sending);
+        TxtFieldSecretKey.setEditable(!sending);
+        TextFieldFilterValues.setEditable(!sending);
+        CheckBoxRecruiting.setEnabled(!sending);
+        CheckBoxLoop.setEnabled(!sending);
+        ComboBoxFilterType.setEnabled(!sending);
+        BtnStop.setEnabled(sending);
+        
         if (sending)
         {
-            BtnStart.setEnabled(false);
-            BtnStop.setEnabled(true);
-            JListFilters.setEnabled(false);
-            ButtonAddFilter.setEnabled(false);
             ButtonRemoveFilter.setEnabled(false);
-            TxtFieldClientKey.setEditable(false);
-            TxtFieldTelegramId.setEditable(false);
-            TxtFieldSecretKey.setEditable(false);
-            TextFieldFilterValues.setEditable(false);
-            CheckBoxRecruiting.setEnabled(false);
-            CheckBoxLoop.setEnabled(false);
             setFilterComboBoxEnabled(null);
         }
         else
-        {
-            BtnStart.setEnabled(true);
-            BtnStop.setEnabled(false);
-            JListFilters.setEnabled(true);
-            ButtonAddFilter.setEnabled(true);
-            TxtFieldClientKey.setEditable(true);
-            TxtFieldTelegramId.setEditable(true);
-            TxtFieldSecretKey.setEditable(true);
-            TextFieldFilterValues.setEditable(true);
-            CheckBoxRecruiting.setEnabled(true);
-            CheckBoxLoop.setEnabled(true);
+        {        
             setFilterComboBoxEnabled(FilterType.getViaText(
                     (String) ComboBoxFilterType.getSelectedItem()));
         }
