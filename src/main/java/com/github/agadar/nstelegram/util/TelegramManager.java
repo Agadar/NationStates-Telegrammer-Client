@@ -11,6 +11,7 @@ import com.github.agadar.nstelegram.event.RecipientRemovedEvent.Reason;
 import com.github.agadar.nstelegram.event.StoppedSendingEvent;
 import com.github.agadar.nstelegram.event.TelegramManagerListener;
 import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
+import com.github.agadar.nstelegram.runnable.SendTelegramsRunnable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -63,7 +64,7 @@ public final class TelegramManager implements TelegramSentListener
     {
         Recipients.clear();
         Filters.forEach((filter) -> { filter.applyFilter(Recipients, localCacheOnly); });
-        removeOldRecipients();
+        //removeOldRecipients();
     }
     
     /**
@@ -114,99 +115,17 @@ public final class TelegramManager implements TelegramSentListener
         if (SecretKey == null || SecretKey.isEmpty())
             throw new IllegalArgumentException("Please supply a Secret Key!");
         
-        refreshFilters(true);   // Refresh filters one last time before checking # of recipients.
+        refreshFilters(true);   // Refresh filters one last time before checking # of recipients
         
         if (numberOfAddressees() == 0)
             throw new IllegalArgumentException("Please supply at least one recipient!"); 
-
+        
+        removeOldRecipients();  // Remove old recipients.
         NSAPI.setUserAgent(String.format(USER_AGENT, ClientKey)); // Update user agent.
         
         // Prepare thread, then run it.
-        telegramThread = new Thread(() ->
-        {
-            boolean causedByError = false;
-            String errorMsg = null;
-            
-            try
-            {
-                do
-                {
-                    // Prepare query.
-                    final TelegramQuery q = NSAPI.telegram(ClientKey, TelegramId, SecretKey, 
-                        Recipients.toArray(new String[Recipients.size()]))
-                            .addListeners(this).addListeners(this);
-
-                    if (SendAsRecruitment)
-                        q.isRecruitment();
-
-                    q.execute(null);    // send the telegrams
-                    
-                    // If looping, update recipients until there's recipients available.
-                    if (IsLooping)
-                    {
-                        final RecipientsRefreshedEvent refrevent = new RecipientsRefreshedEvent(this);
-                        synchronized(Listeners)
-                        {
-                            // Pass telegram sent event through.
-                            Listeners.stream().forEach((tsl) ->
-                            {
-                                tsl.handleRecipientsRefreshed(refrevent);
-                            });
-                        }
-                        
-                        refreshFilters(false);
-                        
-                        while (Recipients.isEmpty() && !Thread.interrupted())
-                        {
-                            final NoRecipientsFoundEvent event = 
-                                    new NoRecipientsFoundEvent(this, NO_ADDRESSEES_FOUND_TIMEOUT);
-                            
-                            synchronized(Listeners)
-                            {
-                                // Pass telegram sent event through.
-                                Listeners.stream().forEach((tsl) ->
-                                {
-                                    tsl.handleNoRecipientsFound(event);
-                                });
-                            }
-                            Thread.sleep(NO_ADDRESSEES_FOUND_TIMEOUT);
-                            
-                            synchronized(Listeners)
-                            {
-                                // Pass telegram sent event through.
-                                Listeners.stream().forEach((tsl) ->
-                                {
-                                    tsl.handleRecipientsRefreshed(refrevent);
-                                });
-                            }
-                            
-                            refreshFilters(false);
-                        }
-                    }
-                } 
-                while (IsLooping && !Thread.interrupted());
-            }
-            catch (InterruptedException ex) { /* Just fall through to finally. */ }
-            catch (Exception ex)
-            {
-                // Dirty solution to not have ratelimiter exceptions show up as legit errors. 
-                if (!ex.getMessage().equals("RateLimiter.class blew up!"))
-                {
-                    causedByError = true;
-                    errorMsg = ex.getMessage();
-                }
-            }
-            finally
-            {
-                final StoppedSendingEvent stoppedEvent = new StoppedSendingEvent(this, 
-                        causedByError, errorMsg, 0, 0, 0);               
-                Listeners.stream().forEach((tsl) ->
-                {
-                    tsl.handleStoppedSending(stoppedEvent);
-                });
-            }
-        });
-        
+        telegramThread = new Thread(new SendTelegramsRunnable(this, Recipients, Listeners,
+            NO_ADDRESSEES_FOUND_TIMEOUT));       
         telegramThread.start();
     }
     
@@ -223,7 +142,7 @@ public final class TelegramManager implements TelegramSentListener
      * Removes old recipients from Recipients. Called right before executing
      * the Telegram Query.
      */
-    private void removeOldRecipients()
+    public void removeOldRecipients()
     {
         Set<String> oldRecipients = History.get(TelegramId);
         

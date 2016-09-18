@@ -45,9 +45,9 @@ import javax.swing.text.DefaultCaret;
  */
 public class NSTelegramForm extends javax.swing.JFrame implements TelegramManagerListener
 {
-    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.1.0"; // Form title.
-    
-    private final TelegramManager tm = new TelegramManager(); // Manages sending telegrams.
+    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.1.0"; // Form title.  
+    private final static String Border = "------------------------------------------";  // Border for output text.
+    private final TelegramManager tm = new TelegramManager(); // Manages sending telegrams. 
     private Thread worker;  // Thread used for compiling address lists.
     
     public NSTelegramForm()
@@ -462,11 +462,11 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     private void BtnStartActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_BtnStartActionPerformed
     {//GEN-HEADEREND:event_BtnStartActionPerformed
         updateGui(true);    // update GUI
-
+        TextAreaOutput.setText(duration());
+        
         try
         {
             tm.startSending();  // start sending telegrams
-            TextAreaOutput.setText(duration());
         }
         catch (Exception ex)
         {
@@ -879,8 +879,8 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         int hours = estimatedDuration / 3600;
         int minutes = estimatedDuration % 3600 / 60;
         int seconds = estimatedDuration % 3600 % 60;
-        return String.format("addressees selected: %s%nestimated duration: "
-                + "%s hours, %s minutes, %s seconds\n\n"
+        return String.format(Border + "%naddressees selected: %s%nestimated duration: "
+                + "%s hours, %s minutes, %s seconds%n" + Border + "%n"
                 , tm.numberOfAddressees(), hours, minutes, seconds);
     }
     
@@ -946,11 +946,11 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         {
             updateGui(false);
 
-            String message = "\nfinished" + (event.CausedByError ? " with error: " 
+            String message = Border + "\nfinished" + (event.CausedByError ? " with error: " 
                     + event.ErrorMsg + "\n" : " without fatal errors\n") + 
                     "telegrams queued: " + event.QueuedSucces + "\n" +
                     "failed to queue: " + event.QueuedFailed + "\n" + 
-                    "not yet queued: " + event.QueuedNot + "\n\n";
+                    "not yet queued: " + event.QueuedNot + "\n" + Border + "\n";
 
             TextAreaOutput.append(message);
         });
@@ -973,7 +973,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     {
         SwingUtilities.invokeLater(() ->
         {
-            printToOutput("finished loop, refreshing recipients for next loop", false);
+            printToOutput("finished loop, refreshing recipients...", false);
         });
     }
 }
