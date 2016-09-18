@@ -22,6 +22,7 @@ import com.github.agadar.nstelegram.filter.FilterRegionsWithTags;
 import com.github.agadar.nstelegram.filter.FilterRegionsWithoutTags;
 import com.github.agadar.nstelegram.filter.FilterWAMembers;
 import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
+import com.github.agadar.nstelegram.runnable.AddFilterRunnable;
 import java.awt.event.ItemEvent;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -547,116 +548,85 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         final FilterType filter = FilterType.getViaText((String) ComboBoxFilterType.getSelectedItem());  
         final String filterValues = TextFieldFilterValues.getText();
         TextFieldFilterValues.setText("");
+        String textForList = filter.getText(); // Used for the text in the visual filter list.
+        Set<String> addressees;  // Declared here as multiple cases need a string set.
+        Filter f;    // The filter to add to the telegram manager.
         
-        worker = new Thread(() ->
+        // Set above variables according to addressees type selected.
+        switch (filter)
         {
-            String type = filter.getText(); // Used for the text in the visual filter list.
-            Set<String> addressees;  // Declared here as multiple cases need a string set.
-            Filter f;    // The filter to add to the telegram manager.
-            
-            try
-            {
-                // Set above variables according to addressees type selected.
-                switch (filter)
-                {
-                    case ALL:
-                        f = new FilterAll();       
-                        break;
-                    case DELEGATES_EXCL:
-                        f = new FilterDelegates(false);
-                        break;
-                    case DELEGATES_INCL:
-                        f = new FilterDelegates(true);
-                        break;
-                    case DELEGATES_NEW:
-                        f = new FilterDelegatesNew();
-                        break;
-                    case NATIONS_EXCL:
-                        addressees = stringToStringList(filterValues);
-                        f = new FilterNations(addressees, false);
-                        type += ": " + addressees;
-                        break;
-                    case NATIONS_INCL:
-                        addressees = stringToStringList(filterValues);
-                        f = new FilterNations(addressees, true);
-                        type += ": " + addressees;
-                        break;
-                    case NATIONS_NEW:
-                        f = new FilterNationsNew();
-                        break;
-                    case NATIONS_REFOUNDED:
-                        f = new FilterNationsRefounded();
-                        break;                  
-                    case NATIONS_EJECTED:
-                        f = new FilterNationsEjected();
-                        break;
-                    case REGIONS_EXCL:
-                        addressees = stringToStringList(filterValues);
-                        f = new FilterRegions(addressees, false);
-                        type += ": " + addressees;
-                        break;
-                    case REGIONS_INCL:
-                        addressees = stringToStringList(filterValues);
-                        f = new FilterRegions(addressees, true);
-                        type += ": " + addressees;
-                        break;
-                    case REGIONS_WITH_TAGS_EXCL:
-                        addressees = stringToStringList(filterValues);
-                        f = new FilterRegionsWithTags(addressees, false);
-                        type += ": " + addressees;
-                        break;
-                    case REGIONS_WITH_TAGS_INCL:
-                        addressees = stringToStringList(filterValues);
-                        f = new FilterRegionsWithTags(addressees, true);
-                        type += ": " + addressees;
-                        break;
-                    case REGIONS_WO_TAGS_EXCL:
-                        addressees = stringToStringList(filterValues);
-                        f = new FilterRegionsWithoutTags(addressees, false);
-                        type += ": " + addressees;
-                        break;
-                    case REGIONS_WO_TAGS_INCL:
-                        addressees = stringToStringList(filterValues);
-                        f = new FilterRegionsWithoutTags(addressees, true);
-                        type += ": " + addressees;
-                        break;
-                    case WA_MEMBERS_EXCL:
-                        f = new FilterWAMembers(false);
-                        break;
-                    case WA_MEMBERS_INCL:
-                        f = new FilterWAMembers(true);
-                        break;
-                    default:
-                        return;
-                }
-
-                // Add filter to telegram manager, then update GUI.
-                tm.addFilter(f);
-                final String finalType = type;                
-                SwingUtilities.invokeLater(() ->
-                {
-                    ((DefaultListModel)JListFilters.getModel()).addElement(finalType);
-                    TextAreaOutput.setText(duration());
-                });
-            
-            } 
-            catch (Exception ex)
-            {
-                // If an exception occured, print it to the output textarea.
-                SwingUtilities.invokeLater(() ->
-                {
-                    printToOutput("a fatal error occured:\n" + ex.getMessage(), false);
-                });
-            }
-            finally
-            {
-                // Always re-enable the 'add filter' button.
-                SwingUtilities.invokeLater(() ->
-                {
-                    ButtonAddFilter.setEnabled(true);
-                });
-            }
-        });
+            case ALL:
+                f = new FilterAll();       
+                break;
+            case DELEGATES_EXCL:
+                f = new FilterDelegates(false);
+                break;
+            case DELEGATES_INCL:
+                f = new FilterDelegates(true);
+                break;
+            case DELEGATES_NEW:
+                f = new FilterDelegatesNew();
+                break;
+            case NATIONS_EXCL:
+                addressees = stringToStringList(filterValues);
+                f = new FilterNations(addressees, false);
+                textForList += ": " + addressees;
+                break;
+            case NATIONS_INCL:
+                addressees = stringToStringList(filterValues);
+                f = new FilterNations(addressees, true);
+                textForList += ": " + addressees;
+                break;
+            case NATIONS_NEW:
+                f = new FilterNationsNew();
+                break;
+            case NATIONS_REFOUNDED:
+                f = new FilterNationsRefounded();
+                break;                  
+            case NATIONS_EJECTED:
+                f = new FilterNationsEjected();
+                break;
+            case REGIONS_EXCL:
+                addressees = stringToStringList(filterValues);
+                f = new FilterRegions(addressees, false);
+                textForList += ": " + addressees;
+                break;
+            case REGIONS_INCL:
+                addressees = stringToStringList(filterValues);
+                f = new FilterRegions(addressees, true);
+                textForList += ": " + addressees;
+                break;
+            case REGIONS_WITH_TAGS_EXCL:
+                addressees = stringToStringList(filterValues);
+                f = new FilterRegionsWithTags(addressees, false);
+                textForList += ": " + addressees;
+                break;
+            case REGIONS_WITH_TAGS_INCL:
+                addressees = stringToStringList(filterValues);
+                f = new FilterRegionsWithTags(addressees, true);
+                textForList += ": " + addressees;
+                break;
+            case REGIONS_WO_TAGS_EXCL:
+                addressees = stringToStringList(filterValues);
+                f = new FilterRegionsWithoutTags(addressees, false);
+                textForList += ": " + addressees;
+                break;
+            case REGIONS_WO_TAGS_INCL:
+                addressees = stringToStringList(filterValues);
+                f = new FilterRegionsWithoutTags(addressees, true);
+                textForList += ": " + addressees;
+                break;
+            case WA_MEMBERS_EXCL:
+                f = new FilterWAMembers(false);
+                break;
+            case WA_MEMBERS_INCL:
+                f = new FilterWAMembers(true);
+                break;
+            default:
+                return;
+        }
+     
+        worker = new Thread(new AddFilterRunnable(this, tm, f, textForList));
         worker.start();
     }//GEN-LAST:event_ButtonAddFilterActionPerformed
 
@@ -803,12 +773,12 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     private javax.swing.ButtonGroup BtnGrpTelegramType;
     private javax.swing.JButton BtnStart;
     private javax.swing.JButton BtnStop;
-    private javax.swing.JButton ButtonAddFilter;
+    public javax.swing.JButton ButtonAddFilter;
     private javax.swing.JButton ButtonRemoveFilter;
     private javax.swing.JCheckBox CheckBoxLoop;
     private javax.swing.JCheckBox CheckBoxRecruiting;
     private javax.swing.JComboBox<String> ComboBoxFilterType;
-    private javax.swing.JList<String> JListFilters;
+    public javax.swing.JList<String> JListFilters;
     private javax.swing.JLabel LabelClientKey;
     private javax.swing.JLabel LabelLoop;
     private javax.swing.JLabel LabelRecruiting;
@@ -820,7 +790,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     private javax.swing.JPanel PanelTelegram;
     private javax.swing.JScrollPane ScrollPaneFilters;
     private javax.swing.JScrollPane ScrollPaneOutput;
-    private javax.swing.JTextArea TextAreaOutput;
+    public javax.swing.JTextArea TextAreaOutput;
     private javax.swing.JTextField TextFieldFiller1;
     private javax.swing.JTextField TextFieldFiller2;
     private javax.swing.JTextField TextFieldFilterValues;
@@ -900,7 +870,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      * 
      * @return 
      */
-    private String duration()
+    public final String duration()
     {
         int estimatedDuration = Math.max(tm.numberOfAddressees() - 1, 0) 
                                 * (CheckBoxRecruiting.isSelected() ? 181 : 31);
@@ -932,7 +902,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      * @param msg
      * @param clear 
      */
-    private void printToOutput(String msg, boolean clear)
+    public void printToOutput(String msg, boolean clear)
     {
         msg = "[" + LocalTime.now().format(DateTimeFormatter
                 .ofPattern("HH:mm:ss")) + "] " + msg + "\n";
