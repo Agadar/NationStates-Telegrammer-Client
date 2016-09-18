@@ -110,6 +110,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         PanelActions = new javax.swing.JPanel();
         BtnStart = new javax.swing.JButton();
         BtnStop = new javax.swing.JButton();
+        BtnClearOutput = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle(NSTelegramForm.FORM_TITLE);
@@ -389,12 +390,25 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
 
         BtnStop.setText("Stop sending");
         BtnStop.setEnabled(false);
+        BtnStop.setMaximumSize(new java.awt.Dimension(97, 23));
+        BtnStop.setMinimumSize(new java.awt.Dimension(97, 23));
         BtnStop.setName("ButtonRemoveAddressee"); // NOI18N
+        BtnStop.setPreferredSize(new java.awt.Dimension(97, 23));
         BtnStop.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
             {
                 BtnStopActionPerformed(evt);
+            }
+        });
+
+        BtnClearOutput.setText("Clear output");
+        BtnClearOutput.setName("ButtonRemoveAddressee"); // NOI18N
+        BtnClearOutput.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                BtnClearOutputActionPerformed(evt);
             }
         });
 
@@ -404,10 +418,12 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
             PanelActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelActionsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(BtnStart, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
-                .addComponent(BtnStop, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addComponent(BtnStart, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(BtnClearOutput, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(BtnStop, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         PanelActionsLayout.setVerticalGroup(
             PanelActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -415,7 +431,8 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
                 .addContainerGap()
                 .addGroup(PanelActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(BtnStart)
-                    .addComponent(BtnStop))
+                    .addComponent(BtnStop, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(BtnClearOutput))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -429,10 +446,10 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
                     .addComponent(PanelTelegram, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(PanelFilters, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(PanelOutput, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(PanelActions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(PanelActions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(PanelOutput, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -746,6 +763,16 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     }//GEN-LAST:event_CheckBoxLoopItemStateChanged
 
     /**
+     * Called when the 'clear output' button has been clicked.
+     * 
+     * @param evt 
+     */
+    private void BtnClearOutputActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_BtnClearOutputActionPerformed
+    {//GEN-HEADEREND:event_BtnClearOutputActionPerformed
+        TextAreaOutput.setText("");
+    }//GEN-LAST:event_BtnClearOutputActionPerformed
+
+    /**
      * @param args the command line arguments
      */
     public static void main(String args[])
@@ -772,6 +799,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton BtnClearOutput;
     private javax.swing.ButtonGroup BtnGrpTelegramType;
     private javax.swing.JButton BtnStart;
     private javax.swing.JButton BtnStop;
