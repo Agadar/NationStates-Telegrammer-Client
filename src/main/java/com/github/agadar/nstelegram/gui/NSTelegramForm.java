@@ -544,10 +544,12 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     private void ButtonAddFilterActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_ButtonAddFilterActionPerformed
     {//GEN-HEADEREND:event_ButtonAddFilterActionPerformed
         TextAreaOutput.setText("compiling address list...");    // Inform user, as this might take a while.
-        ButtonAddFilter.setEnabled(false);
-        final FilterType filter = FilterType.getViaText((String) ComboBoxFilterType.getSelectedItem());  
+        ButtonAddFilter.setEnabled(false);     
+        BtnStart.setEnabled(false);
         final String filterValues = TextFieldFilterValues.getText();
         TextFieldFilterValues.setText("");
+        
+        final FilterType filter = FilterType.getViaText((String) ComboBoxFilterType.getSelectedItem());  
         String textForList = filter.getText(); // Used for the text in the visual filter list.
         Set<String> addressees;  // Declared here as multiple cases need a string set.
         Filter f;    // The filter to add to the telegram manager.
@@ -771,7 +773,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BtnClearOutput;
     private javax.swing.ButtonGroup BtnGrpTelegramType;
-    private javax.swing.JButton BtnStart;
+    public javax.swing.JButton BtnStart;
     private javax.swing.JButton BtnStop;
     public javax.swing.JButton ButtonAddFilter;
     private javax.swing.JButton ButtonRemoveFilter;

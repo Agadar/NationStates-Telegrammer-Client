@@ -50,10 +50,11 @@ public class AddFilterRunnable implements Runnable
         }
         finally
         {
-            // Always re-enable the 'add filter' button.
+            // Always re-enable the 'add filter' and 'start sending' buttons.
             SwingUtilities.invokeLater(() ->
             {
                 Form.ButtonAddFilter.setEnabled(true);
+                Form.BtnStart.setEnabled(true);
             });
         }
     }
