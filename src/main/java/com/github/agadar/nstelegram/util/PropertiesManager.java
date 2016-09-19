@@ -16,6 +16,7 @@ public class PropertiesManager
 {
     // Standard name for this app's properties file.
     private static final String fileName = "nationstates-telegrammer.properties";
+    private static final String defaultVal = "";
     
     // Variables loaded from and saved to the properties file.
     public String ClientKey;
@@ -31,9 +32,9 @@ public class PropertiesManager
     {
         // Prepare properties object.
         Properties props = new Properties();
-        props.setProperty("ClientKey", ClientKey);
-        props.setProperty("TelegramId", TelegramId);
-        props.setProperty("SecretKey", SecretKey);
+        props.setProperty("ClientKey", ClientKey == null ? defaultVal: ClientKey);
+        props.setProperty("TelegramId", TelegramId == null ? defaultVal : TelegramId);
+        props.setProperty("SecretKey", SecretKey == null ? defaultVal : SecretKey);
         props.setProperty("IsRecruitment", Boolean.toString(IsRecruitment));
         props.setProperty("IsLooping", Boolean.toString(IsLooping));
         
@@ -67,10 +68,10 @@ public class PropertiesManager
         }
         
         // Set variables.
-        ClientKey = props.getProperty("ClientKey");
-        TelegramId = props.getProperty("TelegramId");
-        SecretKey = props.getProperty("SecretKey");
-        IsRecruitment = Boolean.valueOf(props.getProperty("IsRecruitment"));
-        IsLooping = Boolean.valueOf(props.getProperty("IsLooping"));
+        ClientKey = props.getProperty("ClientKey", defaultVal);
+        TelegramId = props.getProperty("TelegramId", defaultVal);
+        SecretKey = props.getProperty("SecretKey", defaultVal);
+        IsRecruitment = Boolean.valueOf(props.getProperty("IsRecruitment", "false"));
+        IsLooping = Boolean.valueOf(props.getProperty("IsLooping", "false"));
     }
 }
