@@ -1,6 +1,7 @@
 package com.github.agadar.nstelegram.util;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,6 +25,25 @@ public class FilterCache
         NationsToRegions = new HashMap<>();
         RegionsToTagsWith = new HashMap<>();
         RegionsToTagsWithout = new HashMap<>();
+    }
+    
+    /**
+     * Maps a single nation to a region.
+     * 
+     * @param region
+     * @param nation 
+     */
+    public void mapNationToRegion(String region, String nation)
+    {
+        Set<String> nations = NationsToRegions.get(region);
+        
+        if (nations == null)
+        {
+            nations = new HashSet<>();
+            NationsToRegions.put(region, nations);
+        }
+        
+        nations.add(nation);
     }
     
     /**
