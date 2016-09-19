@@ -630,7 +630,10 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      
         // Check to make sure the thread is not already running to prevent synchronization issues.
         if (worker != null && worker.isAlive())
-            throw new IllegalThreadStateException("Compile recipient list thread already running!");
+        {
+            TextAreaOutput.setText("Compile recipient list thread already running!");
+            return;
+        }
         
         // Prepare thread, then run it.
         worker = new Thread(new AddFilterRunnable(this, tm, f, textForList));
