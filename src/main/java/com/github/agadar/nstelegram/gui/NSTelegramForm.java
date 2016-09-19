@@ -1,13 +1,10 @@
 package com.github.agadar.nstelegram.gui;
 
 import com.github.agadar.nsapi.event.TelegramSentEvent;
-import com.github.agadar.nstelegram.util.FilterType;
-import com.github.agadar.nstelegram.util.PropertiesManager;
-import com.github.agadar.nstelegram.util.TelegramManager;
 import com.github.agadar.nstelegram.event.NoRecipientsFoundEvent;
-import com.github.agadar.nstelegram.event.RecipientsRefreshedEvent;
 import com.github.agadar.nstelegram.event.RecipientRemovedEvent;
 import com.github.agadar.nstelegram.event.RecipientRemovedEvent.Reason;
+import com.github.agadar.nstelegram.event.RecipientsRefreshedEvent;
 import com.github.agadar.nstelegram.event.StoppedSendingEvent;
 import com.github.agadar.nstelegram.event.TelegramManagerListener;
 import com.github.agadar.nstelegram.filter.FilterAll;
@@ -23,6 +20,9 @@ import com.github.agadar.nstelegram.filter.FilterRegionsWithoutTags;
 import com.github.agadar.nstelegram.filter.FilterWAMembers;
 import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
 import com.github.agadar.nstelegram.runnable.AddFilterRunnable;
+import com.github.agadar.nstelegram.util.FilterType;
+import com.github.agadar.nstelegram.util.PropertiesManager;
+import com.github.agadar.nstelegram.util.TelegramManager;
 import java.awt.event.ItemEvent;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -543,7 +543,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      */
     private void ButtonAddFilterActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_ButtonAddFilterActionPerformed
     {//GEN-HEADEREND:event_ButtonAddFilterActionPerformed
-        TextAreaOutput.setText("compiling address list...");    // Inform user, as this might take a while.
+        TextAreaOutput.setText("compiling recipient list...");    // Inform user, as this might take a while.
         ButtonAddFilter.setEnabled(false);     
         BtnStart.setEnabled(false);
         final String filterValues = TextFieldFilterValues.getText();
@@ -628,6 +628,11 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
                 return;
         }
      
+        // Check to make sure the thread is not already running to prevent synchronization issues.
+        if (worker != null && worker.isAlive())
+            throw new IllegalThreadStateException("Compile recipient list thread already running!");
+        
+        // Prepare thread, then run it.
         worker = new Thread(new AddFilterRunnable(this, tm, f, textForList));
         worker.start();
     }//GEN-LAST:event_ButtonAddFilterActionPerformed

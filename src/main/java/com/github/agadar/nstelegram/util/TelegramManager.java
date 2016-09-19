@@ -3,12 +3,8 @@ package com.github.agadar.nstelegram.util;
 import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nsapi.event.TelegramSentEvent;
 import com.github.agadar.nsapi.event.TelegramSentListener;
-import com.github.agadar.nsapi.query.TelegramQuery;
-import com.github.agadar.nstelegram.event.NoRecipientsFoundEvent;
-import com.github.agadar.nstelegram.event.RecipientsRefreshedEvent;
 import com.github.agadar.nstelegram.event.RecipientRemovedEvent;
 import com.github.agadar.nstelegram.event.RecipientRemovedEvent.Reason;
-import com.github.agadar.nstelegram.event.StoppedSendingEvent;
 import com.github.agadar.nstelegram.event.TelegramManagerListener;
 import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
 import com.github.agadar.nstelegram.runnable.SendTelegramsRunnable;
@@ -122,6 +118,10 @@ public final class TelegramManager implements TelegramSentListener
         
         removeOldRecipients();  // Remove old recipients.
         NSAPI.setUserAgent(String.format(USER_AGENT, ClientKey)); // Update user agent.
+        
+        // Check to make sure the thread is not already running to prevent synchronization issues.
+        if (telegramThread != null && telegramThread.isAlive())
+            throw new IllegalThreadStateException("Telegram thread already running!");
         
         // Prepare thread, then run it.
         telegramThread = new Thread(new SendTelegramsRunnable(this, Recipients, Listeners,
