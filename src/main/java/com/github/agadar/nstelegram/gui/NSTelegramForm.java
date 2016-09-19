@@ -48,8 +48,8 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
 {
     public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.1.0"; // Form title.  
     private final static String Border = "------------------------------------------";  // Border for output text.
-    private final TelegramManager tm = new TelegramManager(); // Manages sending telegrams. 
-    private Thread worker;  // Thread used for compiling address lists.
+    private final TelegramManager Tm = new TelegramManager(); // Manages sending telegrams. 
+    private Thread CompileRecipientsWorker;  // Thread used for compiling address lists.
     
     public NSTelegramForm()
     {
@@ -61,17 +61,17 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         // Set fields according to values retrieved from properties file.
         final PropertiesManager ph = new PropertiesManager();
         ph.loadProperties();
-        TxtFieldClientKey.setText(tm.ClientKey = ph.ClientKey);
-        TxtFieldTelegramId.setText(tm.TelegramId = ph.TelegramId);
-        TxtFieldSecretKey.setText(tm.SecretKey = ph.SecretKey);
-        CheckBoxRecruiting.setSelected(tm.SendAsRecruitment = ph.IsRecruitment);
-        CheckBoxLoop.setSelected(tm.IsLooping = ph.IsLooping);
+        TxtFieldClientKey.setText(Tm.ClientKey = ph.ClientKey);
+        TxtFieldTelegramId.setText(Tm.TelegramId = ph.TelegramId);
+        TxtFieldSecretKey.setText(Tm.SecretKey = ph.SecretKey);
+        CheckBoxRecruiting.setSelected(Tm.SendAsRecruitment = ph.IsRecruitment);
+        CheckBoxLoop.setSelected(Tm.IsLooping = ph.IsLooping);
         
         // Set output textarea, for consistency's sake.
         TextAreaOutput.setText(duration());
         
         // Subscribe to telegram manager.
-        tm.addListeners(this);
+        Tm.addListeners(this);
     }
     
     /**
@@ -484,12 +484,12 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         
         try
         {
-            tm.startSending();  // start sending telegrams
+            Tm.startSending();  // start sending telegrams
         }
         catch (Exception ex)
         {
             // if something went wrong while starting sending telegrams, reset GUI
-            TextAreaOutput.setText(ex.getMessage());
+            TextAreaOutput.setText(ex.getMessage() + "\n");
             updateGui(false);
         }
     }//GEN-LAST:event_BtnStartActionPerformed
@@ -502,7 +502,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      */
     private void BtnStopActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_BtnStopActionPerformed
     {//GEN-HEADEREND:event_BtnStopActionPerformed
-        tm.stopSending(); // Call telegram manager to stop sending.
+        Tm.stopSending(); // Call telegram manager to stop sending.
     }//GEN-LAST:event_BtnStopActionPerformed
 
     /**
@@ -543,7 +543,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      */
     private void ButtonAddFilterActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_ButtonAddFilterActionPerformed
     {//GEN-HEADEREND:event_ButtonAddFilterActionPerformed
-        TextAreaOutput.setText("compiling recipient list...");    // Inform user, as this might take a while.
+        TextAreaOutput.setText("compiling recipient list...\n");    // Inform user, as this might take a while.
         ButtonAddFilter.setEnabled(false);     
         BtnStart.setEnabled(false);
         final String filterValues = TextFieldFilterValues.getText();
@@ -629,15 +629,15 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         }
      
         // Check to make sure the thread is not already running to prevent synchronization issues.
-        if (worker != null && worker.isAlive())
+        if (CompileRecipientsWorker != null && CompileRecipientsWorker.isAlive())
         {
-            TextAreaOutput.setText("Compile recipient list thread already running!");
+            TextAreaOutput.setText("Compile recipient list thread already running!\n");
             return;
         }
         
         // Prepare thread, then run it.
-        worker = new Thread(new AddFilterRunnable(this, tm, f, textForList));
-        worker.start();
+        CompileRecipientsWorker = new Thread(new AddFilterRunnable(this, Tm, f, textForList));
+        CompileRecipientsWorker.start();
     }//GEN-LAST:event_ButtonAddFilterActionPerformed
 
     /**
@@ -650,7 +650,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     {//GEN-HEADEREND:event_ButtonRemoveFilterActionPerformed
         // Retrieve selected index, remove filter from telegram manager.
         int index = JListFilters.getSelectedIndex();
-        tm.removeFilterAt(index);
+        Tm.removeFilterAt(index);
         
         // Remove filter from GUI, try select preceding filter.
         ((DefaultListModel)JListFilters.getModel()).remove(index);
@@ -671,11 +671,11 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     {//GEN-HEADEREND:event_formWindowClosing
         // Store relevant variables to properties file.
         final PropertiesManager ph = new PropertiesManager();
-        ph.ClientKey = tm.ClientKey;
-        ph.TelegramId = tm.TelegramId;
-        ph.SecretKey = tm.SecretKey;
-        ph.IsRecruitment = tm.SendAsRecruitment;
-        ph.IsLooping = tm.IsLooping;
+        ph.ClientKey = Tm.ClientKey;
+        ph.TelegramId = Tm.TelegramId;
+        ph.SecretKey = Tm.SecretKey;
+        ph.IsRecruitment = Tm.SendAsRecruitment;
+        ph.IsLooping = Tm.IsLooping;
         ph.saveProperties();
     }//GEN-LAST:event_formWindowClosing
 
@@ -698,7 +698,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      */
     private void TxtFieldClientKeyKeyReleased(java.awt.event.KeyEvent evt)//GEN-FIRST:event_TxtFieldClientKeyKeyReleased
     {//GEN-HEADEREND:event_TxtFieldClientKeyKeyReleased
-        tm.ClientKey = TxtFieldClientKey.getText();
+        Tm.ClientKey = TxtFieldClientKey.getText();
     }//GEN-LAST:event_TxtFieldClientKeyKeyReleased
 
     /**
@@ -708,7 +708,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      */
     private void TxtFieldSecretKeyKeyReleased(java.awt.event.KeyEvent evt)//GEN-FIRST:event_TxtFieldSecretKeyKeyReleased
     {//GEN-HEADEREND:event_TxtFieldSecretKeyKeyReleased
-        tm.SecretKey = TxtFieldSecretKey.getText();
+        Tm.SecretKey = TxtFieldSecretKey.getText();
     }//GEN-LAST:event_TxtFieldSecretKeyKeyReleased
 
     /**
@@ -718,7 +718,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      */
     private void TxtFieldTelegramIdKeyReleased(java.awt.event.KeyEvent evt)//GEN-FIRST:event_TxtFieldTelegramIdKeyReleased
     {//GEN-HEADEREND:event_TxtFieldTelegramIdKeyReleased
-        tm.TelegramId = TxtFieldTelegramId.getText();
+        Tm.TelegramId = TxtFieldTelegramId.getText();
     }//GEN-LAST:event_TxtFieldTelegramIdKeyReleased
 
     /**
@@ -728,7 +728,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      */
     private void CheckBoxRecruitingItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_CheckBoxRecruitingItemStateChanged
     {//GEN-HEADEREND:event_CheckBoxRecruitingItemStateChanged
-        tm.SendAsRecruitment = CheckBoxRecruiting.isSelected();
+        Tm.SendAsRecruitment = CheckBoxRecruiting.isSelected();
         TextAreaOutput.setText(duration());  
     }//GEN-LAST:event_CheckBoxRecruitingItemStateChanged
 
@@ -739,7 +739,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      */
     private void CheckBoxLoopItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_CheckBoxLoopItemStateChanged
     {//GEN-HEADEREND:event_CheckBoxLoopItemStateChanged
-        tm.IsLooping = CheckBoxLoop.isSelected();
+        Tm.IsLooping = CheckBoxLoop.isSelected();
     }//GEN-LAST:event_CheckBoxLoopItemStateChanged
 
     /**
@@ -882,14 +882,14 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      */
     public final String duration()
     {
-        int estimatedDuration = Math.max(tm.numberOfAddressees() - 1, 0) 
+        int estimatedDuration = Math.max(Tm.numberOfRecipients() - 1, 0) 
                                 * (CheckBoxRecruiting.isSelected() ? 181 : 31);
         int hours = estimatedDuration / 3600;
         int minutes = estimatedDuration % 3600 / 60;
         int seconds = estimatedDuration % 3600 % 60;
         return String.format(Border + "%naddressees selected: %s%nestimated duration: "
                 + "%s hours, %s minutes, %s seconds%n" + Border + "%n"
-                , tm.numberOfAddressees(), hours, minutes, seconds);
+                , Tm.numberOfRecipients(), hours, minutes, seconds);
     }
     
     /**

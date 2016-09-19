@@ -1,8 +1,6 @@
 package com.github.agadar.nstelegram.util;
 
 import com.github.agadar.nsapi.NSAPI;
-import com.github.agadar.nsapi.event.TelegramSentEvent;
-import com.github.agadar.nsapi.event.TelegramSentListener;
 import com.github.agadar.nstelegram.event.RecipientRemovedEvent;
 import com.github.agadar.nstelegram.event.RecipientRemovedEvent.Reason;
 import com.github.agadar.nstelegram.event.TelegramManagerListener;
@@ -21,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  * @author Agadar <https://github.com/Agadar/>
  */
-public final class TelegramManager implements TelegramSentListener
+public final class TelegramManager
 {
     // User agent string for formatting.
     private final static String USER_AGENT = "Agadar's Telegrammer using Client "
@@ -33,7 +31,7 @@ public final class TelegramManager implements TelegramSentListener
     private final Set<String> Recipients = new HashSet<>(); // Presumably most up-to-date recipients list, based on Filters.
     private final Map<String, Set<String>> History = new ConcurrentHashMap<>();   // History of recipients, mapped to telegram id's.
     private final Set<TelegramManagerListener> Listeners = new HashSet<>(); // Listeners to events thrown by this.
-    private Thread telegramThread; // The thread on which the TelegramQuery is running.
+    private Thread TelegramThread; // The thread on which the TelegramQuery is running.
     
     // Variables that will be used for sending the telegrams. Should be manually
     // updated by a form or where-ever these values are defined.
@@ -80,9 +78,19 @@ public final class TelegramManager implements TelegramSentListener
      * 
      * @return 
      */
-    public int numberOfAddressees()
+    public int numberOfRecipients()
     {
         return Recipients.size();
+    }
+    
+    /**
+     * Gets a copy of the Recipients.
+     * 
+     * @return 
+     */
+    public Set<String> getRecipients()
+    {
+        return new HashSet<>(Recipients);
     }
     
     /**
@@ -113,20 +121,20 @@ public final class TelegramManager implements TelegramSentListener
         
         refreshFilters(true);   // Refresh filters one last time before checking # of recipients
         
-        if (numberOfAddressees() == 0)
+        if (numberOfRecipients() == 0)
             throw new IllegalArgumentException("Please supply at least one recipient!"); 
         
         removeOldRecipients();  // Remove old recipients.
         NSAPI.setUserAgent(String.format(USER_AGENT, ClientKey)); // Update user agent.
         
         // Check to make sure the thread is not already running to prevent synchronization issues.
-        if (telegramThread != null && telegramThread.isAlive())
+        if (TelegramThread != null && TelegramThread.isAlive())
             throw new IllegalThreadStateException("Telegram thread already running!");
         
         // Prepare thread, then run it.
-        telegramThread = new Thread(new SendTelegramsRunnable(this, Recipients, Listeners,
-            NO_ADDRESSEES_FOUND_TIMEOUT));       
-        telegramThread.start();
+        TelegramThread = new Thread(new SendTelegramsRunnable(this, Recipients, Listeners,
+            NO_ADDRESSEES_FOUND_TIMEOUT, History));       
+        TelegramThread.start();
     }
     
     /**
@@ -134,8 +142,8 @@ public final class TelegramManager implements TelegramSentListener
      */
     public void stopSending()
     {
-        if (telegramThread != null)
-            telegramThread.interrupt();
+        if (TelegramThread != null)
+            TelegramThread.interrupt();
     }
     
     /**
@@ -183,26 +191,6 @@ public final class TelegramManager implements TelegramSentListener
         synchronized (Listeners)
         {
             Listeners.addAll(Arrays.asList(newlisteners));
-        }
-    }
-    
-    @Override
-    public void handleTelegramSent(TelegramSentEvent event)
-    {
-        // Update the History. We're assuming removeOldRecipients is always
-        // called before this and the Telegram Id didn't change in the meantime,
-        // so there is no need to make sure the entry for the current Telegram Id
-        // changed.       
-        if (event.Queued)
-            History.get(TelegramId).add(event.Addressee);
-        
-        synchronized(Listeners)
-        {
-            // Pass telegram sent event through.
-            Listeners.stream().forEach((tsl) ->
-            {
-                tsl.handleTelegramSent(event);
-            });
         }
     }
 }
