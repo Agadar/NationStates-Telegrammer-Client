@@ -9,7 +9,7 @@ It uses my own [NationStates API Java Wrapper](https://github.com/Agadar/NationS
 
 ## Screenshot
 
-![Screenshot NationStates Telegrammer 1.0.0.png](Screenshot NationStates Telegrammer 1.0.0.png)
+![images/Screenshot NationStates Telegrammer 1.1.0.png](images/Screenshot NationStates Telegrammer 1.1.0.png)
 
 ## Links
 
