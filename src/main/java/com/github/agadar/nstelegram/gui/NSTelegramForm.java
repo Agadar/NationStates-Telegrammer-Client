@@ -1,5 +1,7 @@
 package com.github.agadar.nstelegram.gui;
 
+import com.github.agadar.nsapi.NSAPI;
+import com.github.agadar.nsapi.NationStatesAPIException;
 import com.github.agadar.nsapi.event.TelegramSentEvent;
 import com.github.agadar.nstelegram.event.NoRecipientsFoundEvent;
 import com.github.agadar.nstelegram.event.RecipientRemovedEvent;
@@ -72,6 +74,16 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         
         // Subscribe to telegram manager.
         Tm.addListeners(this);
+        
+        // Attempt to set and verify user agent.
+        try
+        {
+            NSAPI.setUserAgent("Agadar's Telegrammer (https://github.com/Agadar/NationStates-Telegrammer)");
+        }
+        catch (NationStatesAPIException ex)
+        {
+            TextAreaOutput.setText(ex.getMessage());
+        }
     }
     
     /**

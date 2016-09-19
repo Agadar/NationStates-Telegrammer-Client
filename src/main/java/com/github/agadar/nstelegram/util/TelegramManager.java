@@ -41,12 +41,6 @@ public final class TelegramManager
     public boolean SendAsRecruitment;
     public boolean IsLooping;
     
-    public TelegramManager() 
-    {
-        // Set user agent for the first time.
-        NSAPI.setUserAgent("Agadar's Telegrammer (https://github.com/Agadar/NationStates-Telegrammer)");
-    }
-    
     /**
      * Refreshes the filters.
      * 
@@ -68,8 +62,8 @@ public final class TelegramManager
      */
     public void addFilter(Filter filter)
     {
-        Filters.add(filter);
         filter.applyFilter(Recipients, false);
+        Filters.add(filter);
         refreshFilters(true);
     }
     

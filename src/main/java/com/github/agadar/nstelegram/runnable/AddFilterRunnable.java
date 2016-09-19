@@ -40,7 +40,7 @@ public class AddFilterRunnable implements Runnable
             });
 
         } 
-        catch (Exception ex)
+        catch (Exception | OutOfMemoryError ex)
         {
             // If an exception occured, print it to the output textarea.
             SwingUtilities.invokeLater(() ->
