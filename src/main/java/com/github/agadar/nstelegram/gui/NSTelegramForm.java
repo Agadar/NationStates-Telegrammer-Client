@@ -67,6 +67,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         TxtFieldTelegramId.setText(Tm.TelegramId = ph.TelegramId);
         TxtFieldSecretKey.setText(Tm.SecretKey = ph.SecretKey);
         CheckBoxRecruiting.setSelected(Tm.SendAsRecruitment = ph.IsRecruitment);
+        TxtFieldRegionFrom.setText(Tm.FromRegion = ph.FromRegion);
         CheckBoxLoop.setSelected(Tm.IsLooping = ph.IsLooping);
         
         // Set output textarea, for consistency's sake.
@@ -110,6 +111,8 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         TextFieldFiller1 = new javax.swing.JTextField();
         CheckBoxLoop = new javax.swing.JCheckBox();
         CheckBoxRecruiting = new javax.swing.JCheckBox();
+        TxtFieldRegionFrom = new javax.swing.JTextField();
+        LabelRegionFrom = new javax.swing.JLabel();
         PanelFilters = new javax.swing.JPanel();
         ScrollPaneFilters = new javax.swing.JScrollPane();
         JListFilters = new javax.swing.JList<>();
@@ -227,31 +230,51 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
             }
         });
 
+        TxtFieldRegionFrom.setEditable(false);
+        TxtFieldRegionFrom.setName("TxtFieldSecretKey"); // NOI18N
+        TxtFieldRegionFrom.addKeyListener(new java.awt.event.KeyAdapter()
+        {
+            public void keyReleased(java.awt.event.KeyEvent evt)
+            {
+                TxtFieldRegionFromKeyReleased(evt);
+            }
+        });
+
+        LabelRegionFrom.setText("From region:");
+        LabelRegionFrom.setName("LabelRecruiting"); // NOI18N
+
         javax.swing.GroupLayout PanelTelegramLayout = new javax.swing.GroupLayout(PanelTelegram);
         PanelTelegram.setLayout(PanelTelegramLayout);
         PanelTelegramLayout.setHorizontalGroup(
             PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelTelegramLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(LabelRecruiting)
-                    .addComponent(LabelSecretKey)
-                    .addComponent(LabelTelegramId)
-                    .addComponent(LabelLoop)
-                    .addComponent(LabelClientKey))
-                .addGap(18, 18, 18)
-                .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(TxtFieldClientKey, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(TxtFieldTelegramId, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(PanelTelegramLayout.createSequentialGroup()
-                        .addComponent(CheckBoxLoop)
+                        .addComponent(LabelRegionFrom)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(TextFieldFiller2, javax.swing.GroupLayout.PREFERRED_SIZE, 6, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelTelegramLayout.createSequentialGroup()
-                        .addComponent(CheckBoxRecruiting)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(TextFieldFiller1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(TxtFieldSecretKey, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(TxtFieldRegionFrom, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(PanelTelegramLayout.createSequentialGroup()
+                        .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(LabelRecruiting)
+                                .addComponent(LabelSecretKey)
+                                .addComponent(LabelTelegramId)
+                                .addComponent(LabelClientKey))
+                            .addComponent(LabelLoop, javax.swing.GroupLayout.Alignment.LEADING))
+                        .addGap(18, 18, 18)
+                        .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(TxtFieldClientKey, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(TxtFieldTelegramId, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(PanelTelegramLayout.createSequentialGroup()
+                                .addComponent(CheckBoxLoop)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(TextFieldFiller2, javax.swing.GroupLayout.PREFERRED_SIZE, 6, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelTelegramLayout.createSequentialGroup()
+                                .addComponent(CheckBoxRecruiting)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(TextFieldFiller1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(TxtFieldSecretKey, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(0, 22, Short.MAX_VALUE))
         );
         PanelTelegramLayout.setVerticalGroup(
@@ -276,10 +299,14 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
                     .addComponent(CheckBoxRecruiting))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(LabelLoop)
+                    .addComponent(TxtFieldRegionFrom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(LabelRegionFrom))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(TextFieldFiller2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(CheckBoxLoop))
-                .addGap(29, 29, 29))
+                    .addComponent(CheckBoxLoop)
+                    .addComponent(LabelLoop))
+                .addGap(19, 19, 19))
         );
 
         PanelFilters.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Filters", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
@@ -385,7 +412,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
             PanelOutputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelOutputLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(ScrollPaneOutput, javax.swing.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
+                .addComponent(ScrollPaneOutput)
                 .addContainerGap())
         );
 
@@ -468,15 +495,15 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(PanelTelegram, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(PanelFilters, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(PanelOutput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(PanelOutput, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(PanelActions, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(PanelActions, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(PanelTelegram, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(PanelFilters, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -687,6 +714,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         ph.TelegramId = Tm.TelegramId;
         ph.SecretKey = Tm.SecretKey;
         ph.IsRecruitment = Tm.SendAsRecruitment;
+        ph.FromRegion = Tm.FromRegion;
         ph.IsLooping = Tm.IsLooping;
         ph.saveProperties();
     }//GEN-LAST:event_formWindowClosing
@@ -741,6 +769,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     private void CheckBoxRecruitingItemStateChanged(java.awt.event.ItemEvent evt)//GEN-FIRST:event_CheckBoxRecruitingItemStateChanged
     {//GEN-HEADEREND:event_CheckBoxRecruitingItemStateChanged
         Tm.SendAsRecruitment = CheckBoxRecruiting.isSelected();
+        TxtFieldRegionFrom.setEditable(CheckBoxRecruiting.isSelected());
         TextAreaOutput.setText(duration());  
     }//GEN-LAST:event_CheckBoxRecruitingItemStateChanged
 
@@ -763,6 +792,16 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     {//GEN-HEADEREND:event_BtnClearOutputActionPerformed
         TextAreaOutput.setText("");
     }//GEN-LAST:event_BtnClearOutputActionPerformed
+
+    /** 
+     * Updates region from on key release.
+     * 
+     * @param evt 
+     */
+    private void TxtFieldRegionFromKeyReleased(java.awt.event.KeyEvent evt)//GEN-FIRST:event_TxtFieldRegionFromKeyReleased
+    {//GEN-HEADEREND:event_TxtFieldRegionFromKeyReleased
+        Tm.FromRegion = TxtFieldRegionFrom.getText();
+    }//GEN-LAST:event_TxtFieldRegionFromKeyReleased
 
     /**
      * @param args the command line arguments
@@ -804,6 +843,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     private javax.swing.JLabel LabelClientKey;
     private javax.swing.JLabel LabelLoop;
     private javax.swing.JLabel LabelRecruiting;
+    private javax.swing.JLabel LabelRegionFrom;
     private javax.swing.JLabel LabelSecretKey;
     private javax.swing.JLabel LabelTelegramId;
     private javax.swing.JPanel PanelActions;
@@ -817,6 +857,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     private javax.swing.JTextField TextFieldFiller2;
     private javax.swing.JTextField TextFieldFilterValues;
     private javax.swing.JTextField TxtFieldClientKey;
+    private javax.swing.JTextField TxtFieldRegionFrom;
     private javax.swing.JTextField TxtFieldSecretKey;
     private javax.swing.JTextField TxtFieldTelegramId;
     // End of variables declaration//GEN-END:variables
@@ -843,11 +884,13 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         
         if (sending)
         {
+            TxtFieldRegionFrom.setEditable(false);
             ButtonRemoveFilter.setEnabled(false);
             setFilterComboBoxEnabled(null);
         }
         else
-        {        
+        {    
+            TxtFieldRegionFrom.setEditable(CheckBoxRecruiting.isSelected());
             setFilterComboBoxEnabled(FilterType.getViaText(
                     (String) ComboBoxFilterType.getSelectedItem()));
         }

@@ -55,16 +55,16 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <Component id="PanelTelegram" min="-2" pref="185" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="PanelFilters" min="-2" pref="234" max="-2" attributes="0"/>
-                  </Group>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
-                      <Component id="PanelOutput" min="-2" max="-2" attributes="0"/>
+                      <Component id="PanelOutput" max="32767" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="PanelActions" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <Component id="PanelTelegram" min="-2" pref="213" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="PanelFilters" min="-2" pref="234" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
@@ -87,30 +87,41 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="LabelRecruiting" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="LabelSecretKey" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="LabelTelegramId" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="LabelLoop" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="LabelClientKey" alignment="0" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="TxtFieldClientKey" min="-2" pref="150" max="-2" attributes="0"/>
-                      <Component id="TxtFieldTelegramId" alignment="0" min="-2" pref="150" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
                       <Group type="102" attributes="0">
-                          <Component id="CheckBoxLoop" min="-2" max="-2" attributes="0"/>
+                          <Component id="LabelRegionFrom" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
-                          <Component id="TextFieldFiller2" min="-2" pref="6" max="-2" attributes="0"/>
+                          <Component id="TxtFieldRegionFrom" min="-2" pref="150" max="-2" attributes="0"/>
                       </Group>
-                      <Group type="102" alignment="1" attributes="0">
-                          <Component id="CheckBoxRecruiting" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="32767" attributes="0"/>
-                          <Component id="TextFieldFiller1" min="-2" max="-2" attributes="0"/>
+                      <Group type="102" attributes="0">
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="LabelRecruiting" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="LabelSecretKey" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="LabelTelegramId" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="LabelClientKey" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Component id="LabelLoop" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="TxtFieldClientKey" min="-2" pref="150" max="-2" attributes="0"/>
+                              <Component id="TxtFieldTelegramId" alignment="0" min="-2" pref="150" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Component id="CheckBoxLoop" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
+                                  <Component id="TextFieldFiller2" min="-2" pref="6" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Component id="CheckBoxRecruiting" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="32767" attributes="0"/>
+                                  <Component id="TextFieldFiller1" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Component id="TxtFieldSecretKey" alignment="1" min="-2" pref="150" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
-                      <Component id="TxtFieldSecretKey" alignment="1" min="-2" pref="150" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="0" pref="22" max="32767" attributes="0"/>
               </Group>
@@ -142,11 +153,16 @@
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="LabelLoop" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="TxtFieldRegionFrom" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="LabelRegionFrom" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="TextFieldFiller2" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="CheckBoxLoop" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="LabelLoop" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -256,6 +272,21 @@
           <Events>
             <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="CheckBoxRecruitingItemStateChanged"/>
           </Events>
+        </Component>
+        <Component class="javax.swing.JTextField" name="TxtFieldRegionFrom">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+            <Property name="name" type="java.lang.String" value="TxtFieldSecretKey" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="TxtFieldRegionFromKeyReleased"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JLabel" name="LabelRegionFrom">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="From region:"/>
+            <Property name="name" type="java.lang.String" value="LabelRecruiting" noResource="true"/>
+          </Properties>
         </Component>
       </SubComponents>
     </Container>
@@ -408,7 +439,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="ScrollPaneOutput" pref="306" max="32767" attributes="0"/>
+                  <Component id="ScrollPaneOutput" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>

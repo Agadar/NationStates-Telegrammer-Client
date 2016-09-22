@@ -39,6 +39,7 @@ public final class TelegramManager
     public String TelegramId;
     public String SecretKey;
     public boolean SendAsRecruitment;
+    public String FromRegion;
     public boolean IsLooping;
     
     /**
@@ -52,7 +53,6 @@ public final class TelegramManager
     {
         Recipients.clear();
         Filters.forEach((filter) -> { filter.applyFilter(Recipients, localCacheOnly); });
-        //removeOldRecipients();
     }
     
     /**
