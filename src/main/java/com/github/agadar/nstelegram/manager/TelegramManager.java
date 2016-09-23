@@ -121,7 +121,7 @@ public final class TelegramManager
         if (numberOfRecipients() == 0)
             throw new IllegalArgumentException("Please supply at least one recipient!"); 
         
-        removeOldRecipients();  // Remove old recipients.
+        removeOldRecipients(false);  // Remove old recipients.
         NSAPI.setUserAgent(String.format(USER_AGENT, ClientKey)); // Update user agent.
         
         // Check to make sure the thread is not already running to prevent synchronization issues.
@@ -145,8 +145,10 @@ public final class TelegramManager
     
     /**
      * Removes invalid recipients from Recipients.
+     * 
+     * @param publishEvents whether or not to publish an event for each skipped recipient
      */
-    public void removeOldRecipients()
+    public void removeOldRecipients(boolean publishEvents)
     {
         for (final Iterator<String> it = Recipients.iterator(); it.hasNext();)
         {
@@ -156,13 +158,17 @@ public final class TelegramManager
             if (reason != null)
             {
                 it.remove();   // Remove recipient
-                final RecipientRemovedEvent event = new RecipientRemovedEvent(this, recipient, reason); // Create event
-                synchronized(Listeners) // fire event
+                
+                if (publishEvents)
                 {
-                    Listeners.stream().forEach((tsl) ->
+                    final RecipientRemovedEvent event = new RecipientRemovedEvent(this, recipient, reason); // Create event
+                    synchronized(Listeners) // fire event
                     {
-                        tsl.handleRecipientRemoved(event);
-                    });
+                        Listeners.stream().forEach((tsl) ->
+                        {
+                            tsl.handleRecipientRemoved(event);
+                        });
+                    }
                 }
             }       
         }

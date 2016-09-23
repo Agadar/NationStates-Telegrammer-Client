@@ -124,7 +124,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
                     }
 
                     Tm.refreshFilters(false);
-                    Tm.removeOldRecipients();
+                    Tm.removeOldRecipients(true);
 
                     while (Recipients.isEmpty() && !Thread.interrupted())
                     {
@@ -151,7 +151,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
                         }
 
                         Tm.refreshFilters(false);
-                        Tm.removeOldRecipients();
+                        Tm.removeOldRecipients(true);
                     }
                 }
             } while (Tm.IsLooping && !Thread.interrupted());
