@@ -6,15 +6,15 @@ import com.github.agadar.nsapi.enums.shard.NationShard;
 import com.github.agadar.nsapi.event.TelegramSentEvent;
 import com.github.agadar.nsapi.event.TelegramSentListener;
 import com.github.agadar.nsapi.query.TelegramQuery;
+import com.github.agadar.nstelegram.enums.TelegramType;
 import com.github.agadar.nstelegram.event.NoRecipientsFoundEvent;
 import com.github.agadar.nstelegram.event.RecipientRemovedEvent;
 import com.github.agadar.nstelegram.event.RecipientRemovedEvent.Reason;
 import com.github.agadar.nstelegram.event.RecipientsRefreshedEvent;
 import com.github.agadar.nstelegram.event.StoppedSendingEvent;
 import com.github.agadar.nstelegram.event.TelegramManagerListener;
-import com.github.agadar.nstelegram.util.QueuedStats;
 import com.github.agadar.nstelegram.manager.TelegramManager;
-import com.github.agadar.nstelegram.enums.TelegramType;
+import com.github.agadar.nstelegram.util.QueuedStats;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -57,43 +57,59 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
         {
             do
             {
-                // If we're recruiting, then we must use a new query for each recipient
-                // as we will be needing to validate each of them.
-                if (Tm.LastTelegramType == TelegramType.RECRUITMENT)
+                if (Recipients.size() > 0)
                 {
-                    String[] RecipArray = Recipients.toArray(new String[Recipients.size()]);
+                    final String[] RecipArray = Recipients.toArray(new String[Recipients.size()]);
                     
-                    // Loop until we've confirmed the first valid recipient.
-                    int i = 0;
-                    while (i < RecipArray.length && !validateRecipient(RecipArray[i++])) { }
-                    
-                    // Loop over remaining recipients, sending a telegram and verifying
-                    // the next recipient.
-                    boolean skipNext = false;
-                    
-                    for (i = i; i < RecipArray.length; i++)
+                    if (null != Tm.LastTelegramType)
+                    switch (Tm.LastTelegramType)
                     {
-                        final boolean skipThis = skipNext;
-                        
-                        if (i < RecipArray.length)
+                        case RECRUITMENT:
                         {
-                            final String nextRecipient = RecipArray[i + 1];
-                            skipNext = !validateRecipient(nextRecipient);
+                            boolean skipNext = !canReceiveRecruitmentTelegrams(RecipArray[0]);
+                            for (int i = 1; i < RecipArray.length; i++)
+                            {
+                                final boolean skipThis = skipNext;
+                                
+                                if (i < RecipArray.length)
+                                {
+                                    final String nextRecipient = RecipArray[i + 1];
+                                    skipNext = !canReceiveRecruitmentTelegrams(nextRecipient);
+                                }
+                                
+                                if (skipThis)
+                                    continue;
+                                
+                                sendTelegram(RecipArray[i]);
+                            }       
+                            break;
                         }
-                        
-                        if (skipThis)
-                            continue;
-                        
-                        sendTelegram(RecipArray[i]);
+                        case CAMPAIGN:
+                        {
+                            boolean skipNext = !canReceiveCampaignTelegrams(RecipArray[0]);
+                            for (int i = 1; i < RecipArray.length; i++)
+                            {
+                                final boolean skipThis = skipNext;
+                                
+                                if (i < RecipArray.length)
+                                {
+                                    final String nextRecipient = RecipArray[i + 1];
+                                    skipNext = !canReceiveCampaignTelegrams(nextRecipient);
+                                }
+                                
+                                if (skipThis)
+                                    continue;
+                                
+                                sendTelegram(RecipArray[i]);
+                            }       
+                            break;
+                        }
+                        default:
+                            sendTelegram(RecipArray);
+                            break;
                     }
                 }
-                // If we're not recruiting, then we can simply throw all recipients
-                // into a single telegram query at once.
-                else
-                {
-                    sendTelegram(Recipients.toArray(new String[Recipients.size()]));
-                }
-
+                
                 // If looping, update recipients until there's recipients available.
                 if (Tm.IsLooping)
                 {
@@ -214,7 +230,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
      * @param recipient
      * @return 
      */
-    private boolean validateRecipient(String recipient)
+    private boolean canReceiveRecruitmentTelegrams(String recipient)
     {
         // Make server call.
         Nation n = NSAPI.nation(recipient).shards(NationShard.CanReceiveRecruitmentTelegrams)
@@ -238,6 +254,51 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
                                 
             final RecipientRemovedEvent event = 
                 new RecipientRemovedEvent(this, recipient, Reason.NotAcceptingRecruitment);
+
+            synchronized(Listeners)
+            {
+                // Pass telegram sent event through.
+                Listeners.stream().forEach((tsl) ->
+                {
+                    tsl.handleRecipientRemoved(event);
+                });
+            }
+            return false;
+        }
+        return true;
+    }
+    
+    /**
+     * Returns whether or not the recipient may receive a campaign telegram.
+     * If not, removes it from Recipients and throws a RecipientRemovedEvent.
+     * 
+     * @param recipient
+     * @return 
+     */
+    private boolean canReceiveCampaignTelegrams(String recipient)
+    {
+        // Make server call.
+        Nation n = NSAPI.nation(recipient).shards(NationShard.CanReceiveCampaignTelegrams)
+                            .canReceiveTelegramFromRegion(Tm.FromRegion).execute();
+         
+        // If nation was not found (null) or can't receive campaign telegrams, then
+        // remove it from Recipients, throw a RecipientRemovedEvent, and return false.
+        if (n == null || !n.CanReceiveCampaignTelegrams)
+        {
+            Recipients.remove(recipient);
+            Set<String> oldRecipients = History.get(Tm.TelegramId);
+        
+            // Create the telegram id entry in history if it doesn't exist yet.
+            if (oldRecipients == null)
+            {
+                oldRecipients = new HashSet<>();
+                History.put(Tm.TelegramId, oldRecipients);
+            }
+
+            oldRecipients.add(recipient);
+                                
+            final RecipientRemovedEvent event = 
+                new RecipientRemovedEvent(this, recipient, Reason.NotAcceptingCampaign);
 
             synchronized(Listeners)
             {

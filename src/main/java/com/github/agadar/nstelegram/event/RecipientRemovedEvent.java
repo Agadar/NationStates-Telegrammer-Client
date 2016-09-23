@@ -16,7 +16,11 @@ public class RecipientRemovedEvent extends EventObject
         AlreadyReceivedBefore,
         
         /** The recipient is currently blocking recruitment telegrams. */
-        NotAcceptingRecruitment;
+        NotAcceptingRecruitment,
+        
+        /** The recipient is currently blocking campaign telegrams. */
+        NotAcceptingCampaign
+        ;
     }
     
     /** The recipient in question. */

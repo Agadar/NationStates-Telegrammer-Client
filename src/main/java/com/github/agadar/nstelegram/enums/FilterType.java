@@ -1,8 +1,5 @@
 package com.github.agadar.nstelegram.enums;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Filter types, with corresponding String explanations.
  * 
@@ -28,18 +25,6 @@ public enum FilterType
     WA_MEMBERS_INCL("WA Members (include)"),
     WA_MEMBERS_EXCL("WA Members (exclude)"),
     ;
-     
-    // Map for looking up addressees type via its explanation.
-    private final static Map<String, FilterType> reverse = new HashMap<>();
-    
-    // Static initializer for filling the reverse map.
-    static
-    {
-        for (FilterType type : FilterType.values())
-        {
-            reverse.put(type.Text, type);
-        }
-    }
     
     // Explanation.
     private final String Text;
@@ -58,16 +43,5 @@ public enum FilterType
     public String toString()
     {
         return Text;
-    }
-    
-    /**
-     * Looks up a filter type via its explanation. May return null.
-     * 
-     * @param text
-     * @return 
-     */
-    public static FilterType getViaText(String text)
-    {
-        return reverse.get(text);
     }
 }
