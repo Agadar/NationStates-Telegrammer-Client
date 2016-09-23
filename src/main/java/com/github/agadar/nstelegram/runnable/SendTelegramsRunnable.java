@@ -6,10 +6,10 @@ import com.github.agadar.nsapi.enums.shard.NationShard;
 import com.github.agadar.nsapi.event.TelegramSentEvent;
 import com.github.agadar.nsapi.event.TelegramSentListener;
 import com.github.agadar.nsapi.query.TelegramQuery;
+import com.github.agadar.nstelegram.enums.SkippedRecipientReason;
 import com.github.agadar.nstelegram.enums.TelegramType;
 import com.github.agadar.nstelegram.event.NoRecipientsFoundEvent;
 import com.github.agadar.nstelegram.event.RecipientRemovedEvent;
-import com.github.agadar.nstelegram.event.RecipientRemovedEvent.Reason;
 import com.github.agadar.nstelegram.event.RecipientsRefreshedEvent;
 import com.github.agadar.nstelegram.event.StoppedSendingEvent;
 import com.github.agadar.nstelegram.event.TelegramManagerListener;
@@ -33,11 +33,11 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
     private final Set<TelegramManagerListener> Listeners;
     private final int NoRecipientsFoundTimeOut;
     private final QueuedStats Stats;
-    private final Map<Tuple<String, String>, Reason> History;
+    private final Map<Tuple<String, String>, SkippedRecipientReason> History;
     
     public SendTelegramsRunnable(TelegramManager telegramManager, Set<String> recipients,
             Set<TelegramManagerListener> listeners, int noRecipientsFoundTimeOut, 
-            Map<Tuple<String, String>, Reason> history)
+            Map<Tuple<String, String>, SkippedRecipientReason> history)
     {
         this.Tm = telegramManager;
         this.Recipients = recipients;
@@ -187,7 +187,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
         // changed.       
         if (event.Queued)
         {
-            History.put(new Tuple(Tm.TelegramId, event.Addressee), Reason.PREVIOUS_RECIPIENT);
+            History.put(new Tuple(Tm.TelegramId, event.Addressee), SkippedRecipientReason.PREVIOUS_RECIPIENT);
             Stats.registerSucces(event.Addressee);
         }
         else
@@ -235,8 +235,8 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
         // Make server call.
         Nation n = NSAPI.nation(recipient).shards(NationShard.CanReceiveRecruitmentTelegrams)
                             .canReceiveTelegramFromRegion(Tm.FromRegion).execute();
-        final Reason reason = (n == null) ? Reason.NOT_FOUND : 
-                !n.CanReceiveRecruitmentTelegrams ? Reason.BLOCKING_RECRUITMENT : null;              
+        final SkippedRecipientReason reason = (n == null) ? SkippedRecipientReason.NOT_FOUND : 
+                !n.CanReceiveRecruitmentTelegrams ? SkippedRecipientReason.BLOCKING_RECRUITMENT : null;              
         return canReceiveXTelegrams(reason, recipient);
     }
     
@@ -251,8 +251,8 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
     {
         // Make server call.
         Nation n = NSAPI.nation(recipient).shards(NationShard.CanReceiveCampaignTelegrams).execute();
-        final Reason reason = (n == null) ? Reason.NOT_FOUND : 
-                !n.CanReceiveCampaignTelegrams ? Reason.BLOCKING_CAMPAIGN : null;              
+        final SkippedRecipientReason reason = (n == null) ? SkippedRecipientReason.NOT_FOUND : 
+                !n.CanReceiveCampaignTelegrams ? SkippedRecipientReason.BLOCKING_CAMPAIGN : null;              
         return canReceiveXTelegrams(reason, recipient);
     }
     
@@ -263,7 +263,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
      * @param recipient
      * @return 
      */
-    private boolean canReceiveXTelegrams(Reason reason, String recipient)
+    private boolean canReceiveXTelegrams(SkippedRecipientReason reason, String recipient)
     {
         if (reason != null)
         {

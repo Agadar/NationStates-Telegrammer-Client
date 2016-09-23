@@ -2,8 +2,8 @@ package com.github.agadar.nstelegram.manager;
 
 import com.github.agadar.nstelegram.enums.TelegramType;
 import com.github.agadar.nsapi.NSAPI;
+import com.github.agadar.nstelegram.enums.SkippedRecipientReason;
 import com.github.agadar.nstelegram.event.RecipientRemovedEvent;
-import com.github.agadar.nstelegram.event.RecipientRemovedEvent.Reason;
 import com.github.agadar.nstelegram.event.TelegramManagerListener;
 import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
 import com.github.agadar.nstelegram.runnable.SendTelegramsRunnable;
@@ -32,7 +32,7 @@ public final class TelegramManager
     
     private final List<Filter> Filters = new ArrayList<>(); // The filters to apply in chronological order.
     private final Set<String> Recipients = new HashSet<>(); // Presumably most up-to-date recipients list, based on Filters.
-    private final Map<Tuple<String, String>, Reason> History = new HashMap<>();   // History of recipients, mapped to telegram id's.
+    private final Map<Tuple<String, String>, SkippedRecipientReason> History = new HashMap<>();   // History of recipients, mapped to telegram id's.
     private final Set<TelegramManagerListener> Listeners = new HashSet<>(); // Listeners to events thrown by this.
     private Thread TelegramThread; // The thread on which the TelegramQuery is running.
     
@@ -151,7 +151,7 @@ public final class TelegramManager
         for (final Iterator<String> it = Recipients.iterator(); it.hasNext();)
         {
             final String recipient = it.next();
-            final Reason reason = History.get(new Tuple(TelegramId, recipient));
+            final SkippedRecipientReason reason = History.get(new Tuple(TelegramId, recipient));
             
             if (reason != null)
             {

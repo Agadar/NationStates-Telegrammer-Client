@@ -7,7 +7,6 @@ import com.github.agadar.nstelegram.enums.FilterType;
 import com.github.agadar.nstelegram.enums.TelegramType;
 import com.github.agadar.nstelegram.event.NoRecipientsFoundEvent;
 import com.github.agadar.nstelegram.event.RecipientRemovedEvent;
-import com.github.agadar.nstelegram.event.RecipientRemovedEvent.Reason;
 import com.github.agadar.nstelegram.event.RecipientsRefreshedEvent;
 import com.github.agadar.nstelegram.event.StoppedSendingEvent;
 import com.github.agadar.nstelegram.event.TelegramManagerListener;
@@ -1028,10 +1027,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     {
         SwingUtilities.invokeLater(() ->
         {
-            String message = "removed '" + event.Recipient + "' from recipients list: "
-                    + (event.Reason == Reason.PREVIOUS_RECIPIENT ? 
-                        "already received this telegram" : "recipient is blocking telegram");
-            printToOutput(message, false);
+            printToOutput("skipping recipient '" + event.Recipient + "': " + event.Reason, false);
         });
     }
 
