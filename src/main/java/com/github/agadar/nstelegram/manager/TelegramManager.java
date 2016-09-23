@@ -1,5 +1,6 @@
-package com.github.agadar.nstelegram.util;
+package com.github.agadar.nstelegram.manager;
 
+import com.github.agadar.nstelegram.enums.TelegramType;
 import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nstelegram.event.RecipientRemovedEvent;
 import com.github.agadar.nstelegram.event.RecipientRemovedEvent.Reason;
