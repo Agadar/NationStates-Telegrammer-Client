@@ -15,7 +15,7 @@ import com.github.agadar.nstelegram.event.StoppedSendingEvent;
 import com.github.agadar.nstelegram.event.TelegramManagerListener;
 import com.github.agadar.nstelegram.manager.TelegramManager;
 import com.github.agadar.nstelegram.util.QueuedStats;
-import java.util.HashSet;
+import com.github.agadar.nstelegram.util.Tuple;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,11 +33,11 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
     private final Set<TelegramManagerListener> Listeners;
     private final int NoRecipientsFoundTimeOut;
     private final QueuedStats Stats;
-    private final Map<String, Set<String>> History;
+    private final Map<Tuple<String, String>, Reason> History;
     
     public SendTelegramsRunnable(TelegramManager telegramManager, Set<String> recipients,
             Set<TelegramManagerListener> listeners, int noRecipientsFoundTimeOut, 
-            Map<String, Set<String>> history)
+            Map<Tuple<String, String>, Reason> history)
     {
         this.Tm = telegramManager;
         this.Recipients = recipients;
@@ -61,7 +61,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
                 {
                     final String[] RecipArray = Recipients.toArray(new String[Recipients.size()]);
                     
-                    if (null != Tm.LastTelegramType)
+                    if (Tm.LastTelegramType != null)
                     switch (Tm.LastTelegramType)
                     {
                         case RECRUITMENT:
@@ -71,7 +71,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
                             {
                                 final boolean skipThis = skipNext;
                                 
-                                if (i < RecipArray.length)
+                                if (i < RecipArray.length - 1)
                                 {
                                     final String nextRecipient = RecipArray[i + 1];
                                     skipNext = !canReceiveRecruitmentTelegrams(nextRecipient);
@@ -91,7 +91,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
                             {
                                 final boolean skipThis = skipNext;
                                 
-                                if (i < RecipArray.length)
+                                if (i < RecipArray.length - 1)
                                 {
                                     final String nextRecipient = RecipArray[i + 1];
                                     skipNext = !canReceiveCampaignTelegrams(nextRecipient);
@@ -187,7 +187,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
         // changed.       
         if (event.Queued)
         {
-            History.get(Tm.TelegramId).add(event.Addressee);
+            History.put(new Tuple(Tm.TelegramId, event.Addressee), Reason.PREVIOUS_RECIPIENT);
             Stats.registerSucces(event.Addressee);
         }
         else
@@ -235,37 +235,9 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
         // Make server call.
         Nation n = NSAPI.nation(recipient).shards(NationShard.CanReceiveRecruitmentTelegrams)
                             .canReceiveTelegramFromRegion(Tm.FromRegion).execute();
-         
-        // If nation was not found (null) or can't receive recruitment telegrams, then
-        // remove it from Recipients, throw a RecipientRemovedEvent, and return false.
-        if (n == null || !n.CanReceiveRecruitmentTelegrams)
-        {
-            Recipients.remove(recipient);
-            Set<String> oldRecipients = History.get(Tm.TelegramId);
-        
-            // Create the telegram id entry in history if it doesn't exist yet.
-            if (oldRecipients == null)
-            {
-                oldRecipients = new HashSet<>();
-                History.put(Tm.TelegramId, oldRecipients);
-            }
-
-            oldRecipients.add(recipient);
-                                
-            final RecipientRemovedEvent event = 
-                new RecipientRemovedEvent(this, recipient, Reason.NotAcceptingRecruitment);
-
-            synchronized(Listeners)
-            {
-                // Pass telegram sent event through.
-                Listeners.stream().forEach((tsl) ->
-                {
-                    tsl.handleRecipientRemoved(event);
-                });
-            }
-            return false;
-        }
-        return true;
+        final Reason reason = (n == null) ? Reason.NOT_FOUND : 
+                !n.CanReceiveRecruitmentTelegrams ? Reason.BLOCKING_RECRUITMENT : null;              
+        return canReceiveXTelegrams(reason, recipient);
     }
     
     /**
@@ -278,27 +250,26 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
     private boolean canReceiveCampaignTelegrams(String recipient)
     {
         // Make server call.
-        Nation n = NSAPI.nation(recipient).shards(NationShard.CanReceiveCampaignTelegrams)
-                            .canReceiveTelegramFromRegion(Tm.FromRegion).execute();
-         
-        // If nation was not found (null) or can't receive campaign telegrams, then
-        // remove it from Recipients, throw a RecipientRemovedEvent, and return false.
-        if (n == null || !n.CanReceiveCampaignTelegrams)
+        Nation n = NSAPI.nation(recipient).shards(NationShard.CanReceiveCampaignTelegrams).execute();
+        final Reason reason = (n == null) ? Reason.NOT_FOUND : 
+                !n.CanReceiveCampaignTelegrams ? Reason.BLOCKING_CAMPAIGN : null;              
+        return canReceiveXTelegrams(reason, recipient);
+    }
+    
+    /**
+     * Shared behavior by canReceiveRecruitmentTelegrams(...) and canReceiveCampaignTelegrams(...).
+     * 
+     * @param reason
+     * @param recipient
+     * @return 
+     */
+    private boolean canReceiveXTelegrams(Reason reason, String recipient)
+    {
+        if (reason != null)
         {
             Recipients.remove(recipient);
-            Set<String> oldRecipients = History.get(Tm.TelegramId);
-        
-            // Create the telegram id entry in history if it doesn't exist yet.
-            if (oldRecipients == null)
-            {
-                oldRecipients = new HashSet<>();
-                History.put(Tm.TelegramId, oldRecipients);
-            }
-
-            oldRecipients.add(recipient);
-                                
-            final RecipientRemovedEvent event = 
-                new RecipientRemovedEvent(this, recipient, Reason.NotAcceptingCampaign);
+            History.put(new Tuple(Tm.TelegramId, recipient), reason);        
+            final RecipientRemovedEvent event = new RecipientRemovedEvent(this, recipient, reason);
 
             synchronized(Listeners)
             {

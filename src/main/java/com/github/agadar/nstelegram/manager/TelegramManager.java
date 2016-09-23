@@ -7,13 +7,15 @@ import com.github.agadar.nstelegram.event.RecipientRemovedEvent.Reason;
 import com.github.agadar.nstelegram.event.TelegramManagerListener;
 import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
 import com.github.agadar.nstelegram.runnable.SendTelegramsRunnable;
+import com.github.agadar.nstelegram.util.Tuple;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages the recipients list and sending telegrams to the former.
@@ -30,7 +32,7 @@ public final class TelegramManager
     
     private final List<Filter> Filters = new ArrayList<>(); // The filters to apply in chronological order.
     private final Set<String> Recipients = new HashSet<>(); // Presumably most up-to-date recipients list, based on Filters.
-    private final Map<String, Set<String>> History = new ConcurrentHashMap<>();   // History of recipients, mapped to telegram id's.
+    private final Map<Tuple<String, String>, Reason> History = new HashMap<>();   // History of recipients, mapped to telegram id's.
     private final Set<TelegramManagerListener> Listeners = new HashSet<>(); // Listeners to events thrown by this.
     private Thread TelegramThread; // The thread on which the TelegramQuery is running.
     
@@ -142,37 +144,27 @@ public final class TelegramManager
     }
     
     /**
-     * Removes old recipients from Recipients. Called right before executing
-     * the Telegram Query.
+     * Removes invalid recipients from Recipients.
      */
     public void removeOldRecipients()
     {
-        Set<String> oldRecipients = History.get(TelegramId);
-        
-        // Create the telegram id entry in history if it doesn't exist yet.
-        if (oldRecipients == null)
+        for (final Iterator<String> it = Recipients.iterator(); it.hasNext();)
         {
-            oldRecipients = new HashSet<>();
-            History.put(TelegramId, oldRecipients);
-        }
-        
-        // Clear old recipients from recipients, publish events for each.
-        for (String oldRecipient : oldRecipients)
-        {
-            if (Recipients.remove(oldRecipient))
+            final String recipient = it.next();
+            final Reason reason = History.get(new Tuple(TelegramId, recipient));
+            
+            if (reason != null)
             {
-                final RecipientRemovedEvent event = 
-                        new RecipientRemovedEvent(this, oldRecipient, Reason.AlreadyReceivedBefore);
-
-                synchronized(Listeners)
+                Recipients.remove(recipient);   // Remove recipient
+                final RecipientRemovedEvent event = new RecipientRemovedEvent(this, recipient, reason); // Create event
+                synchronized(Listeners) // fire event
                 {
-                    // Pass telegram sent event through.
                     Listeners.stream().forEach((tsl) ->
                     {
                         tsl.handleRecipientRemoved(event);
                     });
                 }
-            }
+            }       
         }
     }
     

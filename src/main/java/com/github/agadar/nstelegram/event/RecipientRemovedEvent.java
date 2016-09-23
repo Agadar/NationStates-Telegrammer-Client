@@ -12,14 +12,17 @@ public class RecipientRemovedEvent extends EventObject
     /** Enum for reasons why the recipient was removed. */
     public enum Reason
     {
-        /** The telegram was already sent before to the recipient. */
-        AlreadyReceivedBefore,
+        /** The telegram was already sent before to this recipient. */
+        PREVIOUS_RECIPIENT,
         
         /** The recipient is currently blocking recruitment telegrams. */
-        NotAcceptingRecruitment,
+        BLOCKING_RECRUITMENT,
         
         /** The recipient is currently blocking campaign telegrams. */
-        NotAcceptingCampaign
+        BLOCKING_CAMPAIGN,
+        
+        /** The recipient was not found or doesn't exist. */
+        NOT_FOUND
         ;
     }
     

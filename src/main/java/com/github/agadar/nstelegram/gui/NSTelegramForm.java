@@ -1029,7 +1029,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         SwingUtilities.invokeLater(() ->
         {
             String message = "removed '" + event.Recipient + "' from recipients list: "
-                    + (event.Reason == Reason.AlreadyReceivedBefore ? 
+                    + (event.Reason == Reason.PREVIOUS_RECIPIENT ? 
                         "already received this telegram" : "recipient is blocking telegram");
             printToOutput(message, false);
         });
