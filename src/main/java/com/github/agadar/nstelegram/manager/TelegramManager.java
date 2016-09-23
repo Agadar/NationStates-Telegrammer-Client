@@ -155,7 +155,7 @@ public final class TelegramManager
             
             if (reason != null)
             {
-                Recipients.remove(recipient);   // Remove recipient
+                it.remove();   // Remove recipient
                 final RecipientRemovedEvent event = new RecipientRemovedEvent(this, recipient, reason); // Create event
                 synchronized(Listeners) // fire event
                 {

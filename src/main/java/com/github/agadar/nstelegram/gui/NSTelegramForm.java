@@ -504,13 +504,13 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     {//GEN-HEADEREND:event_BtnStartActionPerformed
         updateGui(true);    // update GUI
         TextAreaOutput.setText(duration());
-        
+
         try
         {
             Tm.startSending();  // start sending telegrams
         }
         catch (Exception ex)
-        {
+        {ex.printStackTrace();
             // if something went wrong while starting sending telegrams, reset GUI
             TextAreaOutput.setText(ex.getMessage() + "\n");
             updateGui(false);
