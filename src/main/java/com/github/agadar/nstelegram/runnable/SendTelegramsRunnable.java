@@ -67,7 +67,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
                         case RECRUITMENT:
                         {
                             boolean skipNext = !canReceiveRecruitmentTelegrams(RecipArray[0]);
-                            for (int i = 1; i < RecipArray.length; i++)
+                            for (int i = 0; i < RecipArray.length; i++)
                             {
                                 final boolean skipThis = skipNext;
                                 
@@ -87,7 +87,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
                         case CAMPAIGN:
                         {
                             boolean skipNext = !canReceiveCampaignTelegrams(RecipArray[0]);
-                            for (int i = 1; i < RecipArray.length; i++)
+                            for (int i = 0; i < RecipArray.length; i++)
                             {
                                 final boolean skipThis = skipNext;
                                 
