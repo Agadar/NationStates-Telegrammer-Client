@@ -22,7 +22,7 @@ public class PropertiesManager
     public String ClientKey;
     public String TelegramId;
     public String SecretKey;
-    public boolean IsRecruitment;
+    public TelegramType LastTelegramType;
     public String FromRegion;
     public boolean IsLooping;
 
@@ -36,7 +36,7 @@ public class PropertiesManager
         props.setProperty("ClientKey", ClientKey == null ? defaultVal: ClientKey);
         props.setProperty("TelegramId", TelegramId == null ? defaultVal : TelegramId);
         props.setProperty("SecretKey", SecretKey == null ? defaultVal : SecretKey);
-        props.setProperty("IsRecruitment", Boolean.toString(IsRecruitment));
+        props.setProperty("TelegramType", LastTelegramType.name());
         props.setProperty("FromRegion", FromRegion == null ? defaultVal : FromRegion);
         props.setProperty("IsLooping", Boolean.toString(IsLooping));
         
@@ -73,7 +73,7 @@ public class PropertiesManager
         ClientKey = props.getProperty("ClientKey", defaultVal);
         TelegramId = props.getProperty("TelegramId", defaultVal);
         SecretKey = props.getProperty("SecretKey", defaultVal);
-        IsRecruitment = Boolean.valueOf(props.getProperty("IsRecruitment", "false"));
+        LastTelegramType = TelegramType.valueOf(props.getProperty("TelegramType", TelegramType.NORMAL.name()));
         FromRegion = props.getProperty("FromRegion", defaultVal);
         IsLooping = Boolean.valueOf(props.getProperty("IsLooping", "false"));
     }

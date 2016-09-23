@@ -38,7 +38,7 @@ public final class TelegramManager
     public String ClientKey;
     public String TelegramId;
     public String SecretKey;
-    public boolean SendAsRecruitment;
+    public TelegramType LastTelegramType;
     public String FromRegion;
     public boolean IsLooping;
     

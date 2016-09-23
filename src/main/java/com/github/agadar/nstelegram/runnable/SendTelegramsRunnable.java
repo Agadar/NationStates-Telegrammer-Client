@@ -14,6 +14,7 @@ import com.github.agadar.nstelegram.event.StoppedSendingEvent;
 import com.github.agadar.nstelegram.event.TelegramManagerListener;
 import com.github.agadar.nstelegram.util.QueuedStats;
 import com.github.agadar.nstelegram.util.TelegramManager;
+import com.github.agadar.nstelegram.util.TelegramType;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -58,7 +59,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
             {
                 // If we're recruiting, then we must use a new query for each recipient
                 // as we will be needing to validate each of them.
-                if (Tm.SendAsRecruitment)
+                if (Tm.LastTelegramType == TelegramType.RECRUITMENT)
                 {
                     String[] RecipArray = Recipients.toArray(new String[Recipients.size()]);
                     
@@ -200,7 +201,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
                 recipients).addListeners(this);
 
         // Tag as recruitment telegram if needed.
-        if (Tm.SendAsRecruitment)
+        if (Tm.LastTelegramType == TelegramType.RECRUITMENT)
             q.isRecruitment();
 
         q.execute(null);    // send the telegrams

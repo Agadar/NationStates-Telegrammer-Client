@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Addressees types, with corresponding string explanations.
+ * Filter types, with corresponding String explanations.
  * 
  * @author marti
  */
@@ -54,18 +54,14 @@ public enum FilterType
         this.Text = text;
     }
     
-    /**
-     * Gets the string explanation.
-     * 
-     * @return 
-     */
-    public String getText()
+    @Override
+    public String toString()
     {
         return Text;
     }
     
     /**
-     * Looks up an addressees type via its explanation. May return null.
+     * Looks up a filter type via its explanation. May return null.
      * 
      * @param text
      * @return 
@@ -73,23 +69,5 @@ public enum FilterType
     public static FilterType getViaText(String text)
     {
         return reverse.get(text);
-    }
-    
-    /**
-     * Returns all string explanations.
-     * 
-     * @return 
-     */
-    public static String[] getTexts()
-    {
-        final FilterType[] vals = values();
-        final String[] help = new String[vals.length];
-        
-        for (int i = 0; i < help.length; i++)
-        {
-            help[i] = vals[i].getText();
-        }
-        
-        return help;
     }
 }

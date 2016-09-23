@@ -89,16 +89,11 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                      <Group type="102" attributes="0">
-                          <Component id="LabelRegionFrom" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="32767" attributes="0"/>
-                          <Component id="TxtFieldRegionFrom" min="-2" pref="150" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" attributes="0">
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="1" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="LabelRecruiting" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="LabelTelegramType" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="LabelSecretKey" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="LabelTelegramId" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="LabelClientKey" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -106,21 +101,24 @@
                               <Component id="LabelLoop" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="TxtFieldClientKey" min="-2" pref="150" max="-2" attributes="0"/>
-                              <Component id="TxtFieldTelegramId" alignment="0" min="-2" pref="150" max="-2" attributes="0"/>
-                              <Group type="102" attributes="0">
-                                  <Component id="CheckBoxLoop" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="32767" attributes="0"/>
-                                  <Component id="TextFieldFiller2" min="-2" pref="6" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="1" attributes="0">
-                                  <Component id="CheckBoxRecruiting" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="32767" attributes="0"/>
-                                  <Component id="TextFieldFiller1" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="TxtFieldSecretKey" alignment="1" min="-2" pref="150" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="LabelRegionFrom" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                      <Component id="TxtFieldRegionFrom" pref="150" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="TxtFieldClientKey" pref="150" max="32767" attributes="0"/>
+                          <Component id="TxtFieldTelegramId" alignment="0" pref="150" max="32767" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="CheckBoxLoop" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Component id="TextFieldFiller2" min="-2" pref="6" max="-2" attributes="0"/>
                           </Group>
+                          <Component id="TxtFieldSecretKey" alignment="0" pref="150" max="32767" attributes="0"/>
+                          <Component id="ComboBoxTelegramType" alignment="0" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace min="0" pref="22" max="32767" attributes="0"/>
@@ -147,9 +145,8 @@
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="LabelRecruiting" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="TextFieldFiller1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="CheckBoxRecruiting" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="LabelTelegramType" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="ComboBoxTelegramType" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
@@ -211,10 +208,10 @@
             <Property name="name" type="java.lang.String" value="LabelClientKey" noResource="true"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="LabelRecruiting">
+        <Component class="javax.swing.JLabel" name="LabelTelegramType">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Recruiting:"/>
-            <Property name="name" type="java.lang.String" value="LabelRecruiting" noResource="true"/>
+            <Property name="text" type="java.lang.String" value="Type:"/>
+            <Property name="name" type="java.lang.String" value="LabelTelegramType" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="TxtFieldClientKey">
@@ -240,15 +237,6 @@
             <Property name="requestFocusEnabled" type="boolean" value="false"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="TextFieldFiller1">
-          <Properties>
-            <Property name="editable" type="boolean" value="false"/>
-            <Property name="enabled" type="boolean" value="false" postCode="TextFieldFiller1.setVisible(false);"/>
-            <Property name="focusable" type="boolean" value="false"/>
-            <Property name="name" type="java.lang.String" value="TxtFieldSecretKey" noResource="true"/>
-            <Property name="requestFocusEnabled" type="boolean" value="false"/>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JCheckBox" name="CheckBoxLoop">
           <Properties>
             <Property name="text" type="java.lang.String" value=" "/>
@@ -259,18 +247,6 @@
           </Properties>
           <Events>
             <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="CheckBoxLoopItemStateChanged"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="CheckBoxRecruiting">
-          <Properties>
-            <Property name="text" type="java.lang.String" value=" "/>
-            <Property name="focusPainted" type="boolean" value="false"/>
-            <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-              <Insets value="[0, -1, 0, 2]"/>
-            </Property>
-          </Properties>
-          <Events>
-            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="CheckBoxRecruitingItemStateChanged"/>
           </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="TxtFieldRegionFrom">
@@ -287,6 +263,19 @@
             <Property name="text" type="java.lang.String" value="From region:"/>
             <Property name="name" type="java.lang.String" value="LabelRecruiting" noResource="true"/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="ComboBoxTelegramType">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="new DefaultComboBoxModel(TelegramType.values())" type="code"/>
+            </Property>
+          </Properties>
+          <Events>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="ComboBoxTelegramTypeItemStateChanged"/>
+          </Events>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;TelegramType&gt;"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>
@@ -383,7 +372,7 @@
         <Component class="javax.swing.JComboBox" name="ComboBoxFilterType">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="new DefaultComboBoxModel(com.github.agadar.nstelegram.util.FilterType.getTexts())" type="code"/>
+              <Connection code="new DefaultComboBoxModel(FilterType.values())" type="code"/>
             </Property>
             <Property name="name" type="java.lang.String" value="ComboBoxFilterType" noResource="true"/>
           </Properties>
@@ -391,7 +380,7 @@
             <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="ComboBoxFilterTypeItemStateChanged"/>
           </Events>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;FilterType&gt;"/>
           </AuxValues>
         </Component>
         <Component class="javax.swing.JTextField" name="TextFieldFilterValues">
