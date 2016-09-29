@@ -113,18 +113,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
                 // If looping, update recipients until there's recipients available.
                 if (Tm.IsLooping)
                 {
-                    final RecipientsRefreshedEvent refrevent = new RecipientsRefreshedEvent(this);
-                    synchronized (Listeners)
-                    {
-                        // Publish recipients refreshed event.
-                        Listeners.stream().forEach((tsl) -> 
-                        {
-                            tsl.handleRecipientsRefreshed(refrevent);
-                        });
-                    }
-
-                    Tm.refreshFilters(false);
-                    Tm.removeOldRecipients(true);
+                    refreshRecipients();
 
                     while (Recipients.isEmpty() && !Thread.interrupted())
                     {
@@ -140,18 +129,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
                             });
                         }
                         Thread.sleep(NoRecipientsFoundTimeOut);
-
-                        synchronized (Listeners)
-                        {
-                            // Publish recipients refreshed event.
-                            Listeners.stream().forEach((tsl) -> 
-                            {
-                                tsl.handleRecipientsRefreshed(refrevent);
-                            });
-                        }
-
-                        Tm.refreshFilters(false);
-                        Tm.removeOldRecipients(true);
+                        refreshRecipients();
                     }
                 }
             } while (Tm.IsLooping && !Thread.interrupted());
@@ -282,5 +260,25 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
             return false;
         }
         return true;
+    }
+    
+    /**
+     * Refreshes the Recipients set.
+     */
+    private void refreshRecipients()
+    {
+        final RecipientsRefreshedEvent refrevent = new RecipientsRefreshedEvent(this);
+        
+        synchronized (Listeners)
+        {
+            // Publish recipients refreshed event.
+            Listeners.stream().forEach((tsl) -> 
+            {
+                tsl.handleRecipientsRefreshed(refrevent);
+            });
+        }
+
+        Tm.refreshFilters(false);
+        Tm.removeOldRecipients(true);
     }
 }

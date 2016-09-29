@@ -48,7 +48,7 @@ import javax.swing.text.DefaultCaret;
  */
 public class NSTelegramForm extends javax.swing.JFrame implements TelegramManagerListener
 {
-    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.1.0"; // Form title.  
+    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.2.0"; // Form title.  
     private final static String Border = "------------------------------------------";  // Border for output text.
     private final TelegramManager Tm = new TelegramManager(); // Manages sending telegrams. 
     private Thread CompileRecipientsWorker;  // Thread used for compiling address lists.
