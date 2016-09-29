@@ -1,5 +1,11 @@
 package com.github.agadar.nstelegram.util;
 
+import com.github.agadar.nsapi.NSAPI;
+import com.github.agadar.nsapi.NationStatesAPIException;
+import com.github.agadar.nsapi.domain.DailyDumpNations;
+import com.github.agadar.nsapi.domain.nation.Nation;
+import com.github.agadar.nsapi.enums.DailyDumpMode;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,9 +18,11 @@ import java.util.Set;
  */
 public class FilterCache 
 {
-    private final Map<String, Set<String>> NationsToRegions;       // nations mapped to regions
+    private final Map<String, Set<String>> NationsToRegions;            // nations mapped to regions
     private final Map<Set<String>, Set<String>> RegionsToTagsWith;      // regions mapped to tags they have
     private final Map<Set<String>, Set<String>> RegionsToTagsWithout;   // regions mapped to tags they don't have
+    private final Map<String, Set<String>> EmbassiesToRegions;          // embassy regions mapped to regions
+    private boolean HasImportedDumpFile = false;                        // indicates whether or not the dump file has been imported yet
     
     public Set<String> Delegates;   // world assembly delegates
     public Set<String> WaMembers;   // world assembly members
@@ -25,6 +33,93 @@ public class FilterCache
         NationsToRegions = new HashMap<>();
         RegionsToTagsWith = new HashMap<>();
         RegionsToTagsWithout = new HashMap<>();
+        EmbassiesToRegions = new HashMap<>();
+    }
+    
+    public void importDumpFile()
+    {
+        // Only if the dump file hasn't already been imported, import the dump file.
+        if (HasImportedDumpFile)
+            return;
+
+        DailyDumpNations ddn;
+
+        try
+        {
+            ddn = NSAPI.nationdump(DailyDumpMode.ReadLocal).execute();
+        }
+        catch (NationStatesAPIException ex)
+        {
+            // If the exception isn't just a FileNotFoundException, throw this.
+            if (ex.getCause().getClass() != FileNotFoundException.class)
+                throw ex;
+
+            // Else, try download the dump file from the server.
+            ddn = NSAPI.nationdump(DailyDumpMode.DownloadAndRead).execute();
+        }
+
+        // ddn should now be filled. Use it to fill the caches.
+        for (Nation n : ddn.Nations)
+        {
+            mapNationToRegion(n.RegionName, n.Name);
+            
+            switch (n.WorldAssemblyStatus)  // Using hard-coded strings for now. Replace with enum once implemented in wrapper.
+            {
+                case "WA Member":
+                    if (WaMembers == null)              // Instantiate first if set is null.
+                        WaMembers = new HashSet<>();
+                    WaMembers.add(n.Name);              // Now add to WA members.
+                    break;
+                case "WA Delegate":
+                    if (Delegates == null)              // Instantiate first if set is null.
+                        Delegates = new HashSet<>();
+                    Delegates.add(n.Name);              // Now add to WA delegates.
+                    break;
+            }
+        }
+
+        HasImportedDumpFile = true;
+    }
+    
+    /**
+     * Maps a single embassy region to a region.
+     * 
+     * @param region
+     * @param embassy 
+     */
+    public void mapEmbassyToRegion(String region, String embassy)
+    {
+        Set<String> embassies = EmbassiesToRegions.get(region);
+        
+        if (embassies == null)
+        {
+            embassies = new HashSet<>();
+            EmbassiesToRegions.put(region, embassies);
+        }
+        
+        embassies.add(embassy);
+    }
+    
+    /**
+     * Maps embassy regions to a region.
+     * 
+     * @param region
+     * @param embassies 
+     */
+    public void mapEmbassiesToRegion(String region, Set<String> embassies)
+    {
+        EmbassiesToRegions.put(region, embassies);
+    }
+    
+    /**
+     * Gets a region's embassy regions.
+     * 
+     * @param region
+     * @return 
+     */
+    public Set<String> getEmbassies(String region)
+    {
+        return EmbassiesToRegions.get(region);
     }
     
     /**

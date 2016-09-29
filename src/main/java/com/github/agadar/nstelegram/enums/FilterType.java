@@ -8,22 +8,24 @@ package com.github.agadar.nstelegram.enums;
 public enum FilterType
 {
     ALL("All"),
-    DELEGATES_INCL("Delegates (include)"),
     DELEGATES_EXCL("Delegates (exclude)"),
+    DELEGATES_INCL("Delegates (include)"),
     DELEGATES_NEW("Delegates (new)"),
-    NATIONS_INCL("Nations (include)"),
+    EMBASSIES_EXCL("Embassies (exclude)"),
+    EMBASSIES_INCL("Embassies (include)"),
+    NATIONS_EJECTED("Nations (ejected)"),
     NATIONS_EXCL("Nations (exclude)"),
+    NATIONS_INCL("Nations (include)"),
     NATIONS_NEW("Nations (new)"),
     NATIONS_REFOUNDED("Nations (refounded)"),
-    NATIONS_EJECTED("Nations (ejected)"),
-    REGIONS_INCL("Regions (include)"),
     REGIONS_EXCL("Regions (exclude)"),
-    REGIONS_WITH_TAGS_INCL("Regions (include with tags)"),
+    REGIONS_INCL("Regions (include)"),
     REGIONS_WITH_TAGS_EXCL("Regions (exclude with tags)"),
-    REGIONS_WO_TAGS_INCL("Regions (include w/o tags)"),
+    REGIONS_WITH_TAGS_INCL("Regions (include with tags)"),
     REGIONS_WO_TAGS_EXCL("Regions (exclude w/o tags)"),
-    WA_MEMBERS_INCL("WA Members (include)"),
+    REGIONS_WO_TAGS_INCL("Regions (include w/o tags)"),
     WA_MEMBERS_EXCL("WA Members (exclude)"),
+    WA_MEMBERS_INCL("WA Members (include)"),
     WA_MEMBERS_NEW("WA Members (new)")
     ;
     

@@ -13,6 +13,7 @@ import com.github.agadar.nstelegram.event.TelegramManagerListener;
 import com.github.agadar.nstelegram.filter.FilterAll;
 import com.github.agadar.nstelegram.filter.FilterDelegates;
 import com.github.agadar.nstelegram.filter.FilterDelegatesNew;
+import com.github.agadar.nstelegram.filter.FilterEmbassies;
 import com.github.agadar.nstelegram.filter.FilterNations;
 import com.github.agadar.nstelegram.filter.FilterNationsEjected;
 import com.github.agadar.nstelegram.filter.FilterNationsNew;
@@ -511,7 +512,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
             Tm.startSending();  // start sending telegrams
         }
         catch (Exception ex)
-        {ex.printStackTrace();
+        {
             // if something went wrong while starting sending telegrams, reset GUI
             TextAreaOutput.setText(ex.getMessage() + "\n");
             updateGui(false);
@@ -592,6 +593,16 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
                 break;
             case DELEGATES_NEW:
                 f = new FilterDelegatesNew();
+                break;
+            case EMBASSIES_EXCL:
+                addressees = stringToStringList(filterValues);
+                f = new FilterEmbassies(addressees, false);
+                textForList += ": " + addressees;
+                break;
+            case EMBASSIES_INCL:
+                addressees = stringToStringList(filterValues);
+                f = new FilterEmbassies(addressees, true);
+                textForList += ": " + addressees;
                 break;
             case NATIONS_EXCL:
                 addressees = stringToStringList(filterValues);
@@ -898,6 +909,8 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         // Else, enable/disable according to type.
         switch (type)
         {
+            case EMBASSIES_INCL:
+            case EMBASSIES_EXCL:
             case NATIONS_INCL:
             case NATIONS_EXCL:
             case REGIONS_INCL:

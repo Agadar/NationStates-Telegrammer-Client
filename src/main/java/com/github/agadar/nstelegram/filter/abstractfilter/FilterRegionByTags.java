@@ -22,9 +22,6 @@ public abstract class FilterRegionByTags extends FilterAddOrRemove
     /** This instance's tags. */
     protected final Set<String> Tags;
     
-    /** Boolean indicating whether the dump file has been imported already. */
-    private static boolean HasImportedDumpFile = false;
-    
     public FilterRegionByTags(Set<String> tags, boolean add)
     {
         super(add);
@@ -67,42 +64,15 @@ public abstract class FilterRegionByTags extends FilterAddOrRemove
         
         for (String region : regions)
         {
-            // Check if global cache contains the values.
-            Set<String> nationsInRegion = GlobalCache.getNationsInRegion(region);
+            Set<String> nationsInRegion = GlobalCache.getNationsInRegion(region);   // Check if global cache contains the values.
             
             if (nationsInRegion == null)
             {
-                // If not, then only if the dump file hasn't already been imported,
-                // import the dump file.
-                if (HasImportedDumpFile)
-                    continue;
-
-                DailyDumpNations ddn;
+                GlobalCache.importDumpFile();                               // If not, then import dump file.
+                nationsInRegion = GlobalCache.getNationsInRegion(region);   // Check if it contains it now.
                 
-                try
-                {
-                    ddn = NSAPI.nationdump(DailyDumpMode.ReadLocal).execute();
-                }
-                catch (NationStatesAPIException ex)
-                {
-                    // If the exception isn't just a FileNotFoundException, throw this.
-                    if (ex.getCause().getClass() != FileNotFoundException.class)
-                        throw ex;
-
-                    // Else, try download the dump file from the server.
-                    ddn = NSAPI.nationdump(DailyDumpMode.DownloadAndRead).execute();
-                }
-                
-                // ddn should now be filled. Use it to fill the caches.
-                for (Nation n : ddn.Nations)
-                {
-                    GlobalCache.mapNationToRegion(n.RegionName, n.Name);
-                    
-                    if (region.equals(n.RegionName))
-                        LocalCache.add(n.Name);
-                }
-                
-                HasImportedDumpFile = true;
+                if (nationsInRegion != null)                                // If it does, then add the nations to local cache.
+                    LocalCache.addAll(nationsInRegion);               
             }
             else
             {
