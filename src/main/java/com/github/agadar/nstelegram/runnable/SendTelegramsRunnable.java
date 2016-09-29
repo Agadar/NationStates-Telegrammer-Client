@@ -204,6 +204,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
     /**
      * Returns whether or not the recipient may receive a recruitment telegram.
      * If not, removes it from Recipients and throws a RecipientRemovedEvent.
+     * If the server couldn't be reached, always returns true.
      * 
      * @param recipient
      * @return 
@@ -230,6 +231,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
     /**
      * Returns whether or not the recipient may receive a campaign telegram.
      * If not, removes it from Recipients and throws a RecipientRemovedEvent.
+     * If the server couldn't be reached, always returns true.
      * 
      * @param recipient
      * @return 
