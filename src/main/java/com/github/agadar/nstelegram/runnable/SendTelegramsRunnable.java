@@ -210,12 +210,21 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
      */
     private boolean canReceiveRecruitmentTelegrams(String recipient)
     {
-        // Make server call.
-        Nation n = NSAPI.nation(recipient).shards(NationShard.CanReceiveRecruitmentTelegrams)
-                            .canReceiveTelegramFromRegion(Tm.FromRegion).execute();
-        final SkippedRecipientReason reason = (n == null) ? SkippedRecipientReason.NOT_FOUND : 
-                !n.CanReceiveRecruitmentTelegrams ? SkippedRecipientReason.BLOCKING_RECRUITMENT : null;              
-        return canReceiveXTelegrams(reason, recipient);
+        try
+        {
+            // Make server call.
+            Nation n = NSAPI.nation(recipient).shards(NationShard.CanReceiveRecruitmentTelegrams)
+                                .canReceiveTelegramFromRegion(Tm.FromRegion).execute();
+            final SkippedRecipientReason reason = (n == null) ? SkippedRecipientReason.NOT_FOUND : 
+                    !n.CanReceiveRecruitmentTelegrams ? SkippedRecipientReason.BLOCKING_RECRUITMENT : null;              
+            return canReceiveXTelegrams(reason, recipient);
+        }
+        catch (Exception ex)
+        {
+            // If for any reason the call failed, just take the gamble and say 
+            // that the recipient can receive the telegram.
+            return true;
+        }
     }
     
     /**
@@ -227,11 +236,20 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
      */
     private boolean canReceiveCampaignTelegrams(String recipient)
     {
-        // Make server call.
-        Nation n = NSAPI.nation(recipient).shards(NationShard.CanReceiveCampaignTelegrams).execute();
-        final SkippedRecipientReason reason = (n == null) ? SkippedRecipientReason.NOT_FOUND : 
-                !n.CanReceiveCampaignTelegrams ? SkippedRecipientReason.BLOCKING_CAMPAIGN : null;              
-        return canReceiveXTelegrams(reason, recipient);
+        try
+        {
+            // Make server call.
+            Nation n = NSAPI.nation(recipient).shards(NationShard.CanReceiveCampaignTelegrams).execute();
+            final SkippedRecipientReason reason = (n == null) ? SkippedRecipientReason.NOT_FOUND : 
+                    !n.CanReceiveCampaignTelegrams ? SkippedRecipientReason.BLOCKING_CAMPAIGN : null;              
+            return canReceiveXTelegrams(reason, recipient);
+        }
+        catch (Exception ex)
+        {
+            // If for any reason the call failed, just take the gamble and say 
+            // that the recipient can receive the telegram.
+            return true;
+        }
     }
     
     /**
