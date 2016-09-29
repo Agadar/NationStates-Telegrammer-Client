@@ -24,6 +24,7 @@ public enum FilterType
     REGIONS_WO_TAGS_EXCL("Regions (exclude w/o tags)"),
     WA_MEMBERS_INCL("WA Members (include)"),
     WA_MEMBERS_EXCL("WA Members (exclude)"),
+    WA_MEMBERS_NEW("WA Members (new)")
     ;
     
     // Explanation.

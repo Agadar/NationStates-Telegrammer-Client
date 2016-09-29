@@ -23,7 +23,9 @@ public abstract class FilterHappenings extends FilterAdd
     {
         became,     // new delegates
         refounded,  // refounded nations
-        ejected     // ejected nations
+        ejected,    // ejected nations
+        admitted    // new WA members
+        ;
     }
     
     /** This instance's keyword. */
@@ -52,9 +54,7 @@ public abstract class FilterHappenings extends FilterAdd
                 final Matcher matcher = PATTERN.matcher(h.Description);
                 
                 if (matcher.find())
-                {
                     nations.add(matcher.group(1));
-                }
             }
         });    
         

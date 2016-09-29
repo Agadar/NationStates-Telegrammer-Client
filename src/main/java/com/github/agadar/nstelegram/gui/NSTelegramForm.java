@@ -21,6 +21,7 @@ import com.github.agadar.nstelegram.filter.FilterRegions;
 import com.github.agadar.nstelegram.filter.FilterRegionsWithTags;
 import com.github.agadar.nstelegram.filter.FilterRegionsWithoutTags;
 import com.github.agadar.nstelegram.filter.FilterWAMembers;
+import com.github.agadar.nstelegram.filter.FilterWAMembersNew;
 import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
 import com.github.agadar.nstelegram.manager.PropertiesManager;
 import com.github.agadar.nstelegram.manager.TelegramManager;
@@ -574,8 +575,8 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         
         final FilterType filter = (FilterType) ComboBoxFilterType.getSelectedItem();  
         String textForList = filter.toString(); // Used for the text in the visual filter list.
-        Set<String> addressees;  // Declared here as multiple cases need a string set.
-        Filter f;    // The filter to add to the telegram manager.
+        Set<String> addressees;                 // Declared here as multiple cases need a string set.
+        Filter f;                               // The filter to add to the telegram manager.
         
         // Set above variables according to addressees type selected.
         switch (filter)
@@ -646,6 +647,9 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
                 break;
             case WA_MEMBERS_INCL:
                 f = new FilterWAMembers(true);
+                break;
+            case WA_MEMBERS_NEW:
+                f = new FilterWAMembersNew();
                 break;
             default:
                 return;

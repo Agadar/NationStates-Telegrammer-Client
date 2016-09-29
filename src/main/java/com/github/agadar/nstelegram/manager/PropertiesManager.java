@@ -37,7 +37,7 @@ public class PropertiesManager
         props.setProperty("ClientKey", ClientKey == null ? defaultVal: ClientKey);
         props.setProperty("TelegramId", TelegramId == null ? defaultVal : TelegramId);
         props.setProperty("SecretKey", SecretKey == null ? defaultVal : SecretKey);
-        props.setProperty("TelegramType", LastTelegramType.name());
+        props.setProperty("TelegramType", LastTelegramType != null ? LastTelegramType.name() : TelegramType.NORMAL.name());
         props.setProperty("FromRegion", FromRegion == null ? defaultVal : FromRegion);
         props.setProperty("IsLooping", Boolean.toString(IsLooping));
         
@@ -66,7 +66,8 @@ public class PropertiesManager
         } 
         catch (IOException ex)
         {
-            // Silently ignore this, as this means the properties file simply doesn't exist yet.
+            // Properties file doesn't exist yet. Set defaults.
+            LastTelegramType = TelegramType.NORMAL;
             return;
         }
         
