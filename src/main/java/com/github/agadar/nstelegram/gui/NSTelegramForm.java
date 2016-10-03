@@ -1033,7 +1033,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
                     "telegrams queued: " + event.QueuedSucces + "\n" +
                     "blocked by category: " + event.RecipientIsBlocking + "\n" + 
                     "recipients not found: " + event.RecipientDidntExist + "\n" +
-                    "failed b/c other reasons: " + event.DisconnectOrOtherReason + Border + "\n";
+                    "failed b/c other reasons: " + event.DisconnectOrOtherReason + "\n" + Border + "\n";
             TextAreaOutput.append(message);
         });
     }
