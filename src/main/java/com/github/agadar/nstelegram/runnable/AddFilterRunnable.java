@@ -2,6 +2,7 @@ package com.github.agadar.nstelegram.runnable;
 
 import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
 import com.github.agadar.nstelegram.gui.NSTelegramForm;
+import com.github.agadar.nstelegram.gui.NSTelegramForm.Status;
 import com.github.agadar.nstelegram.manager.TelegramManager;
 import javax.swing.DefaultListModel;
 import javax.swing.SwingUtilities;
@@ -53,8 +54,7 @@ public class AddFilterRunnable implements Runnable
             // Always re-enable the 'add filter' and 'start sending' buttons.
             SwingUtilities.invokeLater(() ->
             {
-                Form.ButtonAddFilter.setEnabled(true);
-                Form.BtnStart.setEnabled(true);
+                Form.updateGui(Status.Idle);
             });
         }
     }

@@ -48,12 +48,20 @@ import javax.swing.text.DefaultCaret;
  *
  * @author Agadar <https://github.com/Agadar/>
  */
-public class NSTelegramForm extends javax.swing.JFrame implements TelegramManagerListener
+public final class NSTelegramForm extends javax.swing.JFrame implements TelegramManagerListener
 {
     public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.2.0"; // Form title.  
     private final static String Border = "------------------------------------------";  // Border for output text.
     private final TelegramManager Tm = new TelegramManager(); // Manages sending telegrams. 
     private Thread CompileRecipientsWorker;  // Thread used for compiling address lists.
+    
+    /** Enumerator for different states. */
+    public enum Status
+    {
+        Idle,
+        CompilingRecipients,
+        SendingTelegrams;
+    }
     
     public NSTelegramForm()
     {
@@ -71,7 +79,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         ComboBoxTelegramType.setSelectedItem(Tm.LastTelegramType = ph.LastTelegramType);
         TxtFieldRegionFrom.setText(Tm.FromRegion = ph.FromRegion);
         CheckBoxLoop.setSelected(Tm.IsLooping = ph.IsLooping);
-        updateGui(false);                   // Update entire GUI in case we missed something in visual designer.
+        updateGui(Status.Idle);                   // Update entire GUI in case we missed something in visual designer.
         TextAreaOutput.setText(duration()); // Set output textarea, for consistency's sake.
         Tm.addListeners(this);              // Subscribe to telegram manager.
         
@@ -504,7 +512,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      */
     private void BtnStartActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_BtnStartActionPerformed
     {//GEN-HEADEREND:event_BtnStartActionPerformed
-        updateGui(true);    // update GUI
+        updateGui(Status.SendingTelegrams);    // update GUI
         TextAreaOutput.setText(duration());
 
         try
@@ -515,7 +523,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         {
             // if something went wrong while starting sending telegrams, reset GUI
             TextAreaOutput.setText(ex.getMessage() + "\n");
-            updateGui(false);
+            updateGui(Status.Idle);
         }
     }//GEN-LAST:event_BtnStartActionPerformed
 
@@ -543,7 +551,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
             return;
         
         TextFieldFilterValues.setText("");  // Clear the textfield in question.
-        setFilterComboBoxEnabled((FilterType) evt.getItem(), false);
+        setFilterComboBoxEnabled((FilterType) evt.getItem(), Status.Idle);
     }//GEN-LAST:event_ComboBoxFilterTypeItemStateChanged
 
     /**
@@ -569,8 +577,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     private void ButtonAddFilterActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_ButtonAddFilterActionPerformed
     {//GEN-HEADEREND:event_ButtonAddFilterActionPerformed
         TextAreaOutput.setText("compiling recipient list...\n");    // Inform user, as this might take a while.
-        ButtonAddFilter.setEnabled(false);     
-        BtnStart.setEnabled(false);
+        updateGui(Status.CompilingRecipients);
         final String filterValues = TextFieldFilterValues.getText();
         TextFieldFilterValues.setText("");
         
@@ -803,7 +810,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         
         // Enable or disable TxtFieldRegionFrom.
         final TelegramType selected = (TelegramType) evt.getItem();
-        setFromRegionTextAndEnabled(selected, false);
+        setFromRegionTextAndEnabled(selected, Status.Idle);
         Tm.LastTelegramType = selected;
         
         TextAreaOutput.setText(duration()); // Print new duration to output textarea.
@@ -868,27 +875,26 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     // End of variables declaration//GEN-END:variables
 
     /**
-     * Updates the GUI according to whether we've begun sending telegrams, or
-     * stopped sending telegrams.
+     * Updates the GUI according to the current status.
      * 
-     * @param sending 
+     * @param status
      */
-    private void updateGui(boolean sending)
+    public void updateGui(Status status)
     {
-        BtnStart.setEnabled(!sending);
-        JListFilters.setEnabled(!sending);
-        ButtonAddFilter.setEnabled(!sending);
-        TxtFieldClientKey.setEditable(!sending);
-        TxtFieldTelegramId.setEditable(!sending);
-        TxtFieldSecretKey.setEditable(!sending);
-        TextFieldFilterValues.setEditable(!sending);
-        ComboBoxTelegramType.setEnabled(!sending);
-        CheckBoxLoop.setEnabled(!sending);
-        ComboBoxFilterType.setEnabled(!sending);
-        BtnStop.setEnabled(sending);
-        ButtonRemoveFilter.setEnabled(!sending && JListFilters.getSelectedValue() != null);
-        setFilterComboBoxEnabled((FilterType) ComboBoxFilterType.getSelectedItem(), sending);
-        setFromRegionTextAndEnabled((TelegramType) ComboBoxTelegramType.getSelectedItem(), sending);
+        BtnStart.setEnabled(status == Status.Idle);
+        JListFilters.setEnabled(status == Status.Idle);
+        ButtonAddFilter.setEnabled(status == Status.Idle);
+        TxtFieldClientKey.setEditable(status == Status.Idle);
+        TxtFieldTelegramId.setEditable(status == Status.Idle);
+        TxtFieldSecretKey.setEditable(status == Status.Idle);
+        TextFieldFilterValues.setEditable(status == Status.Idle);
+        ComboBoxTelegramType.setEnabled(status == Status.Idle);
+        CheckBoxLoop.setEnabled(status == Status.Idle);
+        ComboBoxFilterType.setEnabled(status == Status.Idle);
+        BtnStop.setEnabled(status == Status.SendingTelegrams);
+        ButtonRemoveFilter.setEnabled(status == Status.Idle && JListFilters.getSelectedValue() != null);
+        setFilterComboBoxEnabled((FilterType) ComboBoxFilterType.getSelectedItem(), status);
+        setFromRegionTextAndEnabled((TelegramType) ComboBoxTelegramType.getSelectedItem(), status);
     }
     
     /**
@@ -897,10 +903,10 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      * 
      * @param type 
      */
-    private void setFilterComboBoxEnabled(FilterType type, boolean sending)
+    private void setFilterComboBoxEnabled(FilterType type, Status status)
     {
         // If type is null, always disable.
-        if (sending || type == null)
+        if (status != Status.Idle || type == null)
         {
             TextFieldFilterValues.setEditable(false);
             return;
@@ -932,16 +938,12 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
      * 
      * @param type 
      */
-    private void setFromRegionTextAndEnabled(TelegramType type, boolean sending)
+    private void setFromRegionTextAndEnabled(TelegramType type, Status status)
     {
-        if (sending)
-        {
+        if (status != Status.Idle)
             TxtFieldRegionFrom.setEditable(false);
-        }
         else if (type == TelegramType.RECRUITMENT)
-        {
             TxtFieldRegionFrom.setEditable(true);
-        }
         else
         {
             TxtFieldRegionFrom.setEditable(false);
@@ -1027,7 +1029,7 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
     {
         SwingUtilities.invokeLater(() ->
         {
-            updateGui(false);
+            updateGui(Status.Idle);
             final String message = Border + "\nfinished" + (event.CausedByError ? " with error: " 
                     + event.ErrorMsg + "\n" : " without fatal errors\n") + 
                     "telegrams queued: " + event.QueuedSucces + "\n" +
