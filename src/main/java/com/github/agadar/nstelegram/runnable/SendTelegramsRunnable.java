@@ -43,7 +43,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
         this.Recipients = recipients;
         this.Listeners = listeners;
         this.NoRecipientsFoundTimeOut = noRecipientsFoundTimeOut;
-        this.Stats = new QueuedStats(Recipients);
+        this.Stats = new QueuedStats();
         this.History = history;
     }    
     
@@ -148,7 +148,8 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
         {
             final StoppedSendingEvent stoppedEvent = new StoppedSendingEvent(this,
                     causedByError, errorMsg, Stats.getQueuedSucces(), 
-                    Stats.getQueuedFailed(), Stats.getQueuedNot());
+                    Stats.getRecipientDidntExist(), Stats.getRecipientIsBlocking(),
+                    Stats.getDisconnectOrOtherReason());
             Listeners.stream().forEach((tsl) -> 
             {
                 tsl.handleStoppedSending(stoppedEvent);
@@ -169,9 +170,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
             Stats.registerSucces(event.Addressee);
         }
         else
-        {
-            Stats.registerFailure(event.Addressee);
-        }
+            Stats.registerFailure(event.Addressee, null);
         
         synchronized(Listeners)
         {
@@ -265,6 +264,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
     {
         if (reason != null)
         {
+            Stats.registerFailure(recipient, reason);
             Recipients.remove(recipient);
             History.put(new Tuple(Tm.TelegramId, recipient), reason);        
             final RecipientRemovedEvent event = new RecipientRemovedEvent(this, recipient, reason);

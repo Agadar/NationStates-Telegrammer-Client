@@ -15,19 +15,23 @@ public class StoppedSendingEvent extends EventObject
     public final String ErrorMsg;
     /** Number of telegrams queued successfully. */
     public final int QueuedSucces;
-    /** Number of telegrams that failed to queue. */
-    public final int QueuedFailed;
-    /** Number of telegrams that were never queued. */
-    public final int QueuedNot;
+    /** Number of telegrams that failed to queue because the recipient didn't exist. */
+    public final int RecipientDidntExist;
+    /** Number of telegrams that failed to queue because the recipient is blocking telegrams of that type. */
+    public final int RecipientIsBlocking;
+    /** Number of telegrams that failed to queue because of some other reason, such as disconnect. */
+    public final int DisconnectOrOtherReason;
     
     public StoppedSendingEvent(Object source, boolean causedByError, String errorMsg,
-            int queuedSucces, int queuedFailed, int queuedNot)
+            int queuedSucces, int recipientDidntExist, int recipientIsBlocking, 
+            int disconnectOrOtherReason)
     {
         super(source);
         this.CausedByError = causedByError;
         this.ErrorMsg = errorMsg;
         this.QueuedSucces = queuedSucces;
-        this.QueuedFailed = queuedFailed;
-        this.QueuedNot = queuedNot;
+        this.RecipientDidntExist = recipientDidntExist;
+        this.RecipientIsBlocking = recipientIsBlocking;
+        this.DisconnectOrOtherReason = disconnectOrOtherReason;
     }
 }

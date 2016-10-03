@@ -1,5 +1,6 @@
 package com.github.agadar.nstelegram.util;
 
+import com.github.agadar.nstelegram.enums.SkippedRecipientReason;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,40 +12,40 @@ import java.util.Set;
  */
 public class QueuedStats 
 {
-    private final Set<String> RecipientsRemaining;
     private final Set<String> QueuedSucces = new HashSet<>();
-    private final Set<String> QueuedFailed = new HashSet<>();
-    
-    /**
-     * Constructor.
-     * 
-     * @param recipients
-     */
-    public QueuedStats(Set<String> recipients)
-    {
-        this.RecipientsRemaining = recipients;
-    }
+    private final Set<String> RecipientDidntExist = new HashSet<>();
+    private final Set<String> RecipientIsBlocking = new HashSet<>();
+    private final Set<String> DisconnectOrOtherReason = new HashSet<>();
     
     public void registerSucces(String recipient)
     {
-        if (RecipientsRemaining.contains(recipient))
-        {
-            RecipientsRemaining.remove(recipient);
-            QueuedSucces.add(recipient);
-        }
-        else if (QueuedFailed.contains(recipient))
-        {
-            QueuedFailed.remove(recipient);
-            QueuedSucces.add(recipient);
-        }
+        QueuedSucces.add(recipient);
+        RecipientDidntExist.remove(recipient);
+        RecipientIsBlocking.remove(recipient);
+        DisconnectOrOtherReason.remove(recipient);
     }
     
-    public void registerFailure(String recipient)
+    public void registerFailure(String recipient, SkippedRecipientReason reason)
     {
-        if (RecipientsRemaining.contains(recipient))
+        // If the recipient already received the telegram succesfully before, don't register a failure.
+        if (QueuedSucces.contains(recipient))
+            return;
+        
+        if (reason == null) // Else if no reason given, assume 'DisconnectOrOtherReason'
         {
-            RecipientsRemaining.remove(recipient);
-            QueuedFailed.add(recipient);
+            DisconnectOrOtherReason.add(recipient);
+            return;
+        }
+        
+        switch (reason)     // Else if reason given, add to appropriate map.
+        {
+            case BLOCKING_RECRUITMENT:
+            case BLOCKING_CAMPAIGN:
+                RecipientIsBlocking.add(recipient);
+                break;
+            case NOT_FOUND:
+                RecipientDidntExist.add(recipient);
+                break;
         }
     }
     
@@ -53,13 +54,18 @@ public class QueuedStats
         return QueuedSucces.size();
     }
     
-    public int getQueuedFailed()
+    public int getRecipientDidntExist()
     {
-        return QueuedFailed.size();
+        return RecipientDidntExist.size();
     }
     
-    public int getQueuedNot()
+    public int getRecipientIsBlocking()
     {
-        return RecipientsRemaining.size();
+        return RecipientIsBlocking.size();
+    }
+    
+    public int getDisconnectOrOtherReason()
+    {
+        return DisconnectOrOtherReason.size();
     }
 }

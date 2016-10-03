@@ -1028,13 +1028,12 @@ public class NSTelegramForm extends javax.swing.JFrame implements TelegramManage
         SwingUtilities.invokeLater(() ->
         {
             updateGui(false);
-
-            String message = Border + "\nfinished" + (event.CausedByError ? " with error: " 
+            final String message = Border + "\nfinished" + (event.CausedByError ? " with error: " 
                     + event.ErrorMsg + "\n" : " without fatal errors\n") + 
                     "telegrams queued: " + event.QueuedSucces + "\n" +
-                    "failed to queue: " + event.QueuedFailed + "\n" + 
-                    "not yet queued: " + event.QueuedNot + "\n" + Border + "\n";
-
+                    "blocked by category: " + event.RecipientIsBlocking + "\n" + 
+                    "recipients not found: " + event.RecipientDidntExist + "\n" +
+                    "failed b/c other reasons: " + event.DisconnectOrOtherReason + Border + "\n";
             TextAreaOutput.append(message);
         });
     }

@@ -24,17 +24,16 @@ import java.util.Set;
  */
 public final class TelegramManager
 {
-    // User agent string for formatting.
     private final static String USER_AGENT = "Agadar's Telegrammer using Client "
-            + "Key '%s' (https://github.com/Agadar/NationStates-Telegrammer)";
-    // Duration in milliseconds for timeout when no recipients were found while looping.
-    private final static int NO_ADDRESSEES_FOUND_TIMEOUT = 60000;
+            + "Key '%s' (https://github.com/Agadar/NationStates-Telegrammer)";  // User agent string for formatting.
+    private final static int NO_ADDRESSEES_FOUND_TIMEOUT = 60000;               // Duration in milliseconds for timeout when no recipients were found while looping.
     
-    private final List<Filter> Filters = new ArrayList<>(); // The filters to apply in chronological order.
-    private final Set<String> Recipients = new HashSet<>(); // Presumably most up-to-date recipients list, based on Filters.
-    private final Map<Tuple<String, String>, SkippedRecipientReason> History = new HashMap<>();   // History of recipients, mapped to telegram id's.
+    private final List<Filter> Filters = new ArrayList<>();                 // The filters to apply, in chronological order.
+    private final Set<String> Recipients = new HashSet<>();                 // Supposedly most up-to-date recipients list, based on Filters.
+    private final Map<Tuple<String, String>, SkippedRecipientReason> History 
+            = new HashMap<>();                                              // History of recipients, mapped to telegram id's.
     private final Set<TelegramManagerListener> Listeners = new HashSet<>(); // Listeners to events thrown by this.
-    private Thread TelegramThread; // The thread on which the TelegramQuery is running.
+    private Thread TelegramThread;                                          // The thread on which the TelegramQuery is running.
     
     // Variables that will be used for sending the telegrams. Should be manually
     // updated by a form or where-ever these values are defined.
