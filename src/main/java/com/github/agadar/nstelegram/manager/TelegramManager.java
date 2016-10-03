@@ -120,7 +120,7 @@ public final class TelegramManager
         if (numberOfRecipients() == 0)
             throw new IllegalArgumentException("Please supply at least one recipient!"); 
         
-        removeOldRecipients(false);  // Remove old recipients.
+        removeOldRecipients(true);  // Remove old recipients.
         NSAPI.setUserAgent(String.format(USER_AGENT, ClientKey)); // Update user agent.
         
         // Check to make sure the thread is not already running to prevent synchronization issues.

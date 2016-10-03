@@ -299,6 +299,6 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
         }
 
         Tm.refreshFilters(false);
-        Tm.removeOldRecipients(true);
+        Tm.removeOldRecipients(false);
     }
 }
