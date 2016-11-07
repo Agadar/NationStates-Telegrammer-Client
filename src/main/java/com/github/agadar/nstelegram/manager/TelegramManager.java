@@ -43,6 +43,7 @@ public final class TelegramManager
     public TelegramType LastTelegramType;
     public String FromRegion;
     public boolean IsLooping;
+    public boolean NoDuplicates;
     
     /**
      * Refreshes the filters.

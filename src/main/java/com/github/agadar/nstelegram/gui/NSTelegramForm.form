@@ -40,7 +40,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="PanelTelegram" max="32767" attributes="0"/>
-                  <Component id="PanelFilters" pref="273" max="32767" attributes="0"/>
+                  <Component id="PanelFilters" pref="344" max="32767" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
@@ -55,16 +55,16 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+              <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
-                      <Component id="PanelOutput" max="32767" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="PanelOutput" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="PanelActions" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
-                      <Component id="PanelTelegram" min="-2" pref="213" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="PanelFilters" min="-2" pref="234" max="-2" attributes="0"/>
+                      <Component id="PanelTelegram" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="PanelFilters" min="-2" pref="272" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
@@ -87,11 +87,11 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
+              <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="1" attributes="0">
-                          <Group type="103" groupAlignment="1" attributes="0">
+                      <Group type="103" alignment="0" groupAlignment="0" attributes="0">
+                          <Group type="103" alignment="1" groupAlignment="1" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="LabelTelegramType" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="LabelSecretKey" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -100,33 +100,33 @@
                               </Group>
                               <Component id="LabelLoop" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" alignment="0" attributes="0">
                           <Component id="LabelRegionFrom" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                       </Group>
+                      <Component id="LabelNoDuplicates" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                      <Component id="TxtFieldRegionFrom" pref="150" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="TxtFieldRegionFrom" alignment="1" pref="150" max="32767" attributes="0"/>
                       <Component id="TxtFieldClientKey" alignment="0" pref="150" max="32767" attributes="0"/>
                       <Component id="TxtFieldTelegramId" alignment="0" pref="150" max="32767" attributes="0"/>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="CheckBoxLoop" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="32767" attributes="0"/>
-                          <Component id="TextFieldFiller2" min="-2" pref="6" max="-2" attributes="0"/>
-                      </Group>
                       <Component id="TxtFieldSecretKey" alignment="0" pref="150" max="32767" attributes="0"/>
                       <Component id="ComboBoxTelegramType" alignment="0" max="32767" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Component id="CheckBoxNoDuplicates" min="-2" max="-2" attributes="0"/>
+                              <Component id="CheckBoxLoop" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
                   </Group>
-                  <EmptySpace min="0" pref="22" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="LabelClientKey" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="TxtFieldClientKey" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -153,11 +153,15 @@
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="TextFieldFiller2" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="CheckBoxLoop" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="LabelLoop" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="CheckBoxNoDuplicates" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="LabelNoDuplicates" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace pref="12" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -226,15 +230,6 @@
             <Property name="name" type="java.lang.String" value="LabelSendAs" noResource="true"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="TextFieldFiller2">
-          <Properties>
-            <Property name="editable" type="boolean" value="false"/>
-            <Property name="enabled" type="boolean" value="false" postCode="TextFieldFiller2.setVisible(false);"/>
-            <Property name="focusable" type="boolean" value="false"/>
-            <Property name="name" type="java.lang.String" value="TxtFieldSecretKey" noResource="true"/>
-            <Property name="requestFocusEnabled" type="boolean" value="false"/>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JCheckBox" name="CheckBoxLoop">
           <Properties>
             <Property name="text" type="java.lang.String" value=" "/>
@@ -258,7 +253,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="LabelRegionFrom">
           <Properties>
-            <Property name="text" type="java.lang.String" value="From region:"/>
+            <Property name="text" type="java.lang.String" value="For region:"/>
             <Property name="name" type="java.lang.String" value="LabelRecruiting" noResource="true"/>
           </Properties>
         </Component>
@@ -274,6 +269,24 @@
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;TelegramType&gt;"/>
           </AuxValues>
+        </Component>
+        <Component class="javax.swing.JLabel" name="LabelNoDuplicates">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="No duplicate TG&apos;s:"/>
+            <Property name="name" type="java.lang.String" value="LabelSendAs" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="CheckBoxNoDuplicates">
+          <Properties>
+            <Property name="text" type="java.lang.String" value=" "/>
+            <Property name="focusPainted" type="boolean" value="false"/>
+            <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+              <Insets value="[0, -1, 0, 2]"/>
+            </Property>
+          </Properties>
+          <Events>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="CheckBoxNoDuplicatesItemStateChanged"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -298,10 +311,10 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="ComboBoxFilterType" max="32767" attributes="0"/>
-                      <Component id="ScrollPaneFilters" pref="0" max="32767" attributes="0"/>
+                      <Component id="ScrollPaneFilters" pref="310" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="ButtonRemoveFilter" min="-2" pref="116" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="ButtonRemoveFilter" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="ButtonAddFilter" max="32767" attributes="0"/>
                       </Group>
                       <Component id="TextFieldFilterValues" alignment="0" max="32767" attributes="0"/>
@@ -312,9 +325,9 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
+              <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="ScrollPaneFilters" min="-2" pref="93" max="-2" attributes="0"/>
+                  <Component id="ScrollPaneFilters" pref="123" max="32767" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="ComboBoxFilterType" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -324,7 +337,7 @@
                       <Component id="ButtonRemoveFilter" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="ButtonAddFilter" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -426,7 +439,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="ScrollPaneOutput" max="32767" attributes="0"/>
+                  <Component id="ScrollPaneOutput" pref="406" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -473,11 +486,11 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="BtnStart" min="-2" pref="120" max="-2" attributes="0"/>
+                  <Component id="BtnStart" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="BtnClearOutput" min="-2" pref="120" max="-2" attributes="0"/>
+                  <Component id="BtnClearOutput" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                  <Component id="BtnStop" min="-2" pref="120" max="-2" attributes="0"/>
+                  <Component id="BtnStop" min="-2" pref="128" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
@@ -488,8 +501,8 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="BtnStart" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="BtnStop" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="BtnClearOutput" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="BtnStop" alignment="3" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
