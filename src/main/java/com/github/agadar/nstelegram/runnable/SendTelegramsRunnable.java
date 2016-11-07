@@ -13,6 +13,7 @@ import com.github.agadar.nstelegram.event.RecipientRemovedEvent;
 import com.github.agadar.nstelegram.event.RecipientsRefreshedEvent;
 import com.github.agadar.nstelegram.event.StoppedSendingEvent;
 import com.github.agadar.nstelegram.event.TelegramManagerListener;
+import com.github.agadar.nstelegram.manager.PropertiesManager;
 import com.github.agadar.nstelegram.manager.TelegramManager;
 import com.github.agadar.nstelegram.util.QueuedStats;
 import com.github.agadar.nstelegram.util.Tuple;
@@ -34,10 +35,11 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
     private final int NoRecipientsFoundTimeOut;
     private final QueuedStats Stats;
     private final Map<Tuple<String, String>, SkippedRecipientReason> History;
+    private final PropertiesManager PropsManager;
     
     public SendTelegramsRunnable(TelegramManager telegramManager, Set<String> recipients,
             Set<TelegramManagerListener> listeners, int noRecipientsFoundTimeOut, 
-            Map<Tuple<String, String>, SkippedRecipientReason> history)
+            Map<Tuple<String, String>, SkippedRecipientReason> history, PropertiesManager propsManager)
     {
         this.Tm = telegramManager;
         this.Recipients = recipients;
@@ -45,6 +47,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
         this.NoRecipientsFoundTimeOut = noRecipientsFoundTimeOut;
         this.Stats = new QueuedStats();
         this.History = history;
+        PropsManager = propsManager;
     }    
     
     @Override
@@ -61,8 +64,8 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
                 {
                     final String[] RecipArray = Recipients.toArray(new String[Recipients.size()]);
                     
-                    if (Tm.LastTelegramType != null)
-                    switch (Tm.LastTelegramType)
+                    if (PropsManager.LastTelegramType != null)
+                    switch (PropsManager.LastTelegramType)
                     {
                         case RECRUITMENT:
                         {
@@ -111,7 +114,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
                 }
                 
                 // If looping, update recipients until there's recipients available.
-                if (Tm.IsLooping)
+                if (PropsManager.IsLooping)
                 {
                     refreshRecipients();
 
@@ -132,7 +135,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
                         refreshRecipients();
                     }
                 }
-            } while (Tm.IsLooping && !Thread.interrupted());
+            } while (PropsManager.IsLooping && !Thread.interrupted());
         } 
         catch (InterruptedException ex) { /* Just fall through to finally. */ } 
         catch (Exception ex)
@@ -166,7 +169,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
         // changed.       
         if (event.Queued)
         {
-            History.put(new Tuple(Tm.TelegramId, event.Addressee), SkippedRecipientReason.PREVIOUS_RECIPIENT);
+            History.put(new Tuple(PropsManager.TelegramId, event.Addressee), SkippedRecipientReason.PREVIOUS_RECIPIENT);
             Stats.registerSucces(event.Addressee);
         }
         else
@@ -190,11 +193,11 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
     private void sendTelegram(String... recipients)
     {
         // Prepare query.
-        final TelegramQuery q = NSAPI.telegram(Tm.ClientKey, Tm.TelegramId, Tm.SecretKey,
+        final TelegramQuery q = NSAPI.telegram(PropsManager.ClientKey, PropsManager.TelegramId, PropsManager.SecretKey,
                 recipients).addListeners(this);
 
         // Tag as recruitment telegram if needed.
-        if (Tm.LastTelegramType == TelegramType.RECRUITMENT)
+        if (PropsManager.LastTelegramType == TelegramType.RECRUITMENT)
             q.isRecruitment();
 
         q.execute(null);    // send the telegrams
@@ -214,7 +217,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
         {
             // Make server call.
             Nation n = NSAPI.nation(recipient).shards(NationShard.CanReceiveRecruitmentTelegrams)
-                                .canReceiveTelegramFromRegion(Tm.FromRegion).execute();
+                                .canReceiveTelegramFromRegion(PropsManager.FromRegion).execute();
             final SkippedRecipientReason reason = (n == null) ? SkippedRecipientReason.NOT_FOUND : 
                     !n.CanReceiveRecruitmentTelegrams ? SkippedRecipientReason.BLOCKING_RECRUITMENT : null;              
             return canReceiveXTelegrams(reason, recipient);
@@ -266,7 +269,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener
         {
             Stats.registerFailure(recipient, reason);
             Recipients.remove(recipient);
-            History.put(new Tuple(Tm.TelegramId, recipient), reason);        
+            History.put(new Tuple(PropsManager.TelegramId, recipient), reason);        
             final RecipientRemovedEvent event = new RecipientRemovedEvent(this, recipient, reason);
 
             synchronized(Listeners)

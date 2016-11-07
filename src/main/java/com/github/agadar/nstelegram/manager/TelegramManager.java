@@ -1,6 +1,5 @@
 package com.github.agadar.nstelegram.manager;
 
-import com.github.agadar.nstelegram.enums.TelegramType;
 import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nstelegram.enums.SkippedRecipientReason;
 import com.github.agadar.nstelegram.event.RecipientRemovedEvent;
@@ -33,17 +32,19 @@ public final class TelegramManager
     private final Map<Tuple<String, String>, SkippedRecipientReason> History 
             = new HashMap<>();                                              // History of recipients, mapped to telegram id's.
     private final Set<TelegramManagerListener> Listeners = new HashSet<>(); // Listeners to events thrown by this.
+    private final PropertiesManager PropsManager;
+    
     private Thread TelegramThread;                                          // The thread on which the TelegramQuery is running.
     
-    // Variables that will be used for sending the telegrams. Should be manually
-    // updated by a form or where-ever these values are defined.
-    public String ClientKey;
-    public String TelegramId;
-    public String SecretKey;
-    public TelegramType LastTelegramType;
-    public String FromRegion;
-    public boolean IsLooping;
-    public boolean NoDuplicates;
+    /**
+     * Constructor that sets the properties manager to use.
+     * 
+     * @param propsManager 
+     */
+    public TelegramManager(PropertiesManager propsManager)
+    {
+        PropsManager = propsManager;
+    }
     
     /**
      * Refreshes the filters.
@@ -109,11 +110,11 @@ public final class TelegramManager
     public void startSending()
     {
         // Make sure all inputs are valid.
-        if (ClientKey == null || ClientKey.isEmpty())
+        if (PropsManager.ClientKey == null || PropsManager.ClientKey.isEmpty())
             throw new IllegalArgumentException("Please supply a Client Key!");      
-        if (TelegramId == null || TelegramId.isEmpty())
+        if (PropsManager.TelegramId == null || PropsManager.TelegramId.isEmpty())
             throw new IllegalArgumentException("Please supply a Telegram Id!");      
-        if (SecretKey == null || SecretKey.isEmpty())
+        if (PropsManager.SecretKey == null || PropsManager.SecretKey.isEmpty())
             throw new IllegalArgumentException("Please supply a Secret Key!");
         
         refreshFilters(true);   // Refresh filters one last time before checking # of recipients
@@ -122,7 +123,7 @@ public final class TelegramManager
             throw new IllegalArgumentException("Please supply at least one recipient!"); 
         
         removeOldRecipients(true);  // Remove old recipients.
-        NSAPI.setUserAgent(String.format(USER_AGENT, ClientKey)); // Update user agent.
+        NSAPI.setUserAgent(String.format(USER_AGENT, PropsManager.ClientKey)); // Update user agent.
         
         // Check to make sure the thread is not already running to prevent synchronization issues.
         if (TelegramThread != null && TelegramThread.isAlive())
@@ -130,7 +131,7 @@ public final class TelegramManager
         
         // Prepare thread, then run it.
         TelegramThread = new Thread(new SendTelegramsRunnable(this, Recipients, Listeners,
-            NO_ADDRESSEES_FOUND_TIMEOUT, History));       
+            NO_ADDRESSEES_FOUND_TIMEOUT, History, PropsManager));       
         TelegramThread.start();
     }
     
@@ -153,7 +154,7 @@ public final class TelegramManager
         for (final Iterator<String> it = Recipients.iterator(); it.hasNext();)
         {
             final String recipient = it.next();
-            final SkippedRecipientReason reason = History.get(new Tuple(TelegramId, recipient));
+            final SkippedRecipientReason reason = History.get(new Tuple(PropsManager.TelegramId, recipient));
             
             if (reason != null)
             {

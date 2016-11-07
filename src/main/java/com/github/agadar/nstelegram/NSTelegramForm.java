@@ -52,7 +52,10 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 {
     public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.3.0"; // Form title.  
     private final static String BORDER = "------------------------------------------";  // Border for output text.
-    private final TelegramManager Tm = new TelegramManager(); // Manages sending telegrams. 
+    
+    private final PropertiesManager PropsManager;
+    private final TelegramManager TgManager;
+    
     private Thread CompileRecipientsWorker;  // Thread used for compiling address lists.
     
     /** Enumerator for different states. */
@@ -63,27 +66,28 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         SendingTelegrams;
     }
     
-    public NSTelegramForm()
+    public NSTelegramForm(PropertiesManager propsManager, TelegramManager tgManager)
     {
         initComponents();
+        
+        // Set managers.
+        PropsManager = propsManager;
+        TgManager = tgManager;
         
         // Sets the output textarea such that it auto-scrolls down.
         ((DefaultCaret) TextAreaOutput.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
         // Set fields according to values retrieved from properties file.
-        final PropertiesManager ph = new PropertiesManager();
-        ph.loadProperties();
-        TxtFieldClientKey.setText(Tm.ClientKey = ph.ClientKey);
-        TxtFieldTelegramId.setText(Tm.TelegramId = ph.TelegramId);
-        TxtFieldSecretKey.setText(Tm.SecretKey = ph.SecretKey);
-        ComboBoxTelegramType.setSelectedItem(Tm.LastTelegramType = ph.LastTelegramType);
-        TxtFieldRegionFrom.setText(Tm.FromRegion = ph.FromRegion);
-        CheckBoxLoop.setSelected(Tm.IsLooping = ph.IsLooping);
-        CheckBoxNoDuplicates.setSelected(Tm.NoDuplicates = ph.NoDuplicateTGs);
+        TxtFieldClientKey.setText(PropsManager.ClientKey);
+        TxtFieldTelegramId.setText(PropsManager.TelegramId);
+        TxtFieldSecretKey.setText(PropsManager.SecretKey);
+        ComboBoxTelegramType.setSelectedItem(PropsManager.LastTelegramType);
+        TxtFieldRegionFrom.setText(PropsManager.FromRegion);
+        CheckBoxLoop.setSelected(PropsManager.IsLooping);
+        CheckBoxNoDuplicates.setSelected(PropsManager.NoDuplicateTGs);
         
         updateGui(Status.Idle);                   // Update entire GUI in case we missed something in visual designer.
         TextAreaOutput.setText(duration()); // Set output textarea, for consistency's sake.
-        Tm.addListeners(this);              // Subscribe to telegram manager.
         
         // Attempt to set and verify user agent.
         try
@@ -496,7 +500,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 
         try
         {
-            Tm.startSending();  // start sending telegrams
+            TgManager.startSending();  // start sending telegrams
         }
         catch (Exception ex)
         {
@@ -514,7 +518,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      */
     private void BtnStopActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_BtnStopActionPerformed
     {//GEN-HEADEREND:event_BtnStopActionPerformed
-        Tm.stopSending(); // Call telegram manager to stop sending.
+        TgManager.stopSending(); // Call telegram manager to stop sending.
     }//GEN-LAST:event_BtnStopActionPerformed
 
     /**
@@ -660,7 +664,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         }
         
         // Prepare thread, then run it.
-        CompileRecipientsWorker = new Thread(new AddFilterRunnable(this, Tm, f, textForList));
+        CompileRecipientsWorker = new Thread(new AddFilterRunnable(this, TgManager, f, textForList));
         CompileRecipientsWorker.start();
     }//GEN-LAST:event_ButtonAddFilterActionPerformed
 
@@ -674,7 +678,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     {//GEN-HEADEREND:event_ButtonRemoveFilterActionPerformed
         // Retrieve selected index, remove filter from telegram manager.
         int index = JListFilters.getSelectedIndex();
-        Tm.removeFilterAt(index);
+        TgManager.removeFilterAt(index);
         
         // Remove filter from GUI, try select preceding filter.
         ((DefaultListModel)JListFilters.getModel()).remove(index);
@@ -694,15 +698,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     private void formWindowClosing(java.awt.event.WindowEvent evt)//GEN-FIRST:event_formWindowClosing
     {//GEN-HEADEREND:event_formWindowClosing
         // Store relevant variables to properties file.
-        final PropertiesManager ph = new PropertiesManager();
-        ph.ClientKey = Tm.ClientKey;
-        ph.TelegramId = Tm.TelegramId;
-        ph.SecretKey = Tm.SecretKey;
-        ph.LastTelegramType = Tm.LastTelegramType;
-        ph.FromRegion = Tm.FromRegion;
-        ph.IsLooping = Tm.IsLooping;
-        ph.NoDuplicateTGs = Tm.NoDuplicates;
-        ph.saveProperties();
+        PropsManager.saveProperties();
     }//GEN-LAST:event_formWindowClosing
 
     /**
@@ -740,7 +736,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         // Enable or disable TxtFieldRegionFrom.
         final TelegramType selected = (TelegramType) evt.getItem();
         setFromRegionTextAndEnabled(selected, Status.Idle);
-        Tm.LastTelegramType = selected;
+        PropsManager.LastTelegramType = selected;
 
         TextAreaOutput.setText(duration()); // Print new duration to output textarea.
     }//GEN-LAST:event_ComboBoxTelegramTypeItemStateChanged
@@ -751,7 +747,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt 
      */
     private void TxtFieldRegionFromKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldRegionFromKeyReleased
-        Tm.FromRegion = TxtFieldRegionFrom.getText();
+        PropsManager.FromRegion = TxtFieldRegionFrom.getText();
     }//GEN-LAST:event_TxtFieldRegionFromKeyReleased
 
     /**
@@ -760,39 +756,24 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt 
      */
     private void CheckBoxLoopItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_CheckBoxLoopItemStateChanged
-        Tm.IsLooping = CheckBoxLoop.isSelected();
+        PropsManager.IsLooping = CheckBoxLoop.isSelected();
     }//GEN-LAST:event_CheckBoxLoopItemStateChanged
 
-    /**
-     * Updates Telegram Id value on key release.
-     * 
-     * @param evt 
-     */
+    private void CheckBoxNoDuplicatesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_CheckBoxNoDuplicatesItemStateChanged
+        PropsManager.NoDuplicateTGs = CheckBoxNoDuplicates.isSelected();
+    }//GEN-LAST:event_CheckBoxNoDuplicatesItemStateChanged
+
     private void TxtFieldClientKeyKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldClientKeyKeyReleased
-        Tm.ClientKey = TxtFieldClientKey.getText();
+        PropsManager.ClientKey = TxtFieldClientKey.getText();
     }//GEN-LAST:event_TxtFieldClientKeyKeyReleased
 
-    /**
-     * Updates Secret Key value on key release.
-     * 
-     * @param evt 
-     */
-    private void TxtFieldSecretKeyKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldSecretKeyKeyReleased
-        Tm.SecretKey = TxtFieldSecretKey.getText();
-    }//GEN-LAST:event_TxtFieldSecretKeyKeyReleased
-
-    /**
-     * Updates Client Key value on key release.
-     * 
-     * @param evt 
-     */
     private void TxtFieldTelegramIdKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldTelegramIdKeyReleased
-        Tm.TelegramId = TxtFieldTelegramId.getText();
+        PropsManager.TelegramId = TxtFieldTelegramId.getText();
     }//GEN-LAST:event_TxtFieldTelegramIdKeyReleased
 
-    private void CheckBoxNoDuplicatesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_CheckBoxNoDuplicatesItemStateChanged
-        Tm.NoDuplicates = CheckBoxNoDuplicates.isSelected();
-    }//GEN-LAST:event_CheckBoxNoDuplicatesItemStateChanged
+    private void TxtFieldSecretKeyKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldSecretKeyKeyReleased
+        PropsManager.SecretKey = TxtFieldSecretKey.getText();
+    }//GEN-LAST:event_TxtFieldSecretKeyKeyReleased
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BtnClearOutput;
@@ -913,14 +894,14 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      */
     public final String duration()
     {
-        int estimatedDuration = Math.max(Tm.numberOfRecipients() - 1, 0) 
+        int estimatedDuration = Math.max(TgManager.numberOfRecipients() - 1, 0) 
             * (ComboBoxTelegramType.getSelectedItem() == TelegramType.RECRUITMENT ? 181 : 31);
         int hours = estimatedDuration / 3600;
         int minutes = estimatedDuration % 3600 / 60;
         int seconds = estimatedDuration % 3600 % 60;
         return String.format(BORDER + "%naddressees selected: %s%nestimated duration: "
                 + "%s hours, %s minutes, %s seconds%n" + BORDER + "%n"
-                , Tm.numberOfRecipients(), hours, minutes, seconds);
+                , TgManager.numberOfRecipients(), hours, minutes, seconds);
     }
     
     /**
