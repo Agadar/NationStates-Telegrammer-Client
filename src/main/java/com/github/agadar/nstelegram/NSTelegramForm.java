@@ -1,4 +1,4 @@
-package com.github.agadar.nstelegram.gui;
+package com.github.agadar.nstelegram;
 
 import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nsapi.NationStatesAPIException;
@@ -793,33 +793,6 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     private void CheckBoxNoDuplicatesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_CheckBoxNoDuplicatesItemStateChanged
         Tm.NoDuplicates = CheckBoxNoDuplicates.isSelected();
     }//GEN-LAST:event_CheckBoxNoDuplicatesItemStateChanged
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[])
-    {
-        try
-        {
-            //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-
-            /* Create and display the form */
-            java.awt.EventQueue.invokeLater(() -> 
-            {
-                NSTelegramForm form = new NSTelegramForm();
-                form.setLocationRelativeTo(null);
-                form.setVisible(true);
-            });
-        }
-        catch (ClassNotFoundException | InstantiationException |
-                IllegalAccessException |
-                UnsupportedLookAndFeelException ex)
-        {
-            Logger.getLogger(NSTelegramForm.class.getName()).
-                    log(Level.SEVERE, null, ex);
-        }
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BtnClearOutput;

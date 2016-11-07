@@ -99,7 +99,7 @@ public class PropertiesManager
         {
             return Enum.valueOf(type, string);
         }
-        catch (IllegalArgumentException ex)
+        catch (IllegalArgumentException | NullPointerException ex)
         {
             return defaultValue;
         }
