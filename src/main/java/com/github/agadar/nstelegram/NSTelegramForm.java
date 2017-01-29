@@ -34,13 +34,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.text.DefaultCaret;
 
 /**
@@ -84,7 +80,6 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         ComboBoxTelegramType.setSelectedItem(PropsManager.LastTelegramType);
         TxtFieldRegionFrom.setText(PropsManager.FromRegion);
         CheckBoxLoop.setSelected(PropsManager.IsLooping);
-        CheckBoxNoDuplicates.setSelected(PropsManager.NoDuplicateTGs);
 
         updateGui(Status.Idle);                   // Update entire GUI in case we missed something in visual designer.
         TextAreaOutput.setText(duration()); // Set output textarea, for consistency's sake.
@@ -120,8 +115,6 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         TxtFieldRegionFrom = new javax.swing.JTextField();
         LabelRegionFrom = new javax.swing.JLabel();
         ComboBoxTelegramType = new javax.swing.JComboBox<>();
-        LabelNoDuplicates = new javax.swing.JLabel();
-        CheckBoxNoDuplicates = new javax.swing.JCheckBox();
         PanelFilters = new javax.swing.JPanel();
         ScrollPaneFilters = new javax.swing.JScrollPane();
         JListFilters = new javax.swing.JList<>();
@@ -220,18 +213,6 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             }
         });
 
-        LabelNoDuplicates.setText("No duplicate TG's:");
-        LabelNoDuplicates.setName("LabelSendAs"); // NOI18N
-
-        CheckBoxNoDuplicates.setText(" ");
-        CheckBoxNoDuplicates.setFocusPainted(false);
-        CheckBoxNoDuplicates.setMargin(new java.awt.Insets(0, -1, 0, 2));
-        CheckBoxNoDuplicates.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                CheckBoxNoDuplicatesItemStateChanged(evt);
-            }
-        });
-
         javax.swing.GroupLayout PanelTelegramLayout = new javax.swing.GroupLayout(PanelTelegram);
         PanelTelegram.setLayout(PanelTelegramLayout);
         PanelTelegramLayout.setHorizontalGroup(
@@ -239,28 +220,23 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             .addGroup(PanelTelegramLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(LabelTelegramType)
-                                .addComponent(LabelSecretKey)
-                                .addComponent(LabelTelegramId)
-                                .addComponent(LabelClientKey))
-                            .addComponent(LabelLoop, javax.swing.GroupLayout.Alignment.LEADING))
-                        .addComponent(LabelRegionFrom))
-                    .addComponent(LabelNoDuplicates))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(TxtFieldRegionFrom, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
-                    .addComponent(TxtFieldClientKey, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
-                    .addComponent(TxtFieldTelegramId, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
-                    .addComponent(TxtFieldSecretKey, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
-                    .addComponent(ComboBoxTelegramType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(PanelTelegramLayout.createSequentialGroup()
-                        .addGap(12, 12, 12)
-                        .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(CheckBoxNoDuplicates)
-                            .addComponent(CheckBoxLoop))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(LabelTelegramType)
+                            .addComponent(LabelSecretKey)
+                            .addComponent(LabelTelegramId)
+                            .addComponent(LabelClientKey))
+                        .addComponent(LabelLoop, javax.swing.GroupLayout.Alignment.LEADING))
+                    .addComponent(LabelRegionFrom))
+                .addGap(52, 52, 52)
+                .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(TxtFieldRegionFrom, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                        .addComponent(TxtFieldClientKey, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                        .addComponent(TxtFieldTelegramId, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                        .addComponent(TxtFieldSecretKey, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                        .addComponent(ComboBoxTelegramType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(CheckBoxLoop))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         PanelTelegramLayout.setVerticalGroup(
@@ -290,11 +266,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                 .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(CheckBoxLoop)
                     .addComponent(LabelLoop))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(CheckBoxNoDuplicates)
-                    .addComponent(LabelNoDuplicates))
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         PanelFilters.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Filters", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 11))); // NOI18N
@@ -359,7 +331,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             PanelFiltersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelFiltersLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(ScrollPaneFilters, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
+                .addComponent(ScrollPaneFilters, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(ComboBoxFilterType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -470,14 +442,14 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(PanelOutput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(PanelActions, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(PanelTelegram, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(PanelFilters, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(PanelFilters, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(PanelOutput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(PanelActions, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -755,21 +727,17 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         PropsManager.IsLooping = CheckBoxLoop.isSelected();
     }//GEN-LAST:event_CheckBoxLoopItemStateChanged
 
-    private void CheckBoxNoDuplicatesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_CheckBoxNoDuplicatesItemStateChanged
-        PropsManager.NoDuplicateTGs = CheckBoxNoDuplicates.isSelected();
-    }//GEN-LAST:event_CheckBoxNoDuplicatesItemStateChanged
-
     private void TxtFieldClientKeyKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldClientKeyKeyReleased
         PropsManager.ClientKey = TxtFieldClientKey.getText();
     }//GEN-LAST:event_TxtFieldClientKeyKeyReleased
 
-    private void TxtFieldTelegramIdKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldTelegramIdKeyReleased
-        PropsManager.TelegramId = TxtFieldTelegramId.getText();
-    }//GEN-LAST:event_TxtFieldTelegramIdKeyReleased
-
     private void TxtFieldSecretKeyKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldSecretKeyKeyReleased
         PropsManager.SecretKey = TxtFieldSecretKey.getText();
     }//GEN-LAST:event_TxtFieldSecretKeyKeyReleased
+
+    private void TxtFieldTelegramIdKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldTelegramIdKeyReleased
+        PropsManager.TelegramId = TxtFieldTelegramId.getText();
+    }//GEN-LAST:event_TxtFieldTelegramIdKeyReleased
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BtnClearOutput;
@@ -779,13 +747,11 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     public javax.swing.JButton ButtonAddFilter;
     private javax.swing.JButton ButtonRemoveFilter;
     private javax.swing.JCheckBox CheckBoxLoop;
-    private javax.swing.JCheckBox CheckBoxNoDuplicates;
     private javax.swing.JComboBox<FilterType> ComboBoxFilterType;
     private javax.swing.JComboBox<TelegramType> ComboBoxTelegramType;
     public javax.swing.JList<String> JListFilters;
     private javax.swing.JLabel LabelClientKey;
     private javax.swing.JLabel LabelLoop;
-    private javax.swing.JLabel LabelNoDuplicates;
     private javax.swing.JLabel LabelRegionFrom;
     private javax.swing.JLabel LabelSecretKey;
     private javax.swing.JLabel LabelTelegramId;
@@ -819,7 +785,6 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         TextFieldFilterValues.setEditable(status == Status.Idle);
         ComboBoxTelegramType.setEnabled(status == Status.Idle);
         CheckBoxLoop.setEnabled(status == Status.Idle);
-        CheckBoxNoDuplicates.setEnabled(status == Status.Idle);
         ComboBoxFilterType.setEnabled(status == Status.Idle);
         BtnStop.setEnabled(status == Status.SendingTelegrams);
         ButtonRemoveFilter.setEnabled(status == Status.Idle && JListFilters.getSelectedValue() != null);
