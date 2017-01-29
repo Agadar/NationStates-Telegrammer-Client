@@ -10,16 +10,15 @@ import java.util.Set;
 /**
  * Filter for adding new nations to the address set.
  *
- * @author Agadar
+ * @author Agadar (https://github.com/Agadar/)
  */
-public class FilterNationsNew extends FilterAdd
-{
+public class FilterNationsNew extends FilterAdd {
+
     @Override
-    protected Set<String> retrieveNations()
-    {
+    protected Set<String> retrieveNations() {
         // Get fresh new list from server.
         final World w = NSAPI.world(WorldShard.NewestNations).execute();
-        
+
         // Properly set the local and global caches.
         LocalCache = new HashSet<>(w.NewestNations);
         return LocalCache;

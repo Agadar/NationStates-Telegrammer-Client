@@ -7,21 +7,20 @@ import com.github.agadar.nstelegram.filter.abstractfilter.FilterRegionByTags;
 import java.util.Set;
 
 /**
- * Filter for adding/removing nations that are in regions with the supplied tags.
+ * Filter for adding/removing nations that are in regions with the supplied
+ * tags.
  *
- * @author Agadar
+ * @author Agadar (https://github.com/Agadar/)
  */
-public class FilterRegionsWithTags extends FilterRegionByTags
-{
-    public FilterRegionsWithTags(Set<String> tags, boolean add)
-    {
+public class FilterRegionsWithTags extends FilterRegionByTags {
+
+    public FilterRegionsWithTags(Set<String> tags, boolean add) {
         super(tags, add);
     }
 
     @Override
-    protected World getWorld()
-    {
+    protected World getWorld() {
         return NSAPI.world(WorldShard.RegionsByTag).regionsWithTags(Tags
                 .toArray(new String[Tags.size()])).execute();
-    }    
+    }
 }

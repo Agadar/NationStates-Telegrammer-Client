@@ -5,20 +5,18 @@ import java.util.Set;
 
 /**
  * Filter for adding/removing individual nations from address list.
- * 
- * @author Agadar <https://github.com/Agadar/>
+ *
+ * @author Agadar (https://github.com/Agadar/)
  */
-public class FilterNations extends FilterAddOrRemove
-{
-    public FilterNations(Set<String> nations, boolean add)
-    {
+public class FilterNations extends FilterAddOrRemove {
+
+    public FilterNations(Set<String> nations, boolean add) {
         super(add);
         this.LocalCache = nations;
     }
-    
+
     @Override
-    protected Set<String> retrieveNations()
-    {
+    protected Set<String> retrieveNations() {
         return LocalCache;
     }
 }

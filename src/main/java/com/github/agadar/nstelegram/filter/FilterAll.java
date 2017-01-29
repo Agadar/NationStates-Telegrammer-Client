@@ -9,29 +9,28 @@ import java.util.Set;
 
 /**
  * Filter for retrieving ALL nations.
- * 
- * @author Agadar <https://github.com/Agadar/>
+ *
+ * @author Agadar (https://github.com/Agadar/)
  */
-public class FilterAll extends FilterAdd
-{
+public class FilterAll extends FilterAdd {
+
     @Override
-    protected Set<String> retrieveNations()
-    {
+    protected Set<String> retrieveNations() {
         // Query local cache.
-        if (LocalCache != null)
+        if (LocalCache != null) {
             return LocalCache;
-        
+        }
+
         // Query global cache.
-        if (GlobalCache.All != null)
-        {
+        if (GlobalCache.All != null) {
             LocalCache = GlobalCache.All;
             return LocalCache;
         }
-        
+
         // Make API call.
         World w = NSAPI.world(WorldShard.Nations).execute();
         GlobalCache.All = new HashSet<>(w.Nations);
         LocalCache = GlobalCache.All;
         return LocalCache;
-    }  
+    }
 }

@@ -10,30 +10,28 @@ import java.util.Set;
 
 /**
  * Filter for adding/removing World Assembly Delegates from the address set.
- * 
- * @author Agadar <https://github.com/Agadar/>
+ *
+ * @author Agadar (https://github.com/Agadar/)
  */
-public class FilterDelegates extends FilterAddOrRemove
-{
-    public FilterDelegates(boolean add)
-    {
+public class FilterDelegates extends FilterAddOrRemove {
+
+    public FilterDelegates(boolean add) {
         super(add);
     }
-    
+
     @Override
-    protected Set<String> retrieveNations()
-    {
+    protected Set<String> retrieveNations() {
         // Query local cache.
-        if (LocalCache != null)
+        if (LocalCache != null) {
             return LocalCache;
-        
+        }
+
         // Query global cache.
-        if (GlobalCache.Delegates != null)
-        {
+        if (GlobalCache.Delegates != null) {
             LocalCache = GlobalCache.Delegates;
             return LocalCache;
         }
-        
+
         // Make API call.
         WorldAssembly wa = NSAPI.wa(Council.SECURITY_COUNCIL).shards(WAShard.Delegates).execute();
         GlobalCache.Delegates = new HashSet<>(wa.Delegates);

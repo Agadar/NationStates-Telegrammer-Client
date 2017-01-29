@@ -11,24 +11,22 @@ import java.util.Set;
 /**
  * Filter for retrieving ejected nations.
  *
- * @author Agadar
+ * @author Agadar (https://github.com/Agadar/)
  */
-public class FilterNationsEjected extends FilterHappenings
-{
-    public FilterNationsEjected()
-    {
+public class FilterNationsEjected extends FilterHappenings {
+
+    public FilterNationsEjected() {
         super(KeyWord.ejected);
     }
 
     @Override
-    protected Set<String> retrieveNations()
-    {
+    protected Set<String> retrieveNations() {
         // Get fresh new list from server.
         final World w = NSAPI.world(WorldShard.Happenings)
                 .happeningsFilter(HapFilter.eject).execute();
-        
+
         // Derive ejected nations from happenings, and properly set the local and global caches.
-        LocalCache = this.filterHappenings(new HashSet<>(w.Happenings));        
+        LocalCache = this.filterHappenings(new HashSet<>(w.Happenings));
         return LocalCache;
     }
 }

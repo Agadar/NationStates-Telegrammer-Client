@@ -5,39 +5,38 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Holder for telegram queued statistics, containing logic to properly keep 
+ * Holder for telegram queued statistics, containing logic to properly keep
  * track of the statistics.
- * 
- * @author Agadar <https://github.com/Agadar/>
+ *
+ * @author Agadar (https://github.com/Agadar/)
  */
-public class QueuedStats 
-{
+public class QueuedStats {
+
     private final Set<String> QueuedSucces = new HashSet<>();
     private final Set<String> RecipientDidntExist = new HashSet<>();
     private final Set<String> RecipientIsBlocking = new HashSet<>();
     private final Set<String> DisconnectOrOtherReason = new HashSet<>();
-    
-    public void registerSucces(String recipient)
-    {
+
+    public void registerSucces(String recipient) {
         QueuedSucces.add(recipient);
         RecipientDidntExist.remove(recipient);
         RecipientIsBlocking.remove(recipient);
         DisconnectOrOtherReason.remove(recipient);
     }
-    
-    public void registerFailure(String recipient, SkippedRecipientReason reason)
-    {
+
+    public void registerFailure(String recipient, SkippedRecipientReason reason) {
         // If the recipient already received the telegram succesfully before, don't register a failure.
-        if (QueuedSucces.contains(recipient))
+        if (QueuedSucces.contains(recipient)) {
             return;
-        
+        }
+
         if (reason == null) // Else if no reason given, assume 'DisconnectOrOtherReason'
         {
             DisconnectOrOtherReason.add(recipient);
             return;
         }
-        
-        switch (reason)     // Else if reason given, add to appropriate map.
+
+        switch (reason) // Else if reason given, add to appropriate map.
         {
             case BLOCKING_RECRUITMENT:
             case BLOCKING_CAMPAIGN:
@@ -48,24 +47,20 @@ public class QueuedStats
                 break;
         }
     }
-    
-    public int getQueuedSucces()
-    {
+
+    public int getQueuedSucces() {
         return QueuedSucces.size();
     }
-    
-    public int getRecipientDidntExist()
-    {
+
+    public int getRecipientDidntExist() {
         return RecipientDidntExist.size();
     }
-    
-    public int getRecipientIsBlocking()
-    {
+
+    public int getRecipientIsBlocking() {
         return RecipientIsBlocking.size();
     }
-    
-    public int getDisconnectOrOtherReason()
-    {
+
+    public int getDisconnectOrOtherReason() {
         return DisconnectOrOtherReason.size();
     }
 }

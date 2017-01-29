@@ -2,11 +2,10 @@ package com.github.agadar.nstelegram.enums;
 
 /**
  * Filter types, with corresponding String explanations.
- * 
- * @author marti
+ *
+ * @author Agadar (https://github.com/Agadar/)
  */
-public enum FilterType
-{
+public enum FilterType {
     ALL("All"),
     DELEGATES_EXCL("Delegates (exclude)"),
     DELEGATES_INCL("Delegates (include)"),
@@ -26,25 +25,22 @@ public enum FilterType
     REGIONS_WO_TAGS_INCL("Regions (include w/o tags)"),
     WA_MEMBERS_EXCL("WA Members (exclude)"),
     WA_MEMBERS_INCL("WA Members (include)"),
-    WA_MEMBERS_NEW("WA Members (new)")
-    ;
-    
+    WA_MEMBERS_NEW("WA Members (new)");
+
     // Explanation.
     private final String Text;
 
     /**
      * Constructor.
-     * 
-     * @param text 
+     *
+     * @param text
      */
-    private FilterType(String text)
-    {
+    private FilterType(String text) {
         this.Text = text;
     }
-    
+
     @Override
-    public String toString()
-    {
+    public String toString() {
         return Text;
     }
 }

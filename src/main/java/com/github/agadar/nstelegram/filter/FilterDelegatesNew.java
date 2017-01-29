@@ -11,24 +11,22 @@ import java.util.Set;
 /**
  * Filter for retrieving new delegates.
  *
- * @author Agadar
+ * @author Agadar (https://github.com/Agadar/)
  */
-public class FilterDelegatesNew extends FilterHappenings
-{
-    public FilterDelegatesNew()
-    {
+public class FilterDelegatesNew extends FilterHappenings {
+
+    public FilterDelegatesNew() {
         super(KeyWord.became);
     }
 
     @Override
-    protected Set<String> retrieveNations()
-    {
+    protected Set<String> retrieveNations() {
         // Get fresh new list from server.
         final WorldAssembly w = NSAPI.wa(Council.SECURITY_COUNCIL)
                 .shards(WAShard.RecentHappenings).execute();
-        
+
         // Derive new delegates from happenings, and properly set the local and global caches.
-        LocalCache = this.filterHappenings(new HashSet<>(w.RecentHappenings));       
+        LocalCache = this.filterHappenings(new HashSet<>(w.RecentHappenings));
         return LocalCache;
     }
 }

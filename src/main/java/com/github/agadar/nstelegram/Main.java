@@ -9,39 +9,35 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  * Main entry for this application.
- * 
- * @author martin
+ *
+ * @author Agadar (https://github.com/Agadar/)n
  */
-public class Main 
-{
-    public static void main(String args[])
-    {
+public class Main {
+
+    public static void main(String args[]) {
         // Retrieve properties.
         final PropertiesManager propsManager = new PropertiesManager();
         propsManager.loadProperties();
-        
+
         // Instantiate telegram manager.
         final TelegramManager tgManager = new TelegramManager(propsManager);
-        
+
         // Set-up graphical form.      
-        try
-        {
+        try {
             // Set cross-platform look&feel.
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 
             // Create and display the form.
-            java.awt.EventQueue.invokeLater(() -> 
-            {
+            java.awt.EventQueue.invokeLater(()
+                    -> {
                 final NSTelegramForm form = new NSTelegramForm(propsManager, tgManager);
                 tgManager.addListeners(form);   // subscribe form to TelegramManager.
                 form.setLocationRelativeTo(null);
                 form.setVisible(true);
             });
-        }
-        catch (ClassNotFoundException | InstantiationException |
+        } catch (ClassNotFoundException | InstantiationException |
                 IllegalAccessException |
-                UnsupportedLookAndFeelException ex)
-        {
+                UnsupportedLookAndFeelException ex) {
             Logger.getLogger(NSTelegramForm.class.getName()).
                     log(Level.SEVERE, null, ex);
         }
