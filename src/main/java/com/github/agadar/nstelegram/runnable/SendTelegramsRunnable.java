@@ -60,8 +60,8 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
                 if (Recipients.size() > 0) {
                     final String[] RecipArray = Recipients.toArray(new String[Recipients.size()]);
 
-                    if (PropsManager.LastTelegramType != null) {
-                        switch (PropsManager.LastTelegramType) {
+                    if (PropsManager.lastTelegramType != null) {
+                        switch (PropsManager.lastTelegramType) {
                             case RECRUITMENT: {
                                 boolean skipNext = !canReceiveRecruitmentTelegrams(RecipArray[0]);
                                 for (int i = 0; i < RecipArray.length; i++) {
@@ -105,8 +105,8 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
                     }
                 }
 
-                // If looping, update recipients until there's recipients available.
-                if (PropsManager.IsLooping) {
+                // If not yet exhausted, update recipients until there's recipients available.
+                if (!Tm.isExhausted()) {
                     refreshRecipients();
 
                     while (Recipients.isEmpty() && !Thread.interrupted()) {
@@ -124,7 +124,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
                         refreshRecipients();
                     }
                 }
-            } while (PropsManager.IsLooping && !Thread.interrupted());
+            } while (!Thread.interrupted() && !Tm.isExhausted());
         } catch (InterruptedException ex) {
             /* Just fall through to finally. */ } catch (Exception ex) {
             // Dirty solution to not have ratelimiter exceptions show up as legit errors. 
@@ -151,7 +151,10 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
         // so there is no need to make sure the entry for the current Telegram Id
         // changed.       
         if (event.Queued) {
-            History.put(new Tuple(PropsManager.TelegramId, event.Addressee), SkippedRecipientReason.PREVIOUS_RECIPIENT);
+            // Only add it to the history if this wasn't a dry run, i.e. no actual telegram was sent.
+            if (!PropsManager.dryRun) {
+                History.put(new Tuple(PropsManager.telegramId, event.Addressee), SkippedRecipientReason.PREVIOUS_RECIPIENT);
+            }
             Stats.registerSucces(event.Addressee);
         } else {
             Stats.registerFailure(event.Addressee, null);
@@ -173,12 +176,17 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
      */
     private void sendTelegram(String... recipients) {
         // Prepare query.
-        final TelegramQuery q = NSAPI.telegram(PropsManager.ClientKey, PropsManager.TelegramId, PropsManager.SecretKey,
+        final TelegramQuery q = NSAPI.telegram(PropsManager.clientKey, PropsManager.telegramId, PropsManager.secretKey,
                 recipients).addListeners(this);
 
         // Tag as recruitment telegram if needed.
-        if (PropsManager.LastTelegramType == TelegramType.RECRUITMENT) {
+        if (PropsManager.lastTelegramType == TelegramType.RECRUITMENT) {
             q.isRecruitment();
+        }
+        
+        // Tag as dry run if needed.
+        if (PropsManager.dryRun) {
+            q.isDryRun();
         }
 
         q.execute(null);    // send the telegrams
@@ -196,7 +204,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
         try {
             // Make server call.
             Nation n = NSAPI.nation(recipient).shards(NationShard.CanReceiveRecruitmentTelegrams)
-                    .canReceiveTelegramFromRegion(PropsManager.FromRegion).execute();
+                    .canReceiveTelegramFromRegion(PropsManager.fromRegion).execute();
             final SkippedRecipientReason reason = (n == null) ? SkippedRecipientReason.NOT_FOUND
                     : !n.CanReceiveRecruitmentTelegrams ? SkippedRecipientReason.BLOCKING_RECRUITMENT : null;
             return canReceiveXTelegrams(reason, recipient);
@@ -241,7 +249,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
         if (reason != null) {
             Stats.registerFailure(recipient, reason);
             Recipients.remove(recipient);
-            History.put(new Tuple(PropsManager.TelegramId, recipient), reason);
+            History.put(new Tuple(PropsManager.telegramId, recipient), reason);
             final RecipientRemovedEvent event = new RecipientRemovedEvent(this, recipient, reason);
 
             synchronized (Listeners) {

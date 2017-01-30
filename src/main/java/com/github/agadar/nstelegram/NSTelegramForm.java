@@ -75,12 +75,12 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         ((DefaultCaret) TextAreaOutput.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
         // Set fields according to values retrieved from properties file.
-        TxtFieldClientKey.setText(PropsManager.ClientKey);
-        TxtFieldTelegramId.setText(PropsManager.TelegramId);
-        TxtFieldSecretKey.setText(PropsManager.SecretKey);
-        ComboBoxTelegramType.setSelectedItem(PropsManager.LastTelegramType);
-        TxtFieldRegionFrom.setText(PropsManager.FromRegion);
-        CheckBoxLoop.setSelected(PropsManager.IsLooping);
+        TxtFieldClientKey.setText(PropsManager.clientKey);
+        TxtFieldTelegramId.setText(PropsManager.telegramId);
+        TxtFieldSecretKey.setText(PropsManager.secretKey);
+        ComboBoxTelegramType.setSelectedItem(PropsManager.lastTelegramType);
+        TxtFieldRegionFrom.setText(PropsManager.fromRegion);
+        CheckBoxDryRun.setSelected(PropsManager.dryRun);
 
         updateGui(Status.Idle);                   // Update entire GUI in case we missed something in visual designer.
         TextAreaOutput.setText(duration()); // Set output textarea, for consistency's sake.
@@ -111,8 +111,8 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         LabelClientKey = new javax.swing.JLabel();
         LabelTelegramType = new javax.swing.JLabel();
         TxtFieldClientKey = new javax.swing.JTextField();
-        LabelLoop = new javax.swing.JLabel();
-        CheckBoxLoop = new javax.swing.JCheckBox();
+        LabelDryRun = new javax.swing.JLabel();
+        CheckBoxDryRun = new javax.swing.JCheckBox();
         TxtFieldRegionFrom = new javax.swing.JTextField();
         LabelRegionFrom = new javax.swing.JLabel();
         ComboBoxTelegramType = new javax.swing.JComboBox<>();
@@ -184,15 +184,15 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             }
         });
 
-        LabelLoop.setText("Looping:");
-        LabelLoop.setName("LabelSendAs"); // NOI18N
+        LabelDryRun.setText("Dry Run:");
+        LabelDryRun.setName("LabelSendAs"); // NOI18N
 
-        CheckBoxLoop.setText(" ");
-        CheckBoxLoop.setFocusPainted(false);
-        CheckBoxLoop.setMargin(new java.awt.Insets(0, -1, 0, 2));
-        CheckBoxLoop.addItemListener(new java.awt.event.ItemListener() {
+        CheckBoxDryRun.setText(" ");
+        CheckBoxDryRun.setFocusPainted(false);
+        CheckBoxDryRun.setMargin(new java.awt.Insets(0, -1, 0, 2));
+        CheckBoxDryRun.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                CheckBoxLoopItemStateChanged(evt);
+                CheckBoxDryRunItemStateChanged(evt);
             }
         });
 
@@ -227,7 +227,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                             .addComponent(LabelSecretKey)
                             .addComponent(LabelTelegramId)
                             .addComponent(LabelClientKey))
-                        .addComponent(LabelLoop, javax.swing.GroupLayout.Alignment.LEADING))
+                        .addComponent(LabelDryRun, javax.swing.GroupLayout.Alignment.LEADING))
                     .addComponent(LabelRegionFrom))
                 .addGap(52, 52, 52)
                 .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -237,7 +237,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                         .addComponent(TxtFieldTelegramId, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
                         .addComponent(TxtFieldSecretKey, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
                         .addComponent(ComboBoxTelegramType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(CheckBoxLoop))
+                    .addComponent(CheckBoxDryRun))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         PanelTelegramLayout.setVerticalGroup(
@@ -265,8 +265,8 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                     .addComponent(LabelRegionFrom))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(PanelTelegramLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(CheckBoxLoop)
-                    .addComponent(LabelLoop))
+                    .addComponent(CheckBoxDryRun)
+                    .addComponent(LabelDryRun))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -705,7 +705,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         // Enable or disable TxtFieldRegionFrom.
         final TelegramType selected = (TelegramType) evt.getItem();
         setFromRegionTextAndEnabled(selected, Status.Idle);
-        PropsManager.LastTelegramType = selected;
+        PropsManager.lastTelegramType = selected;
 
         TextAreaOutput.setText(duration()); // Print new duration to output textarea.
     }//GEN-LAST:event_ComboBoxTelegramTypeItemStateChanged
@@ -716,7 +716,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void TxtFieldRegionFromKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldRegionFromKeyReleased
-        PropsManager.FromRegion = TxtFieldRegionFrom.getText();
+        PropsManager.fromRegion = TxtFieldRegionFrom.getText();
     }//GEN-LAST:event_TxtFieldRegionFromKeyReleased
 
     /**
@@ -724,20 +724,20 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      *
      * @param evt
      */
-    private void CheckBoxLoopItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_CheckBoxLoopItemStateChanged
-        PropsManager.IsLooping = CheckBoxLoop.isSelected();
-    }//GEN-LAST:event_CheckBoxLoopItemStateChanged
+    private void CheckBoxDryRunItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_CheckBoxDryRunItemStateChanged
+        PropsManager.dryRun = CheckBoxDryRun.isSelected();
+    }//GEN-LAST:event_CheckBoxDryRunItemStateChanged
 
     private void TxtFieldClientKeyKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldClientKeyKeyReleased
-        PropsManager.ClientKey = TxtFieldClientKey.getText();
+        PropsManager.clientKey = TxtFieldClientKey.getText();
     }//GEN-LAST:event_TxtFieldClientKeyKeyReleased
 
     private void TxtFieldSecretKeyKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldSecretKeyKeyReleased
-        PropsManager.SecretKey = TxtFieldSecretKey.getText();
+        PropsManager.secretKey = TxtFieldSecretKey.getText();
     }//GEN-LAST:event_TxtFieldSecretKeyKeyReleased
 
     private void TxtFieldTelegramIdKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldTelegramIdKeyReleased
-        PropsManager.TelegramId = TxtFieldTelegramId.getText();
+        PropsManager.telegramId = TxtFieldTelegramId.getText();
     }//GEN-LAST:event_TxtFieldTelegramIdKeyReleased
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -747,12 +747,12 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     private javax.swing.JButton BtnStop;
     public javax.swing.JButton ButtonAddFilter;
     private javax.swing.JButton ButtonRemoveFilter;
-    private javax.swing.JCheckBox CheckBoxLoop;
+    private javax.swing.JCheckBox CheckBoxDryRun;
     private javax.swing.JComboBox<FilterType> ComboBoxFilterType;
     private javax.swing.JComboBox<TelegramType> ComboBoxTelegramType;
     public javax.swing.JList<String> JListFilters;
     private javax.swing.JLabel LabelClientKey;
-    private javax.swing.JLabel LabelLoop;
+    private javax.swing.JLabel LabelDryRun;
     private javax.swing.JLabel LabelRegionFrom;
     private javax.swing.JLabel LabelSecretKey;
     private javax.swing.JLabel LabelTelegramId;
@@ -785,7 +785,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         TxtFieldSecretKey.setEditable(status == Status.Idle);
         TextFieldFilterValues.setEditable(status == Status.Idle);
         ComboBoxTelegramType.setEnabled(status == Status.Idle);
-        CheckBoxLoop.setEnabled(status == Status.Idle);
+        CheckBoxDryRun.setEnabled(status == Status.Idle);
         ComboBoxFilterType.setEnabled(status == Status.Idle);
         BtnStop.setEnabled(status == Status.SendingTelegrams);
         ButtonRemoveFilter.setEnabled(status == Status.Idle && JListFilters.getSelectedValue() != null);

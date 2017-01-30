@@ -97,7 +97,7 @@
                               <Component id="LabelTelegramId" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="LabelClientKey" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="LabelLoop" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="LabelDryRun" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Component id="LabelRegionFrom" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -110,7 +110,7 @@
                           <Component id="TxtFieldSecretKey" alignment="0" pref="150" max="32767" attributes="0"/>
                           <Component id="ComboBoxTelegramType" alignment="0" max="32767" attributes="0"/>
                       </Group>
-                      <Component id="CheckBoxLoop" min="-2" max="-2" attributes="0"/>
+                      <Component id="CheckBoxDryRun" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
               </Group>
@@ -146,8 +146,8 @@
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="CheckBoxLoop" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="LabelLoop" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="CheckBoxDryRun" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="LabelDryRun" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -212,13 +212,13 @@
             <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="TxtFieldClientKeyKeyReleased"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JLabel" name="LabelLoop">
+        <Component class="javax.swing.JLabel" name="LabelDryRun">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Looping:"/>
+            <Property name="text" type="java.lang.String" value="Dry Run:"/>
             <Property name="name" type="java.lang.String" value="LabelSendAs" noResource="true"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JCheckBox" name="CheckBoxLoop">
+        <Component class="javax.swing.JCheckBox" name="CheckBoxDryRun">
           <Properties>
             <Property name="text" type="java.lang.String" value=" "/>
             <Property name="focusPainted" type="boolean" value="false"/>
@@ -227,7 +227,7 @@
             </Property>
           </Properties>
           <Events>
-            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="CheckBoxLoopItemStateChanged"/>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="CheckBoxDryRunItemStateChanged"/>
           </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="TxtFieldRegionFrom">

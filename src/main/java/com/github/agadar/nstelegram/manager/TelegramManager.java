@@ -60,6 +60,14 @@ public final class TelegramManager {
             filter.applyFilter(Recipients, localCacheOnly);
         });
     }
+    
+    /**
+     * Returns whether or not all filters are exhausted.
+     * @return True if all filters are exhausted, otherwise false.
+     */
+    public boolean isExhausted() {
+        return Filters.stream().noneMatch((filter) -> (!filter.isExhausted()));
+    }
 
     /**
      * Adds new filter.
@@ -106,13 +114,13 @@ public final class TelegramManager {
      */
     public void startSending() {
         // Make sure all inputs are valid.
-        if (PropsManager.ClientKey == null || PropsManager.ClientKey.isEmpty()) {
+        if (PropsManager.clientKey == null || PropsManager.clientKey.isEmpty()) {
             throw new IllegalArgumentException("Please supply a Client Key!");
         }
-        if (PropsManager.TelegramId == null || PropsManager.TelegramId.isEmpty()) {
+        if (PropsManager.telegramId == null || PropsManager.telegramId.isEmpty()) {
             throw new IllegalArgumentException("Please supply a Telegram Id!");
         }
-        if (PropsManager.SecretKey == null || PropsManager.SecretKey.isEmpty()) {
+        if (PropsManager.secretKey == null || PropsManager.secretKey.isEmpty()) {
             throw new IllegalArgumentException("Please supply a Secret Key!");
         }
         
@@ -128,7 +136,7 @@ public final class TelegramManager {
         }
 
         removeOldRecipients(true);  // Remove old recipients.
-        NSAPI.setUserAgent(String.format(USER_AGENT, PropsManager.ClientKey)); // Update user agent.
+        NSAPI.setUserAgent(String.format(USER_AGENT, PropsManager.clientKey)); // Update user agent.
 
         // Prepare thread, then run it.
         TelegramThread = new Thread(new SendTelegramsRunnable(this, Recipients, Listeners,
@@ -154,7 +162,7 @@ public final class TelegramManager {
     public void removeOldRecipients(boolean publishEvents) {
         for (final Iterator<String> it = Recipients.iterator(); it.hasNext();) {
             final String recipient = it.next();
-            final SkippedRecipientReason reason = History.get(new Tuple(PropsManager.TelegramId, recipient));
+            final SkippedRecipientReason reason = History.get(new Tuple(PropsManager.telegramId, recipient));
 
             if (reason != null) {
                 it.remove();   // Remove recipient

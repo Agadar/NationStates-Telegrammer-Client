@@ -22,13 +22,12 @@ public class PropertiesManager {
     private static final String DEFAULT_BOOL_VAL = "false";
 
     // Variables loaded from and saved to the properties file.
-    public String ClientKey;
-    public String TelegramId;
-    public String SecretKey;
-    public TelegramType LastTelegramType;
-    public String FromRegion;
-    public boolean IsLooping;
-    public boolean NoDuplicateTGs;
+    public String clientKey;
+    public String telegramId;
+    public String secretKey;
+    public TelegramType lastTelegramType;
+    public String fromRegion;
+    public boolean dryRun;
 
     /**
      * Saves the application's properties to the file.
@@ -36,13 +35,12 @@ public class PropertiesManager {
     public void saveProperties() {
         // Prepare properties object.
         Properties props = new Properties();
-        props.setProperty("ClientKey", ClientKey == null ? DEFAULT_STRING_VAL : ClientKey);
-        props.setProperty("TelegramId", TelegramId == null ? DEFAULT_STRING_VAL : TelegramId);
-        props.setProperty("SecretKey", SecretKey == null ? DEFAULT_STRING_VAL : SecretKey);
-        props.setProperty("TelegramType", LastTelegramType != null ? LastTelegramType.name() : TelegramType.NORMAL.name());
-        props.setProperty("FromRegion", FromRegion == null ? DEFAULT_STRING_VAL : FromRegion);
-        props.setProperty("IsLooping", Boolean.toString(IsLooping));
-        props.setProperty("NoDuplicateTGs", Boolean.toString(NoDuplicateTGs));
+        props.setProperty("clientKey", clientKey == null ? DEFAULT_STRING_VAL : clientKey);
+        props.setProperty("telegramId", telegramId == null ? DEFAULT_STRING_VAL : telegramId);
+        props.setProperty("secretKey", secretKey == null ? DEFAULT_STRING_VAL : secretKey);
+        props.setProperty("telegramType", lastTelegramType != null ? lastTelegramType.name() : TelegramType.NORMAL.name());
+        props.setProperty("fromRegion", fromRegion == null ? DEFAULT_STRING_VAL : fromRegion);
+        props.setProperty("dryRun", Boolean.toString(dryRun));
 
         // Save to file.
         try (OutputStream output = new FileOutputStream(FILENAME)) {
@@ -66,13 +64,12 @@ public class PropertiesManager {
         }
 
         // Set variables.
-        ClientKey = props.getProperty("ClientKey", DEFAULT_STRING_VAL);
-        TelegramId = props.getProperty("TelegramId", DEFAULT_STRING_VAL);
-        SecretKey = props.getProperty("SecretKey", DEFAULT_STRING_VAL);
-        LastTelegramType = valueOf(TelegramType.class, props.getProperty("TelegramType"), TelegramType.NORMAL);
-        FromRegion = props.getProperty("FromRegion", DEFAULT_STRING_VAL);
-        IsLooping = Boolean.valueOf(props.getProperty("IsLooping", DEFAULT_BOOL_VAL));
-        NoDuplicateTGs = Boolean.valueOf(props.getProperty("NoDuplicateTGs", DEFAULT_BOOL_VAL));
+        clientKey = props.getProperty("clientKey", DEFAULT_STRING_VAL);
+        telegramId = props.getProperty("telegramId", DEFAULT_STRING_VAL);
+        secretKey = props.getProperty("secretKey", DEFAULT_STRING_VAL);
+        lastTelegramType = valueOf(TelegramType.class, props.getProperty("telegramType"), TelegramType.NORMAL);
+        fromRegion = props.getProperty("fromRegion", DEFAULT_STRING_VAL);
+        dryRun = Boolean.valueOf(props.getProperty("dryRun", DEFAULT_BOOL_VAL));
     }
 
     /**
