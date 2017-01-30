@@ -159,7 +159,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
         } else {
             Stats.registerFailure(event.Addressee, null);
         }
-
+        System.out.println("--------called----1-----");
         synchronized (Listeners) {
             // Pass telegram sent event through.
             Listeners.stream().forEach((tsl)

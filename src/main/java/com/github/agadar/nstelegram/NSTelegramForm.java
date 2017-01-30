@@ -890,6 +890,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 
     @Override
     public void handleTelegramSent(TelegramSentEvent event) {
+        System.out.println("--------called----2-----");
         // Print info to output.
         SwingUtilities.invokeLater(()
                 -> {
