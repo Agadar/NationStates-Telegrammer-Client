@@ -13,13 +13,18 @@ public abstract class Filter {
     /**
      * The cache that is to be used by all child filters.
      */
-    protected final static FilterCache GlobalCache = new FilterCache();
+    protected final static FilterCache GLOBAL_CACHE = new FilterCache();
 
     /**
      * Set containing the nations from the last time retrieveNations() was
      * called.
      */
-    protected Set<String> LocalCache;
+    protected Set<String> localCache;
+    
+    /**
+     * Whether or not this filter has been exhausted.
+     */
+    protected boolean exhausted = false;
 
     /**
      * Applies this filter to the supplied set of nations, removing and/or
@@ -41,4 +46,19 @@ public abstract class Filter {
      * @return
      */
     protected abstract Set<String> retrieveNations();
+    
+    /**
+     * Whether or not this filter has been exhausted.
+     * @return 
+     */
+    public boolean isExhausted() {
+        return exhausted;
+    }
+    
+    /**
+     * Resets this filter so that it is no longer exhausted.
+     */
+    public void reset() {
+        exhausted = false;
+    }
 }

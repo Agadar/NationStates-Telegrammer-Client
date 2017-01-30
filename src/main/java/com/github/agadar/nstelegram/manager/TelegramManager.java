@@ -7,6 +7,7 @@ import com.github.agadar.nstelegram.event.TelegramManagerListener;
 import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
 import com.github.agadar.nstelegram.runnable.SendTelegramsRunnable;
 import com.github.agadar.nstelegram.util.Tuple;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,6 +56,7 @@ public final class TelegramManager {
     public void refreshFilters(boolean localCacheOnly) {
         Recipients.clear();
         Filters.forEach((filter) -> {
+            filter.reset();
             filter.applyFilter(Recipients, localCacheOnly);
         });
     }
@@ -67,7 +69,6 @@ public final class TelegramManager {
     public void addFilter(Filter filter) {
         filter.applyFilter(Recipients, false);
         Filters.add(filter);
-        refreshFilters(true);
     }
 
     /**
@@ -114,6 +115,11 @@ public final class TelegramManager {
         if (PropsManager.SecretKey == null || PropsManager.SecretKey.isEmpty()) {
             throw new IllegalArgumentException("Please supply a Secret Key!");
         }
+        
+        // Check to make sure the thread is not already running to prevent synchronization issues.
+        if (TelegramThread != null && TelegramThread.isAlive()) {
+            throw new IllegalThreadStateException("Telegram thread already running!");
+        }
 
         refreshFilters(true);   // Refresh filters one last time before checking # of recipients
 
@@ -123,11 +129,6 @@ public final class TelegramManager {
 
         removeOldRecipients(true);  // Remove old recipients.
         NSAPI.setUserAgent(String.format(USER_AGENT, PropsManager.ClientKey)); // Update user agent.
-
-        // Check to make sure the thread is not already running to prevent synchronization issues.
-        if (TelegramThread != null && TelegramThread.isAlive()) {
-            throw new IllegalThreadStateException("Telegram thread already running!");
-        }
 
         // Prepare thread, then run it.
         TelegramThread = new Thread(new SendTelegramsRunnable(this, Recipients, Listeners,

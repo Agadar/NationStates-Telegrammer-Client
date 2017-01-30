@@ -27,6 +27,7 @@ import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
 import com.github.agadar.nstelegram.manager.PropertiesManager;
 import com.github.agadar.nstelegram.manager.TelegramManager;
 import com.github.agadar.nstelegram.runnable.AddFilterRunnable;
+
 import java.awt.event.ItemEvent;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;

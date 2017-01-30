@@ -26,8 +26,8 @@ public class FilterWAMembersNew extends FilterHappenings {
                 .shards(WAShard.RecentMemberLog).execute();
 
         // Derive new delegates from happenings, and properly set the local and global caches.
-        LocalCache = this.filterHappenings(new HashSet<>(w.RecentMemberLog));
-        System.out.println(LocalCache); // for debugging only
-        return LocalCache;
+        localCache = this.filterHappenings(new HashSet<>(w.RecentMemberLog));
+        //System.out.println(localCache); // for debugging only
+        return localCache;
     }
 }

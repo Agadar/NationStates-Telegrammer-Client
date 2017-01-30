@@ -4,6 +4,7 @@ import com.github.agadar.nstelegram.filter.abstractfilter.FilterAddOrRemove;
 import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nsapi.domain.region.Region;
 import com.github.agadar.nsapi.enums.shard.RegionShard;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,17 +29,17 @@ public class FilterRegions extends FilterAddOrRemove {
     @Override
     protected Set<String> retrieveNations() {
         // Query local cache.
-        if (LocalCache != null) {
-            return LocalCache;
+        if (localCache != null) {
+            return localCache;
         }
 
         // Query global cache. For every region not found in the global cache,
         // retrieve its nations from the server and also update the global cache.
-        LocalCache = new HashSet<>();
+        localCache = new HashSet<>();
 
-        for (String region : Regions) {
+        Regions.stream().forEach((region) -> {
             // Check if global cache contains the values.
-            Set<String> nationsInRegion = GlobalCache.getNationsInRegion(region);
+            Set<String> nationsInRegion = GLOBAL_CACHE.getNationsInRegion(region);
 
             // If not, retrieve them from the server and also update global cache.
             if (nationsInRegion == null) {
@@ -47,18 +48,17 @@ public class FilterRegions extends FilterAddOrRemove {
 
                 // If region does not exist, just add empty map to global cache.
                 if (r == null) {
-                    GlobalCache.mapNationsToRegion(region, new HashSet<>());
+                    GLOBAL_CACHE.mapNationsToRegion(region, new HashSet<>());
                 } // Else, do proper mapping.
                 else {
                     nationsInRegion = new HashSet<>(r.NationNames);
-                    LocalCache.addAll(nationsInRegion);
-                    GlobalCache.mapNationsToRegion(region, nationsInRegion);
+                    localCache.addAll(nationsInRegion);
+                    GLOBAL_CACHE.mapNationsToRegion(region, nationsInRegion);
                 }
             } else {
-                LocalCache.addAll(nationsInRegion);
+                localCache.addAll(nationsInRegion);
             }
-        }
-
-        return LocalCache;
+        });
+        return localCache;
     }
 }

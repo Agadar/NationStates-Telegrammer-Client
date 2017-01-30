@@ -4,6 +4,7 @@ import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nsapi.domain.world.World;
 import com.github.agadar.nsapi.enums.shard.WorldShard;
 import com.github.agadar.nstelegram.filter.abstractfilter.FilterRegionByTags;
+
 import java.util.Set;
 
 /**
@@ -20,7 +21,7 @@ public class FilterRegionsWithTags extends FilterRegionByTags {
 
     @Override
     protected World getWorld() {
-        return NSAPI.world(WorldShard.RegionsByTag).regionsWithTags(Tags
-                .toArray(new String[Tags.size()])).execute();
+        return NSAPI.world(WorldShard.RegionsByTag).regionsWithTags(tags
+                .toArray(new String[tags.size()])).execute();
     }
 }

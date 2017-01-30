@@ -12,11 +12,11 @@ public class FilterNations extends FilterAddOrRemove {
 
     public FilterNations(Set<String> nations, boolean add) {
         super(add);
-        this.LocalCache = nations;
+        this.localCache = nations;
     }
 
     @Override
     protected Set<String> retrieveNations() {
-        return LocalCache;
+        return localCache;
     }
 }

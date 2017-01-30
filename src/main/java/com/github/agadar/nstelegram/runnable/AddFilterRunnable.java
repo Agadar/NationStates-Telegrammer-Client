@@ -4,6 +4,7 @@ import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
 import com.github.agadar.nstelegram.NSTelegramForm;
 import com.github.agadar.nstelegram.NSTelegramForm.Status;
 import com.github.agadar.nstelegram.manager.TelegramManager;
+
 import javax.swing.DefaultListModel;
 import javax.swing.SwingUtilities;
 

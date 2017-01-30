@@ -5,6 +5,7 @@ import com.github.agadar.nsapi.domain.wa.WorldAssembly;
 import com.github.agadar.nsapi.enums.Council;
 import com.github.agadar.nsapi.enums.shard.WAShard;
 import com.github.agadar.nstelegram.filter.abstractfilter.FilterAddOrRemove;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,21 +22,23 @@ public class FilterWAMembers extends FilterAddOrRemove {
 
     @Override
     protected Set<String> retrieveNations() {
-        // Query local cache.
-        if (LocalCache != null) {
-            return LocalCache;
+        // Query local cache, return if it exists.
+        if (localCache != null) {
+            return localCache;
         }
 
-        // Query global cache.
-        if (GlobalCache.WaMembers != null) {
-            LocalCache = GlobalCache.WaMembers;
-            return LocalCache;
+        // Query global cache, set local cache to it if what we search was found,
+        // then return local cache.
+        if (GLOBAL_CACHE.WaMembers != null) {
+            localCache = GLOBAL_CACHE.WaMembers;
+            return localCache;
         }
 
-        // Make API call.
+        // If global cache does not contain what we need, do an API call to
+        // retrieve the data, store it in global cache and local cache, then return it.
         final WorldAssembly wa = NSAPI.wa(Council.SECURITY_COUNCIL).shards(WAShard.Members).execute();
-        GlobalCache.WaMembers = new HashSet<>(wa.Members);
-        LocalCache = GlobalCache.WaMembers;
-        return LocalCache;
+        GLOBAL_CACHE.WaMembers = new HashSet<>(wa.Members);
+        localCache = GLOBAL_CACHE.WaMembers;
+        return localCache;
     }
 }

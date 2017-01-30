@@ -5,13 +5,15 @@ import com.github.agadar.nsapi.domain.region.Embassy;
 import com.github.agadar.nsapi.domain.region.Region;
 import com.github.agadar.nsapi.enums.shard.RegionShard;
 import com.github.agadar.nstelegram.filter.abstractfilter.FilterAddOrRemove;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- *
+ * Filter for adding or removing from the address set nations that are inhabitants
+ * of regions that have embassies with any of the specified regions.
  *
  * @author Agadar (https://github.com/Agadar/)
  */
@@ -27,8 +29,8 @@ public class FilterEmbassies extends FilterAddOrRemove {
     @Override
     protected Set<String> retrieveNations() {
         // Query local cache.
-        if (LocalCache != null) {
-            return LocalCache;
+        if (localCache != null) {
+            return localCache;
         }
 
         final Set<String> embassies = new HashSet<>();  // All embassies of the selected regions.
@@ -36,7 +38,7 @@ public class FilterEmbassies extends FilterAddOrRemove {
                 -> // Iterate over regions to fill embassies.
                 {
                     // Query global cache for embassies mapped to region.
-                    Set<String> currentEmbassies = GlobalCache.getEmbassies(region);
+                    Set<String> currentEmbassies = GLOBAL_CACHE.getEmbassies(region);
 
                     // If they aren't in the global cache, retrieve from server and cache them.
                     if (currentEmbassies == null) {
@@ -49,7 +51,7 @@ public class FilterEmbassies extends FilterAddOrRemove {
                             currentEmbassies = new HashSet<>();
                         }
 
-                        GlobalCache.mapEmbassiesToRegion(region, embassies);
+                        GLOBAL_CACHE.mapEmbassiesToRegion(region, embassies);
                     }
                     return currentEmbassies;
                 }).forEach((currentEmbassies)
@@ -57,29 +59,29 @@ public class FilterEmbassies extends FilterAddOrRemove {
             embassies.addAll(currentEmbassies); // Add current embassies to total set.
         });
 
-        System.out.println(embassies);  // print for debug purposes.
+        //System.out.println(embassies);  // print for debug purposes.
 
         // Query global cache. If a region is not found in the global cache,
         // then (download and) read the daily data dump and query the global cache again.
-        LocalCache = new HashSet<>();
+        localCache = new HashSet<>();
         embassies.stream().forEach((region)
                 -> {
-            Set<String> nationsInRegion = GlobalCache.getNationsInRegion(region);   // Check if global cache contains the values.
+            Set<String> nationsInRegion = GLOBAL_CACHE.getNationsInRegion(region);   // Check if global cache contains the values.
 
             if (nationsInRegion == null) {
-                GlobalCache.importDumpFile();                               // If not, then import dump file.
-                nationsInRegion = GlobalCache.getNationsInRegion(region);   // Check if it contains it now.
+                GLOBAL_CACHE.importDumpFile();                               // If not, then import dump file.
+                nationsInRegion = GLOBAL_CACHE.getNationsInRegion(region);   // Check if it contains it now.
 
                 if (nationsInRegion != null) // If it does, then add the nations to local cache.
                 {
-                    LocalCache.addAll(nationsInRegion);
+                    localCache.addAll(nationsInRegion);
                 }
             } else {
-                LocalCache.addAll(nationsInRegion);
+                localCache.addAll(nationsInRegion);
             }
         });
 
-        return LocalCache;
+        return localCache;
     }
 
     /**

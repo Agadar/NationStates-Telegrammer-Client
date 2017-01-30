@@ -5,11 +5,12 @@ import com.github.agadar.nsapi.domain.world.World;
 import com.github.agadar.nsapi.enums.HapFilter;
 import com.github.agadar.nsapi.enums.shard.WorldShard;
 import com.github.agadar.nstelegram.filter.abstractfilter.FilterHappenings;
+
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Filter for retrieving ejected nations.
+ * Filter for retrieving ejected nations. Is never exhausted.
  *
  * @author Agadar (https://github.com/Agadar/)
  */
@@ -26,7 +27,12 @@ public class FilterNationsEjected extends FilterHappenings {
                 .happeningsFilter(HapFilter.eject).execute();
 
         // Derive ejected nations from happenings, and properly set the local and global caches.
-        LocalCache = this.filterHappenings(new HashSet<>(w.Happenings));
-        return LocalCache;
+        localCache = this.filterHappenings(new HashSet<>(w.Happenings));
+        return localCache;
+    }
+    
+    @Override
+    public boolean isExhausted() {
+        return false;
     }
 }

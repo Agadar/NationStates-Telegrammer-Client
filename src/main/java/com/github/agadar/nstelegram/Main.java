@@ -2,6 +2,7 @@ package com.github.agadar.nstelegram;
 
 import com.github.agadar.nstelegram.manager.PropertiesManager;
 import com.github.agadar.nstelegram.manager.TelegramManager;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.UIManager;

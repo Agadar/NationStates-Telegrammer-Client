@@ -1,13 +1,8 @@
 package com.github.agadar.nstelegram.filter.abstractfilter;
 
-import com.github.agadar.nsapi.NSAPI;
-import com.github.agadar.nsapi.NationStatesAPIException;
-import com.github.agadar.nsapi.domain.DailyDumpNations;
-import com.github.agadar.nsapi.domain.nation.Nation;
+import static com.github.agadar.nstelegram.filter.abstractfilter.Filter.GLOBAL_CACHE;
 import com.github.agadar.nsapi.domain.world.World;
-import com.github.agadar.nsapi.enums.DailyDumpMode;
-import static com.github.agadar.nstelegram.filter.abstractfilter.Filter.GlobalCache;
-import java.io.FileNotFoundException;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,22 +17,22 @@ public abstract class FilterRegionByTags extends FilterAddOrRemove {
     /**
      * This instance's tags.
      */
-    protected final Set<String> Tags;
+    protected final Set<String> tags;
 
     public FilterRegionByTags(Set<String> tags, boolean add) {
         super(add);
-        this.Tags = tags;
+        this.tags = tags;
     }
 
     @Override
     protected final Set<String> retrieveNations() {
         // Query local cache.
-        if (LocalCache != null) {
-            return LocalCache;
+        if (localCache != null) {
+            return localCache;
         }
 
         // Query global cache for regions mapped to tags.
-        Set<String> regions = GlobalCache.getRegionsToTagsWith(Tags);
+        Set<String> regions = GLOBAL_CACHE.getRegionsToTagsWith(tags);
 
         // If they aren't in the global cache, retrieve from server and cache them.
         if (regions == null) {
@@ -52,30 +47,29 @@ public abstract class FilterRegionByTags extends FilterAddOrRemove {
                 regions = new HashSet<>();
             }
 
-            GlobalCache.mapRegionsToTagsWith(Tags, regions);
+            GLOBAL_CACHE.mapRegionsToTagsWith(tags, regions);
         }
 
         // Query global cache. If a region is not found in the global cache,
         // then (download and) read the daily data dump and query the global cache again.
-        LocalCache = new HashSet<>();
+        localCache = new HashSet<>();
 
         for (String region : regions) {
-            Set<String> nationsInRegion = GlobalCache.getNationsInRegion(region);   // Check if global cache contains the values.
+            Set<String> nationsInRegion = GLOBAL_CACHE.getNationsInRegion(region);   // Check if global cache contains the values.
 
             if (nationsInRegion == null) {
-                GlobalCache.importDumpFile();                               // If not, then import dump file.
-                nationsInRegion = GlobalCache.getNationsInRegion(region);   // Check if it contains it now.
+                GLOBAL_CACHE.importDumpFile();                               // If not, then import dump file.
+                nationsInRegion = GLOBAL_CACHE.getNationsInRegion(region);   // Check if it contains it now.
 
-                if (nationsInRegion != null) // If it does, then add the nations to local cache.
-                {
-                    LocalCache.addAll(nationsInRegion);
+                if (nationsInRegion != null) {  // If it does, then add the nations to local cache.
+                    localCache.addAll(nationsInRegion);
                 }
             } else {
-                LocalCache.addAll(nationsInRegion);
+                localCache.addAll(nationsInRegion);
             }
         }
 
-        return LocalCache;
+        return localCache;
     }
 
     /**
