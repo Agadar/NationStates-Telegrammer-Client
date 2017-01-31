@@ -13,6 +13,7 @@ import com.github.agadar.nstelegram.event.TelegramManagerListener;
 import com.github.agadar.nstelegram.filter.FilterAll;
 import com.github.agadar.nstelegram.filter.FilterDelegates;
 import com.github.agadar.nstelegram.filter.FilterDelegatesNew;
+import com.github.agadar.nstelegram.filter.FilterDelegatesNewFinite;
 import com.github.agadar.nstelegram.filter.FilterEmbassies;
 import com.github.agadar.nstelegram.filter.FilterNations;
 import com.github.agadar.nstelegram.filter.FilterNationsEjected;
@@ -547,6 +548,9 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             case DELEGATES_NEW:
                 f = new FilterDelegatesNew();
                 break;
+            case DELEGATES_NEW_MAX:
+                f = new FilterDelegatesNewFinite(Integer.parseInt(filterValues));
+                break;
             case EMBASSIES_EXCL:
                 addressees = stringToStringList(filterValues);
                 f = new FilterEmbassies(addressees, false);
@@ -814,6 +818,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             case REGIONS_WITH_TAGS_EXCL:
             case REGIONS_WO_TAGS_INCL:
             case REGIONS_WO_TAGS_EXCL:
+            case DELEGATES_NEW_MAX:
                 TextFieldFilterValues.setEditable(true);
                 break;
             default:

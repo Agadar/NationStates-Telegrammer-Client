@@ -39,11 +39,11 @@ public abstract class Filter {
     public void applyFilter(Set<String> addresses) {
         Set<String> copy = new HashSet<>(nations);
         TelegramManager.get().removeOldRecipients(copy);
-        copy.stream().forEach(cnsmr-> {
+        /*copy.stream().forEach(cnsmr-> {
             if (!addresses.contains(cnsmr)) {
                 System.out.println(cnsmr);
             }
-        });
+        });*/
         addresses.addAll(copy);
     }
 
@@ -64,4 +64,10 @@ public abstract class Filter {
     public boolean cantRetrieveMoreNations() {
         return cantRetrieveMoreNations;
     }
+    
+    /**
+     * Resets this filter. Does nothing by default. Child overrides might make it
+     * so that this filter can retrieve more nations again.
+     */
+    public void reset() { }
 }

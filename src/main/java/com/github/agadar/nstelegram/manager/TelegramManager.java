@@ -83,6 +83,18 @@ public final class TelegramManager {
     }
     
     /**
+     * Resets, refreshes, and reapplies all filters to the address list.
+     */
+    public void resetAndReapplyFilters() {
+        recipients.clear();
+        filters.forEach((filter) -> {
+            filter.reset();
+            filter.refresh();
+            filter.applyFilter(recipients);
+        });
+    }
+    
+    /**
      * Refreshes and reapplies all filters to the address list.
      */
     public void refreshAndReapplyFilters() {

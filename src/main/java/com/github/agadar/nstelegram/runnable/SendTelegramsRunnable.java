@@ -148,6 +148,10 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
                 errorMsg = ex.getMessage();
             }
         } finally {
+            // Reset filters.
+            Tm.resetAndReapplyFilters();
+            
+            // Send stopped event.
             final StoppedSendingEvent stoppedEvent = new StoppedSendingEvent(this,
                     causedByError, errorMsg, Stats.getQueuedSucces(),
                     Stats.getRecipientDidntExist(), Stats.getRecipientIsBlocking(),

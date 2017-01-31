@@ -6,26 +6,28 @@ package com.github.agadar.nstelegram.enums;
  * @author Agadar (https://github.com/Agadar/)
  */
 public enum FilterType {
-    ALL("All"),
-    DELEGATES_EXCL("Delegates (exclude)"),
-    DELEGATES_INCL("Delegates (include)"),
-    DELEGATES_NEW("Delegates (new)"),
-    EMBASSIES_EXCL("Embassies (exclude)"),
-    EMBASSIES_INCL("Embassies (include)"),
-    NATIONS_EJECTED("Nations (ejected)"),
-    NATIONS_EXCL("Nations (exclude)"),
-    NATIONS_INCL("Nations (include)"),
-    NATIONS_NEW("Nations (new)"),
-    NATIONS_REFOUNDED("Nations (refounded)"),
-    REGIONS_EXCL("Regions (exclude)"),
-    REGIONS_INCL("Regions (include)"),
-    REGIONS_WITH_TAGS_EXCL("Regions (exclude with tags)"),
-    REGIONS_WITH_TAGS_INCL("Regions (include with tags)"),
-    REGIONS_WO_TAGS_EXCL("Regions (exclude w/o tags)"),
-    REGIONS_WO_TAGS_INCL("Regions (include w/o tags)"),
-    WA_MEMBERS_EXCL("WA Members (exclude)"),
-    WA_MEMBERS_INCL("WA Members (include)"),
-    WA_MEMBERS_NEW("WA Members (new)");
+    ALL("+ all nations"),
+    NATIONS_EJECTED("+ ejected nations (indefinitely)"),
+    EMBASSIES_INCL("+ embassies of regions"),
+    NATIONS_NEW("+ new nations (indefinitely)"),
+    DELEGATES_NEW_MAX("+ new WA delegates"),
+    DELEGATES_NEW("+ new WA delegates (indefinitely)"),
+    WA_MEMBERS_NEW("+ new WA members (indefinitely)"),
+    NATIONS_REFOUNDED("+ refounded nations (indefinitely)"),
+    REGIONS_INCL("+ regions"),
+    REGIONS_WITH_TAGS_INCL("+ regions with tags"),
+    REGIONS_WO_TAGS_INCL("+ regions without tags"),
+    NATIONS_INCL("+ specific nations"),
+    DELEGATES_EXCL("+ WA delegates"),
+    WA_MEMBERS_INCL("+ WA members"),
+    EMBASSIES_EXCL("- embassies of regions"),
+    REGIONS_EXCL("- regions"),
+    REGIONS_WITH_TAGS_EXCL("- regions with tags"),
+    REGIONS_WO_TAGS_EXCL("- regions without tags"),
+    NATIONS_EXCL("- specific nations"),
+    DELEGATES_INCL("- WA delegates"),
+    WA_MEMBERS_EXCL("- WA members")
+    ;
 
     // Explanation.
     private final String Text;
