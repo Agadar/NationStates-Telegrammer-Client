@@ -37,7 +37,7 @@ public class FilterWAMembers extends FilterAddOrRemove {
         final WorldAssembly wa = NSAPI.wa(Council.SECURITY_COUNCIL).shards(WAShard.Members).execute();
         GLOBAL_CACHE.WaMembers = new HashSet<>(wa.Members);
         nations = GLOBAL_CACHE.WaMembers;
-        
+
         cantRetrieveMoreNations = true;
     }
 }

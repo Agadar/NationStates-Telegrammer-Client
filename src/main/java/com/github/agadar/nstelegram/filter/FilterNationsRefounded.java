@@ -28,4 +28,9 @@ public class FilterNationsRefounded extends FilterHappenings {
         // Derive refounded nations from happenings, and properly set the local and global caches.
         nations = this.filterHappenings(new HashSet<>(w.Happenings));
     }
+
+    @Override
+    public boolean potentiallyInfinite() {
+        return true;
+    }
 }

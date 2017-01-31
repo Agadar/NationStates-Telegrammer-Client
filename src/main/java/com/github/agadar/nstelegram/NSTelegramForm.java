@@ -571,7 +571,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                 break;
             }
             case NATIONS_EXCL: {
-                Set<String>addressees = stringToStringList(filterValues);
+                Set<String> addressees = stringToStringList(filterValues);
                 f = new FilterNations(addressees, false);
                 textForList += ": " + addressees;
                 break;
@@ -895,13 +895,18 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @return
      */
     public final String duration() {
-        int estimatedDuration = Math.max(TelegramManager.get().numberOfRecipients() - 1, 0)
-                * (ComboBoxTelegramType.getSelectedItem() == TelegramType.RECRUITMENT ? 181 : 31);
-        int hours = estimatedDuration / 3600;
-        int minutes = estimatedDuration % 3600 / 60;
-        int seconds = estimatedDuration % 3600 % 60;
-        return String.format(BORDER + "%naddressees selected: %s%nestimated duration: "
-                + "%s hours, %s minutes, %s seconds%n" + BORDER + "%n", TelegramManager.get().numberOfRecipients(), hours, minutes, seconds);
+        if (!TelegramManager.get().potentiallyInfinite()) {
+            int estimatedDuration = Math.max(TelegramManager.get().numberOfRecipients() - 1, 0)
+                    * (ComboBoxTelegramType.getSelectedItem() == TelegramType.RECRUITMENT ? 181 : 31);
+            int hours = estimatedDuration / 3600;
+            int minutes = estimatedDuration % 3600 / 60;
+            int seconds = estimatedDuration % 3600 % 60;
+            return String.format(BORDER + "%naddressees selected: %s%nestimated duration: "
+                    + "%s hours, %s minutes, %s seconds%n" + BORDER + "%n", TelegramManager.get().numberOfRecipients(), hours, minutes, seconds);
+        } else {
+            return String.format(BORDER + "%naddressees selected: ∞%nestimated duration: "
+                    + "∞%n" + BORDER + "%n");
+        }
     }
 
     /**
@@ -933,18 +938,19 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             TextAreaOutput.append(msg);
         }
     }
-    
+
     /**
-     * Parses the supplied string to an unsigned int.
-     * If the supplied string is null or cannot be parsed, then 0 is returned.
+     * Parses the supplied string to an unsigned int. If the supplied string is
+     * null or cannot be parsed, then 0 is returned.
+     *
      * @param parseMe
-     * @return 
+     * @return
      */
     private int stringToUInt(String parseMe) {
         if (parseMe == null) {
             return 0;
         }
-        
+
         try {
             return Integer.parseUnsignedInt(parseMe);
         } catch (NumberFormatException ex) {

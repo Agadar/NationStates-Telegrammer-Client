@@ -10,15 +10,15 @@ import java.util.HashSet;
 
 /**
  * Filter for retrieving X ejected nations, where X >= 0.
- * 
+ *
  * @author Agadar (https://github.com/Agadar/)
  */
 public class FilterNationsEjectedFinite extends FilterHappeningsFinite {
-    
+
     public FilterNationsEjectedFinite(int amountToRetrieve) {
         super(KeyWord.ejected, amountToRetrieve);
     }
-    
+
     @Override
     public void refresh() {
         // Get fresh new list from server.

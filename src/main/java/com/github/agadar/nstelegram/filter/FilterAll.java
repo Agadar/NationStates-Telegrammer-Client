@@ -32,7 +32,7 @@ public class FilterAll extends Filter {
         final World w = NSAPI.world(WorldShard.Nations).execute();
         GLOBAL_CACHE.All = new HashSet<>(w.Nations);
         nations = GLOBAL_CACHE.All;
-        
+
         cantRetrieveMoreNations = true;
     }
 }

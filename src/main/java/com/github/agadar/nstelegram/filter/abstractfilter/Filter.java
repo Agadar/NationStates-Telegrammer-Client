@@ -24,14 +24,15 @@ public abstract class Filter {
     protected Set<String> nations;
 
     /**
-     * Whether or not this filter can not retrieve any new nations by more calls to refresh().
+     * Whether or not this filter can not retrieve any new nations by more calls
+     * to refresh().
      */
     protected boolean cantRetrieveMoreNations = false;
 
     /**
      * Applies this filter to the supplied set of nations, removing or adding
      * nations according to this filter's rules.
-     * 
+     *
      * refresh() should've been called at least once before calling this.
      *
      * @param addresses
@@ -39,11 +40,6 @@ public abstract class Filter {
     public void applyFilter(Set<String> addresses) {
         Set<String> copy = new HashSet<>(nations);
         TelegramManager.get().removeOldRecipients(copy);
-        /*copy.stream().forEach(cnsmr-> {
-            if (!addresses.contains(cnsmr)) {
-                System.out.println(cnsmr);
-            }
-        });*/
         addresses.addAll(copy);
     }
 
@@ -57,17 +53,29 @@ public abstract class Filter {
     }
 
     /**
-     * Whether or not this filter can not retrieve any new nations by more calls to refresh().
+     * Whether or not this filter can not retrieve any new nations anymore by
+     * subsequent calls to refresh().
      *
      * @return
      */
     public boolean cantRetrieveMoreNations() {
         return cantRetrieveMoreNations;
     }
-    
+
     /**
-     * Resets this filter. Does nothing by default. Child overrides might make it
-     * so that this filter can retrieve more nations again.
+     * Resets this filter. Does nothing by default. Child overrides might make
+     * it so that this filter can retrieve more nations again.
      */
-    public void reset() { }
+    public void reset() {
+    }
+
+    /**
+     * Returns whether or not this filter can potentially keep supplying new
+     * recipients forever.
+     *
+     * @return
+     */
+    public boolean potentiallyInfinite() {
+        return false;
+    }
 }

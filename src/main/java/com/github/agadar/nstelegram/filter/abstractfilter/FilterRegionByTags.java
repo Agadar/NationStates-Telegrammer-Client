@@ -68,7 +68,7 @@ public abstract class FilterRegionByTags extends FilterAddOrRemove {
                 nations.addAll(nationsInRegion);
             }
         }
-        
+
         cantRetrieveMoreNations = true;
     }
 

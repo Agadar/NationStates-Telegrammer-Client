@@ -22,4 +22,9 @@ public class FilterNationsNew extends Filter {
         // Properly set the local and global caches.
         nations = new HashSet<>(w.NewestNations);
     }
+
+    @Override
+    public boolean potentiallyInfinite() {
+        return true;
+    }
 }

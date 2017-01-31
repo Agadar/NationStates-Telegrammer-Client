@@ -10,15 +10,15 @@ import java.util.HashSet;
 
 /**
  * Filter for retrieving X new WA members, where X >= 0.
- * 
+ *
  * @author Agadar (https://github.com/Agadar/)
  */
 public class FilterWAMembersNewFinite extends FilterHappeningsFinite {
-    
+
     public FilterWAMembersNewFinite(int amountToRetrieve) {
         super(KeyWord.admitted, amountToRetrieve);
     }
-    
+
     @Override
     public void refresh() {
         // Get fresh new list from server.

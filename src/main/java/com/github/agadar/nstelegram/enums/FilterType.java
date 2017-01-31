@@ -30,8 +30,7 @@ public enum FilterType {
     REGIONS_WO_TAGS_EXCL("- regions without tags"),
     NATIONS_EXCL("- specific nations"),
     DELEGATES_INCL("- WA delegates"),
-    WA_MEMBERS_EXCL("- WA members")
-    ;
+    WA_MEMBERS_EXCL("- WA members");
 
     // Explanation.
     private final String Text;

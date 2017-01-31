@@ -28,4 +28,9 @@ public class FilterNationsEjected extends FilterHappenings {
         // Derive ejected nations from happenings, and properly set the cache.
         nations = this.filterHappenings(new HashSet<>(w.Happenings));
     }
+
+    @Override
+    public boolean potentiallyInfinite() {
+        return true;
+    }
 }

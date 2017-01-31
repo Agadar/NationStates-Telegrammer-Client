@@ -41,15 +41,27 @@ public final class TelegramManager {
         }
         return INSTANCE;
     }
-    
-    private TelegramManager() { }
-    
+
+    private TelegramManager() {
+    }
+
     /**
-     * Returns true if none of the filters can retrieve any new nations by more calls to refresh().
+     * Returns true if none of the filters can retrieve any new nations by more
+     * calls to refresh().
+     *
      * @return
      */
     public boolean cantRetrieveMoreNations() {
         return filters.stream().noneMatch((filter) -> (!filter.cantRetrieveMoreNations()));
+    }
+
+    /**
+     * Returns true if at least one of the filters is potentially infinite.
+     *
+     * @return
+     */
+    public boolean potentiallyInfinite() {
+        return filters.stream().anyMatch(filter -> filter.potentiallyInfinite());
     }
 
     /**
@@ -60,7 +72,6 @@ public final class TelegramManager {
     public void addFilter(Filter filter) {
         filter.refresh();
         filter.applyFilter(recipients);
-        //removeOldRecipients(false);
         filters.add(filter);
     }
 
@@ -81,19 +92,19 @@ public final class TelegramManager {
     public Set<String> getRecipients() {
         return new HashSet<>(recipients);
     }
-    
+
     /**
-     * Resets, refreshes, and reapplies all filters to the address list.
+     * Resets and reapplies all filters to the address list.
      */
     public void resetAndReapplyFilters() {
         recipients.clear();
         filters.forEach((filter) -> {
             filter.reset();
-            filter.refresh();
+            //filter.refresh();
             filter.applyFilter(recipients);
         });
     }
-    
+
     /**
      * Refreshes and reapplies all filters to the address list.
      */
@@ -103,7 +114,6 @@ public final class TelegramManager {
             filter.refresh();
             filter.applyFilter(recipients);
         });
-        //removeOldRecipients(false);
     }
 
     /**
@@ -115,9 +125,9 @@ public final class TelegramManager {
         filters.remove(index);
         recipients.clear();
         filters.forEach((filter) -> {
+            filter.reset();
             filter.applyFilter(recipients);
         });
-        //removeOldRecipients(false);
     }
 
     /**
@@ -127,7 +137,7 @@ public final class TelegramManager {
      */
     public void startSending() {
         PropertiesManager propsManager = PropertiesManager.get();
-        
+
         // Make sure all inputs are valid.
         if (propsManager.clientKey == null || propsManager.clientKey.isEmpty()) {
             throw new IllegalArgumentException("Please supply a Client Key!");
@@ -138,19 +148,18 @@ public final class TelegramManager {
         if (propsManager.secretKey == null || propsManager.secretKey.isEmpty()) {
             throw new IllegalArgumentException("Please supply a Secret Key!");
         }
-        
+
         // Check to make sure the thread is not already running to prevent synchronization issues.
         if (telegramThread != null && telegramThread.isAlive()) {
             throw new IllegalThreadStateException("Telegram thread already running!");
         }
 
         //refreshFilters(true);   // Refresh filters one last time before checking # of recipients
-
         if (numberOfRecipients() == 0 && cantRetrieveMoreNations()) {
             throw new IllegalArgumentException("Please supply at least one recipient!");
         }
 
-       // removeOldRecipients(true);  // Remove old recipients.
+        // removeOldRecipients(true);  // Remove old recipients.
         NSAPI.setUserAgent(String.format(USER_AGENT, propsManager.clientKey)); // Update user agent.
 
         // Prepare thread, then run it.

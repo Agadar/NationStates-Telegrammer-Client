@@ -28,4 +28,9 @@ public class FilterDelegatesNew extends FilterHappenings {
         // Derive new delegates from happenings, and properly set the local cache.
         nations = this.filterHappenings(new HashSet<>(w.RecentHappenings));
     }
+
+    @Override
+    public boolean potentiallyInfinite() {
+        return true;
+    }
 }

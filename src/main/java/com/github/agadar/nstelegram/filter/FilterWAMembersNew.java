@@ -28,4 +28,9 @@ public class FilterWAMembersNew extends FilterHappenings {
         // Derive new delegates from happenings, and properly set the local and global caches.
         nations = this.filterHappenings(new HashSet<>(w.RecentMemberLog));
     }
+
+    @Override
+    public boolean potentiallyInfinite() {
+        return true;
+    }
 }

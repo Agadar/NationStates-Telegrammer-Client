@@ -37,7 +37,7 @@ public class FilterDelegates extends FilterAddOrRemove {
         final WorldAssembly wa = NSAPI.wa(Council.SECURITY_COUNCIL).shards(WAShard.Delegates).execute();
         GLOBAL_CACHE.Delegates = new HashSet<>(wa.Delegates);
         nations = GLOBAL_CACHE.Delegates;
-        
+
         cantRetrieveMoreNations = true;
     }
 }

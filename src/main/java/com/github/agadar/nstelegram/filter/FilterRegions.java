@@ -59,7 +59,7 @@ public class FilterRegions extends FilterAddOrRemove {
                 nations.addAll(nationsInRegion);
             }
         });
-        
+
         cantRetrieveMoreNations = true;
     }
 }

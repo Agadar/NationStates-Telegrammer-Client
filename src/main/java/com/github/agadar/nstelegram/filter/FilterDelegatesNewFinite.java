@@ -10,7 +10,7 @@ import java.util.HashSet;
 
 /**
  * Filter for retrieving X new delegates, where X >= 0.
- * 
+ *
  * @author Agadar (https://github.com/Agadar/)
  */
 public class FilterDelegatesNewFinite extends FilterHappeningsFinite {
@@ -18,7 +18,7 @@ public class FilterDelegatesNewFinite extends FilterHappeningsFinite {
     public FilterDelegatesNewFinite(int amountToRetrieve) {
         super(KeyWord.became, amountToRetrieve);
     }
-    
+
     @Override
     public void refresh() {
         // Get fresh new list from server.
@@ -26,6 +26,6 @@ public class FilterDelegatesNewFinite extends FilterHappeningsFinite {
                 .shards(WAShard.RecentHappenings).execute();
 
         // Derive new delegates from happenings, and properly set the local cache.
-        nations = this.filterHappenings(new HashSet<>(w.RecentHappenings));        
+        nations = this.filterHappenings(new HashSet<>(w.RecentHappenings));
     }
 }

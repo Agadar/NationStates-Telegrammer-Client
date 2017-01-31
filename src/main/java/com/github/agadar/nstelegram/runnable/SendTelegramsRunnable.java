@@ -150,7 +150,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
         } finally {
             // Reset filters.
             Tm.resetAndReapplyFilters();
-            
+
             // Send stopped event.
             final StoppedSendingEvent stoppedEvent = new StoppedSendingEvent(this,
                     causedByError, errorMsg, Stats.getQueuedSucces(),
@@ -172,7 +172,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
         if (event.Queued) {
             // Only add it to the history if this wasn't a dry run, i.e. no actual telegram was sent.
             //if (!PropsManager.dryRun) {
-                History.put(new Tuple(PropsManager.telegramId, event.Addressee), SkippedRecipientReason.PREVIOUS_RECIPIENT);
+            History.put(new Tuple(PropsManager.telegramId, event.Addressee), SkippedRecipientReason.PREVIOUS_RECIPIENT);
             //}
             Stats.registerSucces(event.Addressee);
         } else {

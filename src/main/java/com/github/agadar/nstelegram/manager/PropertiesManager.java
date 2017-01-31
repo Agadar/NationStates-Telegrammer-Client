@@ -29,15 +29,16 @@ public class PropertiesManager {
     public TelegramType lastTelegramType;
     public String fromRegion;
     public boolean dryRun;
-    
+
     public static PropertiesManager get() {
         if (INSTANCE == null) {
             INSTANCE = new PropertiesManager();
         }
         return INSTANCE;
     }
-    
-    private PropertiesManager() {}
+
+    private PropertiesManager() {
+    }
 
     /**
      * Saves the application's properties to the file.

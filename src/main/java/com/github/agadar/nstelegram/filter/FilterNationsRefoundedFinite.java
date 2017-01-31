@@ -9,15 +9,15 @@ import java.util.HashSet;
 
 /**
  * Filter for retrieving X refounded nations, where X >= 0.
- * 
+ *
  * @author Agadar (https://github.com/Agadar/)
  */
 public class FilterNationsRefoundedFinite extends FilterHappeningsFinite {
-    
+
     public FilterNationsRefoundedFinite(int amountToRetrieve) {
         super(KeyWord.refounded, amountToRetrieve);
     }
-    
+
     @Override
     public void refresh() {
         // Get fresh new list from server.

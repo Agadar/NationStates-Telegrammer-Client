@@ -8,8 +8,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Abstract parent for filters that add nations derived from Happenings.
- * These can go on retrieving new recipients forever.
+ * Abstract parent for filters that add nations derived from Happenings. These
+ * can go on retrieving new recipients forever.
  *
  * @author Agadar (https://github.com/Agadar/)
  */

@@ -12,8 +12,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Filter for adding or removing from the address set nations that are inhabitants
- * of regions that have embassies with any of the specified regions.
+ * Filter for adding or removing from the address set nations that are
+ * inhabitants of regions that have embassies with any of the specified regions.
  *
  * @author Agadar (https://github.com/Agadar/)
  */
@@ -61,7 +61,6 @@ public class FilterEmbassies extends FilterAddOrRemove {
         });
 
         //System.out.println(embassies);  // print for debug purposes.
-
         // Query global cache. If a region is not found in the global cache,
         // then (download and) read the daily data dump and query the global cache again.
         nations = new HashSet<>();
@@ -81,7 +80,7 @@ public class FilterEmbassies extends FilterAddOrRemove {
                 nations.addAll(nationsInRegion);
             }
         });
-        
+
         cantRetrieveMoreNations = true;
     }
 
