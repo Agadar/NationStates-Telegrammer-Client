@@ -146,7 +146,7 @@ public final class TelegramManager {
 
         //refreshFilters(true);   // Refresh filters one last time before checking # of recipients
 
-        if (numberOfRecipients() == 0) {
+        if (numberOfRecipients() == 0 && cantRetrieveMoreNations()) {
             throw new IllegalArgumentException("Please supply at least one recipient!");
         }
 

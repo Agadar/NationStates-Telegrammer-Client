@@ -531,7 +531,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 
         final FilterType filter = (FilterType) ComboBoxFilterType.getSelectedItem();
         String textForList = filter.toString(); // Used for the text in the visual filter list.
-        Set<String> addressees;                 // Declared here as multiple cases need a string set.
+        //Set<String> addressees;                 // Declared here as multiple cases need a string set.
         Filter f;                               // The filter to add to the telegram manager.
 
         // Set above variables according to addressees type selected.
@@ -548,29 +548,36 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             case DELEGATES_NEW:
                 f = new FilterDelegatesNew();
                 break;
-            case DELEGATES_NEW_MAX:
-                f = new FilterDelegatesNewFinite(Integer.parseInt(filterValues));
+            case DELEGATES_NEW_MAX: {
+                int amount = stringToUInt(filterValues);
+                f = new FilterDelegatesNewFinite(amount);
+                textForList += ": " + amount;
                 break;
-            case EMBASSIES_EXCL:
-                addressees = stringToStringList(filterValues);
+            }
+            case EMBASSIES_EXCL: {
+                Set<String> addressees = stringToStringList(filterValues);
                 f = new FilterEmbassies(addressees, false);
                 textForList += ": " + addressees;
                 break;
-            case EMBASSIES_INCL:
-                addressees = stringToStringList(filterValues);
+            }
+            case EMBASSIES_INCL: {
+                Set<String> addressees = stringToStringList(filterValues);
                 f = new FilterEmbassies(addressees, true);
                 textForList += ": " + addressees;
                 break;
-            case NATIONS_EXCL:
-                addressees = stringToStringList(filterValues);
+            }
+            case NATIONS_EXCL: {
+                Set<String>addressees = stringToStringList(filterValues);
                 f = new FilterNations(addressees, false);
                 textForList += ": " + addressees;
                 break;
-            case NATIONS_INCL:
-                addressees = stringToStringList(filterValues);
+            }
+            case NATIONS_INCL: {
+                Set<String> addressees = stringToStringList(filterValues);
                 f = new FilterNations(addressees, true);
                 textForList += ": " + addressees;
                 break;
+            }
             case NATIONS_NEW:
                 f = new FilterNationsNew();
                 break;
@@ -580,36 +587,42 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             case NATIONS_EJECTED:
                 f = new FilterNationsEjected();
                 break;
-            case REGIONS_EXCL:
-                addressees = stringToStringList(filterValues);
+            case REGIONS_EXCL: {
+                Set<String> addressees = stringToStringList(filterValues);
                 f = new FilterRegions(addressees, false);
                 textForList += ": " + addressees;
                 break;
-            case REGIONS_INCL:
-                addressees = stringToStringList(filterValues);
+            }
+            case REGIONS_INCL: {
+                Set<String> addressees = stringToStringList(filterValues);
                 f = new FilterRegions(addressees, true);
                 textForList += ": " + addressees;
                 break;
-            case REGIONS_WITH_TAGS_EXCL:
-                addressees = stringToStringList(filterValues);
+            }
+            case REGIONS_WITH_TAGS_EXCL: {
+                Set<String> addressees = stringToStringList(filterValues);
                 f = new FilterRegionsWithTags(addressees, false);
                 textForList += ": " + addressees;
                 break;
-            case REGIONS_WITH_TAGS_INCL:
-                addressees = stringToStringList(filterValues);
+            }
+            case REGIONS_WITH_TAGS_INCL: {
+                Set<String> addressees = stringToStringList(filterValues);
                 f = new FilterRegionsWithTags(addressees, true);
                 textForList += ": " + addressees;
                 break;
-            case REGIONS_WO_TAGS_EXCL:
-                addressees = stringToStringList(filterValues);
+            }
+            case REGIONS_WO_TAGS_EXCL: {
+                Set<String> addressees = stringToStringList(filterValues);
                 f = new FilterRegionsWithoutTags(addressees, false);
                 textForList += ": " + addressees;
                 break;
-            case REGIONS_WO_TAGS_INCL:
-                addressees = stringToStringList(filterValues);
+            }
+            case REGIONS_WO_TAGS_INCL: {
+                Set<String> addressees = stringToStringList(filterValues);
                 f = new FilterRegionsWithoutTags(addressees, true);
                 textForList += ": " + addressees;
                 break;
+            }
             case WA_MEMBERS_EXCL:
                 f = new FilterWAMembers(false);
                 break;
@@ -886,6 +899,24 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             TextAreaOutput.setText(msg);
         } else {
             TextAreaOutput.append(msg);
+        }
+    }
+    
+    /**
+     * Parses the supplied string to an unsigned int.
+     * If the supplied string is null or cannot be parsed, then 0 is returned.
+     * @param parseMe
+     * @return 
+     */
+    private int stringToUInt(String parseMe) {
+        if (parseMe == null) {
+            return 0;
+        }
+        
+        try {
+            return Integer.parseUnsignedInt(parseMe);
+        } catch (NumberFormatException ex) {
+            return 0;
         }
     }
 

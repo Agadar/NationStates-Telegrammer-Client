@@ -26,7 +26,7 @@ public class FilterDelegatesNewFinite extends FilterHappenings {
     
     public FilterDelegatesNewFinite(int amountToRetrieve) {
         super(KeyWord.became);
-        this.amountToRetrieve = Math.max(1, amountToRetrieve);
+        this.amountToRetrieve = Math.max(0, amountToRetrieve);
         this.orgAmountToRetrieve = amountToRetrieve;
     }
     
