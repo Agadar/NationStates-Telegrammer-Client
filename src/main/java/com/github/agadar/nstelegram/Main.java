@@ -17,11 +17,7 @@ public class Main {
 
     public static void main(String args[]) {
         // Retrieve properties.
-        final PropertiesManager propsManager = new PropertiesManager();
-        propsManager.loadProperties();
-
-        // Instantiate telegram manager.
-        final TelegramManager tgManager = new TelegramManager(propsManager);
+        PropertiesManager.get().loadProperties();
 
         // Set-up graphical form.      
         try {
@@ -31,8 +27,8 @@ public class Main {
             // Create and display the form.
             java.awt.EventQueue.invokeLater(()
                     -> {
-                final NSTelegramForm form = new NSTelegramForm(propsManager, tgManager);
-                tgManager.addListeners(form);   // subscribe form to TelegramManager.
+                final NSTelegramForm form = new NSTelegramForm();
+                TelegramManager.get().addListeners(form);   // subscribe form to TelegramManager.
                 form.setLocationRelativeTo(null);
                 form.setVisible(true);
             });

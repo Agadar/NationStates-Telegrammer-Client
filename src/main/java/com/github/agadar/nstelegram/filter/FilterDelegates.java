@@ -29,6 +29,7 @@ public class FilterDelegates extends FilterAddOrRemove {
         // Query global cache, set local cache to it if what we search was found.
         if (GLOBAL_CACHE.Delegates != null) {
             nations = GLOBAL_CACHE.Delegates;
+            return;
         }
 
         // If global cache does not contain what we need, do an API call to

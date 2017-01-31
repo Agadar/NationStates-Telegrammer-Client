@@ -17,6 +17,7 @@ import java.util.Properties;
 public class PropertiesManager {
 
     // Standard name for this app's properties file.
+    private static PropertiesManager INSTANCE;
     private static final String FILENAME = "nationstates-telegrammer.properties";
     private static final String DEFAULT_STRING_VAL = "";
     private static final String DEFAULT_BOOL_VAL = "false";
@@ -28,6 +29,15 @@ public class PropertiesManager {
     public TelegramType lastTelegramType;
     public String fromRegion;
     public boolean dryRun;
+    
+    public static PropertiesManager get() {
+        if (INSTANCE == null) {
+            INSTANCE = new PropertiesManager();
+        }
+        return INSTANCE;
+    }
+    
+    private PropertiesManager() {}
 
     /**
      * Saves the application's properties to the file.

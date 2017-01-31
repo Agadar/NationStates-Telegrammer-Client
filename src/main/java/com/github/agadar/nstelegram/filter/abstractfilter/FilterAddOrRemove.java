@@ -27,7 +27,7 @@ public abstract class FilterAddOrRemove extends Filter {
     public void applyFilter(Set<String> addresses) {
         // Do proper behavior according to whether this is an 'add' or a 'remove' filter.
         if (add) {
-            addresses.addAll(nations);
+            super.applyFilter(addresses);
         } else {
             // Remove from the address set this filter's nations.
             addresses.removeAll(this.nations);

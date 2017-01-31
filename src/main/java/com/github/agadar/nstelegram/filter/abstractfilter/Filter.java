@@ -1,6 +1,8 @@
 package com.github.agadar.nstelegram.filter.abstractfilter;
 
+import com.github.agadar.nstelegram.manager.TelegramManager;
 import com.github.agadar.nstelegram.util.FilterCache;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -29,11 +31,20 @@ public abstract class Filter {
     /**
      * Applies this filter to the supplied set of nations, removing or adding
      * nations according to this filter's rules.
+     * 
+     * refresh() should've been called at least once before calling this.
      *
      * @param addresses
      */
     public void applyFilter(Set<String> addresses) {
-        addresses.addAll(nations);
+        Set<String> copy = new HashSet<>(nations);
+        TelegramManager.get().removeOldRecipients(copy);
+        copy.stream().forEach(cnsmr-> {
+            if (!addresses.contains(cnsmr)) {
+                System.out.println(cnsmr);
+            }
+        });
+        addresses.addAll(copy);
     }
 
     /**

@@ -16,7 +16,7 @@ public class FilterAll extends Filter {
 
     @Override
     public void refresh() {
-        // If we already retrieved data before, do nothing.
+        // If we already retrieved data before, just return.
         if (nations != null) {
             return;
         }
@@ -24,6 +24,7 @@ public class FilterAll extends Filter {
         // Query global cache, set local cache to it if what we search was found.
         if (GLOBAL_CACHE.All != null) {
             nations = GLOBAL_CACHE.All;
+            return;
         }
 
         // If global cache does not contain what we need, do an API call to

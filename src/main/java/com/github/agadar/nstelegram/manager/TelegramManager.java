@@ -2,7 +2,6 @@ package com.github.agadar.nstelegram.manager;
 
 import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nstelegram.enums.SkippedRecipientReason;
-import com.github.agadar.nstelegram.event.RecipientRemovedEvent;
 import com.github.agadar.nstelegram.event.TelegramManagerListener;
 import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
 import com.github.agadar.nstelegram.runnable.SendTelegramsRunnable;
@@ -24,34 +23,33 @@ import java.util.Set;
  */
 public final class TelegramManager {
 
+    private static TelegramManager INSTANCE;
     private final static String USER_AGENT = "Agadar's Telegrammer using Client "
             + "Key '%s' (https://github.com/Agadar/NationStates-Telegrammer)";  // User agent string for formatting.
     private final static int NO_ADDRESSEES_FOUND_TIMEOUT = 60000;               // Duration in milliseconds for timeout when no recipients were found while looping.
 
-    private final List<Filter> Filters = new ArrayList<>();                 // The filters to apply, in chronological order.
-    private final Set<String> Recipients = new HashSet<>();                 // Supposedly most up-to-date recipients list, based on Filters.
-    private final Map<Tuple<String, String>, SkippedRecipientReason> History
-            = new HashMap<>();                                              // History of recipients, mapped to telegram id's.
-    private final Set<TelegramManagerListener> Listeners = new HashSet<>(); // Listeners to events thrown by this.
-    private final PropertiesManager PropsManager;
+    private final List<Filter> filters = new ArrayList<>();                 // The filters to apply, in chronological order.
+    private final Set<String> recipients = new HashSet<>();                 // Supposedly most up-to-date recipients list, based on Filters.
+    private final Map<Tuple<String, String>, SkippedRecipientReason> HISTORY = new HashMap<>(); // History of recipients, mapped to telegram id's.
+    private final Set<TelegramManagerListener> listeners = new HashSet<>(); // Listeners to events thrown by this.
 
-    private Thread TelegramThread;                                          // The thread on which the TelegramQuery is running.
+    private Thread telegramThread;                                          // The thread on which the TelegramQuery is running.
 
-    /**
-     * Constructor that sets the properties manager to use.
-     *
-     * @param propsManager
-     */
-    public TelegramManager(PropertiesManager propsManager) {
-        PropsManager = propsManager;
+    public static TelegramManager get() {
+        if (INSTANCE == null) {
+            INSTANCE = new TelegramManager();
+        }
+        return INSTANCE;
     }
+    
+    private TelegramManager() { }
     
     /**
      * Returns true if none of the filters can retrieve any new nations by more calls to refresh().
      * @return
      */
     public boolean cantRetrieveMoreNations() {
-        return Filters.stream().noneMatch((filter) -> (!filter.cantRetrieveMoreNations()));
+        return filters.stream().noneMatch((filter) -> (!filter.cantRetrieveMoreNations()));
     }
 
     /**
@@ -61,9 +59,9 @@ public final class TelegramManager {
      */
     public void addFilter(Filter filter) {
         filter.refresh();
-        filter.applyFilter(Recipients);
-        removeOldRecipients(false);
-        Filters.add(filter);
+        filter.applyFilter(recipients);
+        //removeOldRecipients(false);
+        filters.add(filter);
     }
 
     /**
@@ -72,7 +70,7 @@ public final class TelegramManager {
      * @return
      */
     public int numberOfRecipients() {
-        return Recipients.size();
+        return recipients.size();
     }
 
     /**
@@ -81,19 +79,19 @@ public final class TelegramManager {
      * @return
      */
     public Set<String> getRecipients() {
-        return new HashSet<>(Recipients);
+        return new HashSet<>(recipients);
     }
     
     /**
      * Refreshes and reapplies all filters to the address list.
      */
     public void refreshAndReapplyFilters() {
-        Recipients.clear();
-        Filters.forEach((filter) -> {
+        recipients.clear();
+        filters.forEach((filter) -> {
             filter.refresh();
-            filter.applyFilter(Recipients);
+            filter.applyFilter(recipients);
         });
-        removeOldRecipients(false);
+        //removeOldRecipients(false);
     }
 
     /**
@@ -102,12 +100,12 @@ public final class TelegramManager {
      * @param index
      */
     public void removeFilterAt(int index) {
-        Filters.remove(index);
-        Recipients.clear();
-        Filters.forEach((filter) -> {
-            filter.applyFilter(Recipients);
+        filters.remove(index);
+        recipients.clear();
+        filters.forEach((filter) -> {
+            filter.applyFilter(recipients);
         });
-        removeOldRecipients(false);
+        //removeOldRecipients(false);
     }
 
     /**
@@ -116,19 +114,21 @@ public final class TelegramManager {
      *
      */
     public void startSending() {
+        PropertiesManager propsManager = PropertiesManager.get();
+        
         // Make sure all inputs are valid.
-        if (PropsManager.clientKey == null || PropsManager.clientKey.isEmpty()) {
+        if (propsManager.clientKey == null || propsManager.clientKey.isEmpty()) {
             throw new IllegalArgumentException("Please supply a Client Key!");
         }
-        if (PropsManager.telegramId == null || PropsManager.telegramId.isEmpty()) {
+        if (propsManager.telegramId == null || propsManager.telegramId.isEmpty()) {
             throw new IllegalArgumentException("Please supply a Telegram Id!");
         }
-        if (PropsManager.secretKey == null || PropsManager.secretKey.isEmpty()) {
+        if (propsManager.secretKey == null || propsManager.secretKey.isEmpty()) {
             throw new IllegalArgumentException("Please supply a Secret Key!");
         }
         
         // Check to make sure the thread is not already running to prevent synchronization issues.
-        if (TelegramThread != null && TelegramThread.isAlive()) {
+        if (telegramThread != null && telegramThread.isAlive()) {
             throw new IllegalThreadStateException("Telegram thread already running!");
         }
 
@@ -139,47 +139,32 @@ public final class TelegramManager {
         }
 
        // removeOldRecipients(true);  // Remove old recipients.
-        NSAPI.setUserAgent(String.format(USER_AGENT, PropsManager.clientKey)); // Update user agent.
+        NSAPI.setUserAgent(String.format(USER_AGENT, propsManager.clientKey)); // Update user agent.
 
         // Prepare thread, then run it.
-        TelegramThread = new Thread(new SendTelegramsRunnable(this, Recipients, Listeners,
-                NO_ADDRESSEES_FOUND_TIMEOUT, History, PropsManager));
-        TelegramThread.start();
+        telegramThread = new Thread(new SendTelegramsRunnable(this, recipients, listeners,
+                NO_ADDRESSEES_FOUND_TIMEOUT, HISTORY, propsManager));
+        telegramThread.start();
     }
 
     /**
      * Stops sending the telegram to the recipients.
      */
     public void stopSending() {
-        if (TelegramThread != null) {
-            TelegramThread.interrupt();
+        if (telegramThread != null) {
+            telegramThread.interrupt();
         }
     }
 
     /**
-     * Removes invalid recipients from Recipients.
+     * Removes invalid recipients from the supplied set.
      *
-     * @param publishEvents whether or not to publish an event for each skipped
-     * recipient
+     * @param nations
      */
-    public void removeOldRecipients(boolean publishEvents) {
-        for (final Iterator<String> it = Recipients.iterator(); it.hasNext();) {
-            final String recipient = it.next();
-            final SkippedRecipientReason reason = History.get(new Tuple(PropsManager.telegramId, recipient));
-
-            if (reason != null) {
+    public void removeOldRecipients(Set<String> nations) {
+        for (final Iterator<String> it = nations.iterator(); it.hasNext();) {
+            if (HISTORY.get(new Tuple(PropertiesManager.get().telegramId, it.next())) != null) {
                 it.remove();   // Remove recipient
-
-                if (publishEvents) {
-                    final RecipientRemovedEvent event = new RecipientRemovedEvent(this, recipient, reason); // Create event
-                    synchronized (Listeners) // fire event
-                    {
-                        Listeners.stream().forEach((tsl)
-                                -> {
-                            tsl.handleRecipientRemoved(event);
-                        });
-                    }
-                }
             }
         }
     }
@@ -190,8 +175,8 @@ public final class TelegramManager {
      * @param newlisteners the listeners to register
      */
     public void addListeners(TelegramManagerListener... newlisteners) {
-        synchronized (Listeners) {
-            Listeners.addAll(Arrays.asList(newlisteners));
+        synchronized (listeners) {
+            listeners.addAll(Arrays.asList(newlisteners));
         }
     }
 }

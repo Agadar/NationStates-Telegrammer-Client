@@ -51,7 +51,8 @@ public class FilterEmbassies extends FilterAddOrRemove {
                             currentEmbassies = new HashSet<>();
                         }
 
-                        GLOBAL_CACHE.mapEmbassiesToRegion(region, embassies);
+                        GLOBAL_CACHE.mapEmbassiesToRegion(region, currentEmbassies);
+                        //GLOBAL_CACHE.mapEmbassiesToRegion(region, embassies);
                     }
                     return currentEmbassies;
                 }).forEach((currentEmbassies)

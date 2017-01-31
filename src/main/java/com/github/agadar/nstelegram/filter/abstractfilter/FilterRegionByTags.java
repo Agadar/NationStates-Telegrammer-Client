@@ -2,6 +2,7 @@ package com.github.agadar.nstelegram.filter.abstractfilter;
 
 import static com.github.agadar.nstelegram.filter.abstractfilter.Filter.GLOBAL_CACHE;
 import com.github.agadar.nsapi.domain.world.World;
+import com.github.agadar.nstelegram.manager.TelegramManager;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,7 +27,7 @@ public abstract class FilterRegionByTags extends FilterAddOrRemove {
 
     @Override
     public void refresh() {
-        // If we already retrieved data before, do nothing.
+        // If we already retrieved data before, just return.
         if (nations != null) {
             return;
         }
@@ -68,6 +69,7 @@ public abstract class FilterRegionByTags extends FilterAddOrRemove {
                 nations.addAll(nationsInRegion);
             }
         }
+        
         cantRetrieveMoreNations = true;
     }
 
