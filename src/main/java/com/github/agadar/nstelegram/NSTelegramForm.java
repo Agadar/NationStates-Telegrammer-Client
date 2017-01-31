@@ -85,6 +85,9 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 
         updateGui(Status.Idle);                   // Update entire GUI in case we missed something in visual designer.
         TextAreaOutput.setText(duration()); // Set output textarea, for consistency's sake.
+        
+        // Set hint properly.
+        setInputHint((FilterType) ComboBoxFilterType.getSelectedItem());
 
         // Attempt to set and verify user agent.
         try {
@@ -122,8 +125,8 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         JListFilters = new javax.swing.JList<>();
         ButtonRemoveFilter = new javax.swing.JButton();
         ComboBoxFilterType = new javax.swing.JComboBox<>();
-        TextFieldFilterValues = new javax.swing.JTextField();
         ButtonAddFilter = new javax.swing.JButton();
+        TextFieldFilterValues = new com.github.agadar.nstelegram.HintTextField();
         PanelOutput = new javax.swing.JPanel();
         ScrollPaneOutput = new javax.swing.JScrollPane();
         TextAreaOutput = new javax.swing.JTextArea();
@@ -302,9 +305,6 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             }
         });
 
-        TextFieldFilterValues.setEditable(false);
-        TextFieldFilterValues.setName("TextFieldFilterValues"); // NOI18N
-
         ButtonAddFilter.setText("Add filter");
         ButtonAddFilter.setName("ButtonAddFilter"); // NOI18N
         ButtonAddFilter.addActionListener(new java.awt.event.ActionListener() {
@@ -313,6 +313,8 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             }
         });
 
+        TextFieldFilterValues.setHint("");
+
         javax.swing.GroupLayout PanelFiltersLayout = new javax.swing.GroupLayout(PanelFilters);
         PanelFilters.setLayout(PanelFiltersLayout);
         PanelFiltersLayout.setHorizontalGroup(
@@ -320,13 +322,13 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             .addGroup(PanelFiltersLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(PanelFiltersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(TextFieldFilterValues, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(ComboBoxFilterType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(ScrollPaneFilters, javax.swing.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
                     .addGroup(PanelFiltersLayout.createSequentialGroup()
                         .addComponent(ButtonRemoveFilter)
                         .addGap(18, 18, 18)
-                        .addComponent(ButtonAddFilter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(TextFieldFilterValues))
+                        .addComponent(ButtonAddFilter, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         PanelFiltersLayout.setVerticalGroup(
@@ -338,7 +340,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                 .addComponent(ComboBoxFilterType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(TextFieldFilterValues, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(12, 12, 12)
                 .addGroup(PanelFiltersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(ButtonRemoveFilter)
                     .addComponent(ButtonAddFilter))
@@ -501,7 +503,8 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         if (evt.getStateChange() != ItemEvent.SELECTED) {
             return;
         }
-
+        
+        setInputHint((FilterType) evt.getItem()); // Set the tooltip.
         TextFieldFilterValues.setText("");  // Clear the textfield in question.
         setFilterComboBoxEnabled((FilterType) evt.getItem(), Status.Idle);
     }//GEN-LAST:event_ComboBoxFilterTypeItemStateChanged
@@ -805,7 +808,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     private javax.swing.JScrollPane ScrollPaneFilters;
     private javax.swing.JScrollPane ScrollPaneOutput;
     public javax.swing.JTextArea TextAreaOutput;
-    private javax.swing.JTextField TextFieldFilterValues;
+    private com.github.agadar.nstelegram.HintTextField TextFieldFilterValues;
     private javax.swing.JTextField TxtFieldClientKey;
     private javax.swing.JTextField TxtFieldRegionFrom;
     private javax.swing.JTextField TxtFieldSecretKey;
@@ -956,6 +959,41 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         } catch (NumberFormatException ex) {
             return 0;
         }
+    }
+    
+    /**
+     * Sets the input field's tooltip.
+     * @param type 
+     */
+    private void setInputHint(FilterType type) {
+        String hint = "";
+        
+        switch (type) {
+            case DELEGATES_NEW_MAX:
+            case NATIONS_NEW_MAX:
+            case NATIONS_REFOUNDED_MAX:
+            case NATIONS_EJECTED_MAX:
+            case WA_MEMBERS_NEW_MAX:
+                hint = "Insert number of recipients, e.g. '45'.";
+                break;
+            case EMBASSIES_EXCL:
+            case EMBASSIES_INCL:
+            case REGIONS_EXCL:
+            case REGIONS_INCL:
+                hint = "Insert region names, e.g. 'region1, region2'.";
+                break;
+            case NATIONS_EXCL:
+            case NATIONS_INCL:
+                hint = "Insert nation names, e.g. 'nation1, nation2'.";
+                break;
+            case REGIONS_WITH_TAGS_EXCL:
+            case REGIONS_WITH_TAGS_INCL:    
+            case REGIONS_WO_TAGS_EXCL:
+            case REGIONS_WO_TAGS_INCL:
+                hint = "Insert region tags, e.g. 'tag1, tag2'.";
+                break;
+        }
+        this.TextFieldFilterValues.setHint(hint);
     }
 
     @Override
