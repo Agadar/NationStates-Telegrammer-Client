@@ -4,28 +4,27 @@ import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nsapi.domain.world.World;
 import com.github.agadar.nsapi.enums.HapFilter;
 import com.github.agadar.nsapi.enums.shard.WorldShard;
-import com.github.agadar.nstelegram.filter.abstractfilter.FilterHappenings;
-
+import com.github.agadar.nstelegram.filter.abstractfilter.FilterHappeningsFinite;
 import java.util.HashSet;
 
 /**
- * Filter for retrieving ejected nations.
- *
+ * Filter for retrieving X refounded nations, where X >= 0.
+ * 
  * @author Agadar (https://github.com/Agadar/)
  */
-public class FilterNationsEjected extends FilterHappenings {
-
-    public FilterNationsEjected() {
-        super(KeyWord.ejected);
+public class FilterNationsRefoundedFinite extends FilterHappeningsFinite {
+    
+    public FilterNationsRefoundedFinite(int amountToRetrieve) {
+        super(KeyWord.refounded, amountToRetrieve);
     }
-
+    
     @Override
     public void refresh() {
         // Get fresh new list from server.
         final World w = NSAPI.world(WorldShard.Happenings)
-                .happeningsFilter(HapFilter.eject).execute();
+                .happeningsFilter(HapFilter.founding).execute();
 
-        // Derive ejected nations from happenings, and properly set the cache.
+        // Derive refounded nations from happenings, and properly set the local and global caches.
         nations = this.filterHappenings(new HashSet<>(w.Happenings));
     }
 }

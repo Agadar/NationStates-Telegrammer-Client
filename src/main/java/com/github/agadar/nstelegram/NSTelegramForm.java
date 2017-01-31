@@ -17,13 +17,17 @@ import com.github.agadar.nstelegram.filter.FilterDelegatesNewFinite;
 import com.github.agadar.nstelegram.filter.FilterEmbassies;
 import com.github.agadar.nstelegram.filter.FilterNations;
 import com.github.agadar.nstelegram.filter.FilterNationsEjected;
+import com.github.agadar.nstelegram.filter.FilterNationsEjectedFinite;
 import com.github.agadar.nstelegram.filter.FilterNationsNew;
+import com.github.agadar.nstelegram.filter.FilterNationsNewFinite;
 import com.github.agadar.nstelegram.filter.FilterNationsRefounded;
+import com.github.agadar.nstelegram.filter.FilterNationsRefoundedFinite;
 import com.github.agadar.nstelegram.filter.FilterRegions;
 import com.github.agadar.nstelegram.filter.FilterRegionsWithTags;
 import com.github.agadar.nstelegram.filter.FilterRegionsWithoutTags;
 import com.github.agadar.nstelegram.filter.FilterWAMembers;
 import com.github.agadar.nstelegram.filter.FilterWAMembersNew;
+import com.github.agadar.nstelegram.filter.FilterWAMembersNewFinite;
 import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
 import com.github.agadar.nstelegram.manager.PropertiesManager;
 import com.github.agadar.nstelegram.manager.TelegramManager;
@@ -551,7 +555,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             case DELEGATES_NEW_MAX: {
                 int amount = stringToUInt(filterValues);
                 f = new FilterDelegatesNewFinite(amount);
-                textForList += ": " + amount;
+                textForList += "(" + amount + ")";
                 break;
             }
             case EMBASSIES_EXCL: {
@@ -578,12 +582,30 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                 textForList += ": " + addressees;
                 break;
             }
+            case NATIONS_NEW_MAX: {
+                int amount = stringToUInt(filterValues);
+                f = new FilterNationsNewFinite(amount);
+                textForList += "(" + amount + ")";
+                break;
+            }
             case NATIONS_NEW:
                 f = new FilterNationsNew();
                 break;
+            case NATIONS_REFOUNDED_MAX: {
+                int amount = stringToUInt(filterValues);
+                f = new FilterNationsRefoundedFinite(amount);
+                textForList += "(" + amount + ")";
+                break;
+            }
             case NATIONS_REFOUNDED:
                 f = new FilterNationsRefounded();
                 break;
+            case NATIONS_EJECTED_MAX: {
+                int amount = stringToUInt(filterValues);
+                f = new FilterNationsEjectedFinite(amount);
+                textForList += "(" + amount + ")";
+                break;
+            }
             case NATIONS_EJECTED:
                 f = new FilterNationsEjected();
                 break;
@@ -629,6 +651,12 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             case WA_MEMBERS_INCL:
                 f = new FilterWAMembers(true);
                 break;
+            case WA_MEMBERS_NEW_MAX: {
+                int amount = stringToUInt(filterValues);
+                f = new FilterWAMembersNewFinite(amount);
+                textForList += "(" + amount + ")";
+                break;
+            }
             case WA_MEMBERS_NEW:
                 f = new FilterWAMembersNew();
                 break;
@@ -832,6 +860,10 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             case REGIONS_WO_TAGS_INCL:
             case REGIONS_WO_TAGS_EXCL:
             case DELEGATES_NEW_MAX:
+            case NATIONS_NEW_MAX:
+            case NATIONS_EJECTED_MAX:
+            case NATIONS_REFOUNDED_MAX:
+            case WA_MEMBERS_NEW_MAX:
                 TextFieldFilterValues.setEditable(true);
                 break;
             default:

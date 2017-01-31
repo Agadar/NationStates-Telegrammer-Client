@@ -9,7 +9,7 @@ import com.github.agadar.nstelegram.filter.abstractfilter.FilterHappenings;
 import java.util.HashSet;
 
 /**
- * Filter for retrieving refounded nations. Is never exhausted.
+ * Filter for retrieving refounded nations.
  *
  * @author Agadar (https://github.com/Agadar/)
  */

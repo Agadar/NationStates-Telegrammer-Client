@@ -1,4 +1,4 @@
-package com.github.agadar.nstelegram.filter.abstractfilter;
+package com.github.agadar.nstelegram.filter;
 
 import com.github.agadar.nstelegram.manager.TelegramManager;
 import java.util.HashSet;
@@ -6,21 +6,20 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Special type of FilterHappenings that CAN stop retrieving new recipients at
- * some point, because it is limited by a maximum number.
+ * Filter for retrieving X new nations, where X >= 0.
  * 
  * @author Agadar (https://github.com/Agadar/)
  */
-public abstract class FilterHappeningsFinite extends FilterHappenings {
+public class FilterNationsNewFinite extends FilterNationsNew {
     
     /** The original amount of nations to retrieve. */
     final int orgAmountToRetrieve;
     
     /** The amount of nations left to retrieve. */
-    int amountToRetrieve; 
+    int amountToRetrieve;
     
-    public FilterHappeningsFinite(KeyWord keyWord, int amountToRetrieve) {
-        super(keyWord);
+    public FilterNationsNewFinite(int amountToRetrieve) {
+        super();
         this.amountToRetrieve = Math.max(0, amountToRetrieve);
         this.orgAmountToRetrieve = amountToRetrieve;
     }
