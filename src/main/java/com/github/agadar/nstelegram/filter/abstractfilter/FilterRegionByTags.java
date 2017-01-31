@@ -2,7 +2,6 @@ package com.github.agadar.nstelegram.filter.abstractfilter;
 
 import static com.github.agadar.nstelegram.filter.abstractfilter.Filter.GLOBAL_CACHE;
 import com.github.agadar.nsapi.domain.world.World;
-import com.github.agadar.nstelegram.manager.TelegramManager;
 
 import java.util.HashSet;
 import java.util.Set;

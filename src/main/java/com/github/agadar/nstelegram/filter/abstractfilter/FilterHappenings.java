@@ -8,8 +8,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Abstract parent for filters that add nations derived from Happenings, then 
- * becomes exhausted and doesn't add any more nations to the address set until reset.
+ * Abstract parent for filters that add nations derived from Happenings.
+ * These can go on retrieving new recipients forever.
  *
  * @author Agadar (https://github.com/Agadar/)
  */
