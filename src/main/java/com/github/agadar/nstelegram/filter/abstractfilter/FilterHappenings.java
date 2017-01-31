@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  *
  * @author Agadar (https://github.com/Agadar/)
  */
-public abstract class FilterHappenings extends FilterAdd {
+public abstract class FilterHappenings extends Filter {
 
     /**
      * Pattern used for extracting nation names from happenings descriptions.
@@ -49,7 +49,7 @@ public abstract class FilterHappenings extends FilterAdd {
      * @return
      */
     protected Set<String> filterHappenings(Set<Happening> happenings) {
-        final Set<String> nations = new HashSet<>();
+        final Set<String> temp = new HashSet<>();
 
         happenings.forEach(h
                 -> {
@@ -57,10 +57,10 @@ public abstract class FilterHappenings extends FilterAdd {
                 final Matcher matcher = PATTERN.matcher(h.Description);
 
                 if (matcher.find()) {
-                    nations.add(matcher.group(1));
+                    temp.add(matcher.group(1));
                 }
             }
         });
-        return nations;
+        return temp;
     }
 }

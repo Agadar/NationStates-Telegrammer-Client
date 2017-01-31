@@ -56,11 +56,14 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
         String errorMsg = null;
 
         try {
+            // Loop until either the thread has been interrupted, or all filters are done.
             do {
+                // If there are recipients available...
                 if (Recipients.size() > 0) {
                     final String[] RecipArray = Recipients.toArray(new String[Recipients.size()]);
 
                     if (PropsManager.lastTelegramType != null) {
+                        // According to the telegram type, take proper action...
                         switch (PropsManager.lastTelegramType) {
                             case RECRUITMENT: {
                                 boolean skipNext = !canReceiveRecruitmentTelegrams(RecipArray[0]);
@@ -98,33 +101,45 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
                                 }
                                 break;
                             }
+                            // If we're sending a normal telegram, just send it.
                             default:
                                 sendTelegram(RecipArray);
                                 break;
                         }
                     }
-                }
+                } // Else if the recipients list is empty, sleep for a bit, then continue.
+                else {
+                    final NoRecipientsFoundEvent event = new NoRecipientsFoundEvent(this, NoRecipientsFoundTimeOut);
 
-                // If not yet exhausted, update recipients until there's recipients available.
-                if (!Tm.isExhausted()) {
-                    refreshRecipients();
-
-                    while (Recipients.isEmpty() && !Thread.interrupted()) {
-                        final NoRecipientsFoundEvent event
-                                = new NoRecipientsFoundEvent(this, NoRecipientsFoundTimeOut);
-
-                        synchronized (Listeners) {
-                            // Publish no recipients found event.
-                            Listeners.stream().forEach((tsl)
-                                    -> {
-                                tsl.handleNoRecipientsFound(event);
-                            });
-                        }
-                        Thread.sleep(NoRecipientsFoundTimeOut);
-                        refreshRecipients();
+                    synchronized (Listeners) {
+                        // Publish no recipients found event.
+                        Listeners.stream().forEach((tsl)
+                                -> {
+                            tsl.handleNoRecipientsFound(event);
+                        });
                     }
+                    Thread.sleep(NoRecipientsFoundTimeOut);
                 }
-            } while (!Thread.interrupted() && !Tm.isExhausted());
+
+                // If none of the filters can retrieve any new recipients, just end it all.
+                if (Tm.cantRetrieveMoreNations()) {
+                    break;
+                }
+
+                // Refresh the filters before going back to the top.
+                Tm.refreshAndReapplyFilters();
+                final RecipientsRefreshedEvent refrevent = new RecipientsRefreshedEvent(this);
+
+                synchronized (Listeners) {
+                    // Publish recipients refreshed event.
+                    Listeners.stream().forEach((tsl)
+                            -> {
+                        tsl.handleRecipientsRefreshed(refrevent);
+                    });
+                }
+
+            } while (!Thread.interrupted());
+
         } catch (InterruptedException ex) {
             /* Just fall through to finally. */ } catch (Exception ex) {
             // Dirty solution to not have ratelimiter exceptions show up as legit errors. 
@@ -152,14 +167,14 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
         // changed.       
         if (event.Queued) {
             // Only add it to the history if this wasn't a dry run, i.e. no actual telegram was sent.
-            if (!PropsManager.dryRun) {
+            //if (!PropsManager.dryRun) {
                 History.put(new Tuple(PropsManager.telegramId, event.Addressee), SkippedRecipientReason.PREVIOUS_RECIPIENT);
-            }
+            //}
             Stats.registerSucces(event.Addressee);
         } else {
             Stats.registerFailure(event.Addressee, null);
         }
-        System.out.println("--------called----1-----");
+        //System.out.println("--------called----1-----");
         synchronized (Listeners) {
             // Pass telegram sent event through.
             Listeners.stream().forEach((tsl)
@@ -183,7 +198,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
         if (PropsManager.lastTelegramType == TelegramType.RECRUITMENT) {
             q.isRecruitment();
         }
-        
+
         // Tag as dry run if needed.
         if (PropsManager.dryRun) {
             q.isDryRun();
@@ -262,23 +277,5 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
             return false;
         }
         return true;
-    }
-
-    /**
-     * Refreshes the Recipients set.
-     */
-    private void refreshRecipients() {
-        final RecipientsRefreshedEvent refrevent = new RecipientsRefreshedEvent(this);
-
-        synchronized (Listeners) {
-            // Publish recipients refreshed event.
-            Listeners.stream().forEach((tsl)
-                    -> {
-                tsl.handleRecipientsRefreshed(refrevent);
-            });
-        }
-
-        Tm.refreshFilters(false);
-        Tm.removeOldRecipients(false);
     }
 }

@@ -45,37 +45,24 @@ public final class TelegramManager {
     public TelegramManager(PropertiesManager propsManager) {
         PropsManager = propsManager;
     }
-
-    /**
-     * Refreshes the filters.
-     *
-     * @param localCacheOnly if true, explicitly uses the local caches for
-     * returning the filters' nations lists instead of allowing the possibility
-     * for using the global cache, daily dump file, or calls to the server.
-     */
-    public void refreshFilters(boolean localCacheOnly) {
-        Recipients.clear();
-        Filters.forEach((filter) -> {
-            filter.reset();
-            filter.applyFilter(Recipients, localCacheOnly);
-        });
-    }
     
     /**
-     * Returns whether or not all filters are exhausted.
-     * @return True if all filters are exhausted, otherwise false.
+     * Returns true if none of the filters can retrieve any new nations by more calls to refresh().
+     * @return
      */
-    public boolean isExhausted() {
-        return Filters.stream().noneMatch((filter) -> (!filter.isExhausted()));
+    public boolean cantRetrieveMoreNations() {
+        return Filters.stream().noneMatch((filter) -> (!filter.cantRetrieveMoreNations()));
     }
 
     /**
-     * Adds new filter.
+     * Adds new filter. Assumes it hasn't been refreshed yet.
      *
      * @param filter
      */
     public void addFilter(Filter filter) {
-        filter.applyFilter(Recipients, false);
+        filter.refresh();
+        filter.applyFilter(Recipients);
+        removeOldRecipients(false);
         Filters.add(filter);
     }
 
@@ -96,6 +83,18 @@ public final class TelegramManager {
     public Set<String> getRecipients() {
         return new HashSet<>(Recipients);
     }
+    
+    /**
+     * Refreshes and reapplies all filters to the address list.
+     */
+    public void refreshAndReapplyFilters() {
+        Recipients.clear();
+        Filters.forEach((filter) -> {
+            filter.refresh();
+            filter.applyFilter(Recipients);
+        });
+        removeOldRecipients(false);
+    }
 
     /**
      * Removes the filter with the given index.
@@ -104,7 +103,11 @@ public final class TelegramManager {
      */
     public void removeFilterAt(int index) {
         Filters.remove(index);
-        refreshFilters(true);
+        Recipients.clear();
+        Filters.forEach((filter) -> {
+            filter.applyFilter(Recipients);
+        });
+        removeOldRecipients(false);
     }
 
     /**
@@ -129,13 +132,13 @@ public final class TelegramManager {
             throw new IllegalThreadStateException("Telegram thread already running!");
         }
 
-        refreshFilters(true);   // Refresh filters one last time before checking # of recipients
+        //refreshFilters(true);   // Refresh filters one last time before checking # of recipients
 
         if (numberOfRecipients() == 0) {
             throw new IllegalArgumentException("Please supply at least one recipient!");
         }
 
-        removeOldRecipients(true);  // Remove old recipients.
+       // removeOldRecipients(true);  // Remove old recipients.
         NSAPI.setUserAgent(String.format(USER_AGENT, PropsManager.clientKey)); // Update user agent.
 
         // Prepare thread, then run it.

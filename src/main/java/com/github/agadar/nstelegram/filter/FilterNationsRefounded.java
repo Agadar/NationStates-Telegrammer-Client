@@ -7,7 +7,6 @@ import com.github.agadar.nsapi.enums.shard.WorldShard;
 import com.github.agadar.nstelegram.filter.abstractfilter.FilterHappenings;
 
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Filter for retrieving refounded nations. Is never exhausted.
@@ -21,18 +20,12 @@ public class FilterNationsRefounded extends FilterHappenings {
     }
 
     @Override
-    protected Set<String> retrieveNations() {
+    public void refresh() {
         // Get fresh new list from server.
         final World w = NSAPI.world(WorldShard.Happenings)
                 .happeningsFilter(HapFilter.founding).execute();
 
         // Derive refounded nations from happenings, and properly set the local and global caches.
-        localCache = this.filterHappenings(new HashSet<>(w.Happenings));
-        return localCache;
-    }
-    
-    @Override
-    public boolean isExhausted() {
-        return false;
+        nations = this.filterHappenings(new HashSet<>(w.Happenings));
     }
 }

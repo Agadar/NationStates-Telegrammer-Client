@@ -1,39 +1,37 @@
 package com.github.agadar.nstelegram.filter;
 
-import com.github.agadar.nstelegram.filter.abstractfilter.FilterAdd;
 import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nsapi.domain.world.World;
 import com.github.agadar.nsapi.enums.shard.WorldShard;
+import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
 
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Filter for retrieving ALL nations.
  *
  * @author Agadar (https://github.com/Agadar/)
  */
-public class FilterAll extends FilterAdd {
+public class FilterAll extends Filter {
 
     @Override
-    protected Set<String> retrieveNations() {
-        // Query local cache, return if it exists.
-        if (localCache != null) {
-            return localCache;
+    public void refresh() {
+        // If we already retrieved data before, do nothing.
+        if (nations != null) {
+            return;
         }
 
-        // Query global cache, set local cache to it if what we search was found,
-        // then return local cache.
+        // Query global cache, set local cache to it if what we search was found.
         if (GLOBAL_CACHE.All != null) {
-            localCache = GLOBAL_CACHE.All;
-            return localCache;
+            nations = GLOBAL_CACHE.All;
         }
 
         // If global cache does not contain what we need, do an API call to
-        // retrieve the data, store it in global cache and local cache, then return it.
+        // retrieve the data, then store it in global cache and local cache.
         final World w = NSAPI.world(WorldShard.Nations).execute();
         GLOBAL_CACHE.All = new HashSet<>(w.Nations);
-        localCache = GLOBAL_CACHE.All;
-        return localCache;
+        nations = GLOBAL_CACHE.All;
+        
+        cantRetrieveMoreNations = true;
     }
 }

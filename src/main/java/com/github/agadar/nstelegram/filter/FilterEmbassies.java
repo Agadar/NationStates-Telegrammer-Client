@@ -27,10 +27,10 @@ public class FilterEmbassies extends FilterAddOrRemove {
     }
 
     @Override
-    protected Set<String> retrieveNations() {
-        // Query local cache.
-        if (localCache != null) {
-            return localCache;
+    public void refresh() {
+        // If we already retrieved data before, do nothing.
+        if (nations != null) {
+            return;
         }
 
         final Set<String> embassies = new HashSet<>();  // All embassies of the selected regions.
@@ -63,7 +63,7 @@ public class FilterEmbassies extends FilterAddOrRemove {
 
         // Query global cache. If a region is not found in the global cache,
         // then (download and) read the daily data dump and query the global cache again.
-        localCache = new HashSet<>();
+        nations = new HashSet<>();
         embassies.stream().forEach((region)
                 -> {
             Set<String> nationsInRegion = GLOBAL_CACHE.getNationsInRegion(region);   // Check if global cache contains the values.
@@ -74,14 +74,14 @@ public class FilterEmbassies extends FilterAddOrRemove {
 
                 if (nationsInRegion != null) // If it does, then add the nations to local cache.
                 {
-                    localCache.addAll(nationsInRegion);
+                    nations.addAll(nationsInRegion);
                 }
             } else {
-                localCache.addAll(nationsInRegion);
+                nations.addAll(nationsInRegion);
             }
         });
-
-        return localCache;
+        
+        cantRetrieveMoreNations = true;
     }
 
     /**

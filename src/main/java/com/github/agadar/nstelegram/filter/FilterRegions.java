@@ -27,15 +27,15 @@ public class FilterRegions extends FilterAddOrRemove {
     }
 
     @Override
-    protected Set<String> retrieveNations() {
-        // Query local cache.
-        if (localCache != null) {
-            return localCache;
+    public void refresh() {
+        // If we already retrieved data before, do nothing.
+        if (nations != null) {
+            return;
         }
 
         // Query global cache. For every region not found in the global cache,
         // retrieve its nations from the server and also update the global cache.
-        localCache = new HashSet<>();
+        nations = new HashSet<>();
 
         Regions.stream().forEach((region) -> {
             // Check if global cache contains the values.
@@ -52,13 +52,14 @@ public class FilterRegions extends FilterAddOrRemove {
                 } // Else, do proper mapping.
                 else {
                     nationsInRegion = new HashSet<>(r.NationNames);
-                    localCache.addAll(nationsInRegion);
+                    nations.addAll(nationsInRegion);
                     GLOBAL_CACHE.mapNationsToRegion(region, nationsInRegion);
                 }
             } else {
-                localCache.addAll(nationsInRegion);
+                nations.addAll(nationsInRegion);
             }
         });
-        return localCache;
+        
+        cantRetrieveMoreNations = true;
     }
 }

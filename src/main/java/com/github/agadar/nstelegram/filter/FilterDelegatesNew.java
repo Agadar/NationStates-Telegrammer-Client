@@ -7,7 +7,6 @@ import com.github.agadar.nsapi.enums.shard.WAShard;
 import com.github.agadar.nstelegram.filter.abstractfilter.FilterHappenings;
 
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Filter for retrieving new delegates. Is never exhausted.
@@ -21,18 +20,12 @@ public class FilterDelegatesNew extends FilterHappenings {
     }
 
     @Override
-    protected Set<String> retrieveNations() {
+    public void refresh() {
         // Get fresh new list from server.
         final WorldAssembly w = NSAPI.wa(Council.SECURITY_COUNCIL)
                 .shards(WAShard.RecentHappenings).execute();
 
         // Derive new delegates from happenings, and properly set the local cache.
-        localCache = this.filterHappenings(new HashSet<>(w.RecentHappenings));
-        return localCache;
-    }
-
-    @Override
-    public boolean isExhausted() {
-        return false;
+        nations = this.filterHappenings(new HashSet<>(w.RecentHappenings));
     }
 }

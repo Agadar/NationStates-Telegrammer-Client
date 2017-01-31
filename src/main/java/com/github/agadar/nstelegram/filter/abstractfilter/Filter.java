@@ -19,46 +19,38 @@ public abstract class Filter {
      * Set containing the nations from the last time retrieveNations() was
      * called.
      */
-    protected Set<String> localCache;
-    
-    /**
-     * Whether or not this filter has been exhausted.
-     */
-    protected boolean exhausted = false;
+    protected Set<String> nations;
 
     /**
-     * Applies this filter to the supplied set of nations, removing and/or
-     * adding nations according to this filter's rules.
+     * Whether or not this filter can not retrieve any new nations by more calls to refresh().
+     */
+    protected boolean cantRetrieveMoreNations = false;
+
+    /**
+     * Applies this filter to the supplied set of nations, removing or adding
+     * nations according to this filter's rules.
      *
-     * @param nations
-     * @param localCacheOnly if true, explicitly uses the local cache for
-     * returning this filter's nations list instead of allowing the possibility
-     * for using the global cache, daily dump file, or calls to the server.
+     * @param addresses
      */
-    public abstract void applyFilter(Set<String> nations, boolean localCacheOnly);
+    public void applyFilter(Set<String> addresses) {
+        addresses.addAll(nations);
+    }
 
     /**
-     * Accesses either the local cache, the global cache, a daily dump file, or
-     * the server directly, in order to retrieve the nations defined by this
-     * filter. Called by applyFilter(...). Updates the local cache and possibly
-     * also the caches depending on implementation.
+     * Refreshes this filter. Depending on the implementation, this may mean: -
+     * Doing nothing; - Caching data from the global cache; - Caching data from
+     * a daily dump file; - Caching data from the server.
+     */
+    public void refresh() {
+        cantRetrieveMoreNations = true;
+    }
+
+    /**
+     * Whether or not this filter can not retrieve any new nations by more calls to refresh().
      *
      * @return
      */
-    protected abstract Set<String> retrieveNations();
-    
-    /**
-     * Whether or not this filter has been exhausted.
-     * @return 
-     */
-    public boolean isExhausted() {
-        return exhausted;
-    }
-    
-    /**
-     * Resets this filter so that it is no longer exhausted.
-     */
-    public void reset() {
-        exhausted = false;
+    public boolean cantRetrieveMoreNations() {
+        return cantRetrieveMoreNations;
     }
 }

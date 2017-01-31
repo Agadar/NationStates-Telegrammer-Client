@@ -890,7 +890,6 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 
     @Override
     public void handleTelegramSent(TelegramSentEvent event) {
-        System.out.println("--------called----2-----");
         // Print info to output.
         SwingUtilities.invokeLater(()
                 -> {
@@ -939,7 +938,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     public void handleRecipientsRefreshed(RecipientsRefreshedEvent event) {
         SwingUtilities.invokeLater(()
                 -> {
-            printToOutput("finished loop, refreshing recipients...", false);
+            printToOutput("out of recipients, refreshing recipients list...", false);
         });
     }
 }

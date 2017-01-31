@@ -24,31 +24,13 @@ public abstract class FilterAddOrRemove extends Filter {
     }
 
     @Override
-    public void applyFilter(Set<String> nations, boolean localCacheOnly) {
+    public void applyFilter(Set<String> addresses) {
         // Do proper behavior according to whether this is an 'add' or a 'remove' filter.
         if (add) {
-            // If this filter is exhausted, don't add anything.
-            if (isExhausted()) {
-                return;
-            }
-            
-            // If we're not restricted to the local cache, then fill the local cache.
-            if (!localCacheOnly) {
-                localCache = retrieveNations();
-            }
-            
-            // Fill the address set with our local cache's contents.
-            nations.addAll(localCache);
+            addresses.addAll(nations);
         } else {
-            // If we're not restricted to the local cache, then fill the local cache.
-            if (!localCacheOnly) {
-                localCache = retrieveNations();
-            }
-            
             // Remove from the address set this filter's nations.
-            nations.removeAll(localCache);
+            addresses.removeAll(this.nations);
         }       
-        // Exhaust this filter.
-        exhausted = true;
     }
 }
