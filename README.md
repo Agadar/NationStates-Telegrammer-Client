@@ -10,7 +10,7 @@ This program uses my own [NationStates API Java Wrapper](https://github.com/Agad
 
 ## Screenshot
 
-![images/Screenshot NationStates Telegrammer 1.2.0.png](images/Screenshot NationStates Telegrammer 1.2.0.png)
+![images/Screenshot NationStates Telegrammer 1.3.0.png](images/Screenshot NationStates Telegrammer 1.3.0.png)
 
 ## Links
 
