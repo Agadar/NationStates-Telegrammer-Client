@@ -3,6 +3,7 @@ package com.github.agadar.nstelegram;
 import com.github.agadar.nsapi.NSAPI;
 import com.github.agadar.nsapi.NationStatesAPIException;
 import com.github.agadar.nsapi.event.TelegramSentEvent;
+import com.github.agadar.nsapi.query.TelegramQuery;
 import com.github.agadar.nstelegram.enums.FilterType;
 import com.github.agadar.nstelegram.enums.TelegramType;
 import com.github.agadar.nstelegram.event.NoRecipientsFoundEvent;
@@ -85,7 +86,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 
         updateGui(Status.Idle);                   // Update entire GUI in case we missed something in visual designer.
         TextAreaOutput.setText(duration()); // Set output textarea, for consistency's sake.
-        
+
         // Set hint properly.
         setInputHint((FilterType) ComboBoxFilterType.getSelectedItem());
 
@@ -503,7 +504,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         if (evt.getStateChange() != ItemEvent.SELECTED) {
             return;
         }
-        
+
         setInputHint((FilterType) evt.getItem()); // Set the tooltip.
         TextFieldFilterValues.setText("");  // Clear the textfield in question.
         setFilterComboBoxEnabled((FilterType) evt.getItem(), Status.Idle);
@@ -538,7 +539,6 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 
         final FilterType filter = (FilterType) ComboBoxFilterType.getSelectedItem();
         String textForList = filter.toString(); // Used for the text in the visual filter list.
-        //Set<String> addressees;                 // Declared here as multiple cases need a string set.
         Filter f;                               // The filter to add to the telegram manager.
 
         // Set above variables according to addressees type selected.
@@ -782,6 +782,10 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 
     private void TxtFieldTelegramIdKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldTelegramIdKeyReleased
         PropertiesManager.get().telegramId = TxtFieldTelegramId.getText();
+
+        // Update recipients list, because some recipients may be valid or invalid for the new telegram id.
+        TelegramManager.get().resetAndReapplyFilters();
+        TextAreaOutput.setText(duration());
     }//GEN-LAST:event_TxtFieldTelegramIdKeyReleased
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -900,7 +904,8 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     public final String duration() {
         if (!TelegramManager.get().potentiallyInfinite()) {
             int estimatedDuration = Math.max(TelegramManager.get().numberOfRecipients() - 1, 0)
-                    * (ComboBoxTelegramType.getSelectedItem() == TelegramType.RECRUITMENT ? 181 : 31);
+                    * ((ComboBoxTelegramType.getSelectedItem() == TelegramType.RECRUITMENT
+                            ? TelegramQuery.timeBetweenRecruitTGs : TelegramQuery.timeBetweenTGs) / 1000);
             int hours = estimatedDuration / 3600;
             int minutes = estimatedDuration % 3600 / 60;
             int seconds = estimatedDuration % 3600 % 60;
@@ -960,14 +965,15 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             return 0;
         }
     }
-    
+
     /**
      * Sets the input field's tooltip.
-     * @param type 
+     *
+     * @param type
      */
     private void setInputHint(FilterType type) {
         String hint = "";
-        
+
         switch (type) {
             case DELEGATES_NEW_MAX:
             case NATIONS_NEW_MAX:
@@ -987,7 +993,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                 hint = "Insert nation names, e.g. 'nation1, nation2'.";
                 break;
             case REGIONS_WITH_TAGS_EXCL:
-            case REGIONS_WITH_TAGS_INCL:    
+            case REGIONS_WITH_TAGS_INCL:
             case REGIONS_WO_TAGS_EXCL:
             case REGIONS_WO_TAGS_INCL:
                 hint = "Insert region tags, e.g. 'tag1, tag2'.";
