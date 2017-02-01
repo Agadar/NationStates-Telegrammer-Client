@@ -558,7 +558,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             case DELEGATES_NEW_MAX: {
                 int amount = stringToUInt(filterValues);
                 f = new FilterDelegatesNewFinite(amount);
-                textForList += "(" + amount + ")";
+                textForList += " (" + amount + ")";
                 break;
             }
             case EMBASSIES_EXCL: {
@@ -588,7 +588,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             case NATIONS_NEW_MAX: {
                 int amount = stringToUInt(filterValues);
                 f = new FilterNationsNewFinite(amount);
-                textForList += "(" + amount + ")";
+                textForList += " (" + amount + ")";
                 break;
             }
             case NATIONS_NEW:
@@ -597,7 +597,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             case NATIONS_REFOUNDED_MAX: {
                 int amount = stringToUInt(filterValues);
                 f = new FilterNationsRefoundedFinite(amount);
-                textForList += "(" + amount + ")";
+                textForList += " (" + amount + ")";
                 break;
             }
             case NATIONS_REFOUNDED:
@@ -606,7 +606,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             case NATIONS_EJECTED_MAX: {
                 int amount = stringToUInt(filterValues);
                 f = new FilterNationsEjectedFinite(amount);
-                textForList += "(" + amount + ")";
+                textForList += " (" + amount + ")";
                 break;
             }
             case NATIONS_EJECTED:
@@ -657,7 +657,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             case WA_MEMBERS_NEW_MAX: {
                 int amount = stringToUInt(filterValues);
                 f = new FilterWAMembersNewFinite(amount);
-                textForList += "(" + amount + ")";
+                textForList += " (" + amount + ")";
                 break;
             }
             case WA_MEMBERS_NEW:
