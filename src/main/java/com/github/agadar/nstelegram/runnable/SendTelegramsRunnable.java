@@ -67,7 +67,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
                         switch (PropsManager.lastTelegramType) {
                             case RECRUITMENT: {
                                 boolean skipNext = !canReceiveRecruitmentTelegrams(RecipArray[0]);
-                                for (int i = 0; i < RecipArray.length; i++) {
+                                for (int i = 0; i < RecipArray.length && !Thread.interrupted(); i++) {
                                     final boolean skipThis = skipNext;
 
                                     if (i < RecipArray.length - 1) {
@@ -78,14 +78,13 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
                                     if (skipThis) {
                                         continue;
                                     }
-
                                     sendTelegram(RecipArray[i]);
                                 }
                                 break;
                             }
                             case CAMPAIGN: {
                                 boolean skipNext = !canReceiveCampaignTelegrams(RecipArray[0]);
-                                for (int i = 0; i < RecipArray.length; i++) {
+                                for (int i = 0; i < RecipArray.length && !Thread.interrupted(); i++) {
                                     final boolean skipThis = skipNext;
 
                                     if (i < RecipArray.length - 1) {
@@ -96,7 +95,6 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
                                     if (skipThis) {
                                         continue;
                                     }
-
                                     sendTelegram(RecipArray[i]);
                                 }
                                 break;
@@ -122,7 +120,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
                 }
 
                 // If none of the filters can retrieve any new recipients, just end it all.
-                if (Tm.cantRetrieveMoreNations()) {
+                if (Tm.cantRetrieveMoreNations() || Thread.interrupted()) {
                     break;
                 }
 
@@ -141,12 +139,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
             } while (!Thread.interrupted());
 
         } catch (InterruptedException ex) {
-            /* Just fall through to finally. */ } catch (Exception ex) {
-            // Dirty solution to not have ratelimiter exceptions show up as legit errors. 
-            if (!ex.getMessage().equals("RateLimiter.class blew up!")) {
-                causedByError = true;
-                errorMsg = ex.getMessage();
-            }
+            /* Just fall through to finally. */
         } finally {
             // Reset filters.
             Tm.resetAndReapplyFilters();

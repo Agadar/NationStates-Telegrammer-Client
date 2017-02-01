@@ -42,7 +42,7 @@
         <dependency>
             <groupId>com.github.agadar</groupId>
             <artifactId>nationstates-api-java-wrapper</artifactId>
-            <version>1.2.2</version>
+            <version>1.2.3</version>
         </dependency>
     </dependencies>
     
