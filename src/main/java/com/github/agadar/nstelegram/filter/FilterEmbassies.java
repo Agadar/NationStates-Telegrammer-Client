@@ -1,9 +1,11 @@
 package com.github.agadar.nstelegram.filter;
 
-import com.github.agadar.nsapi.NSAPI;
-import com.github.agadar.nsapi.domain.region.Embassy;
-import com.github.agadar.nsapi.domain.region.Region;
-import com.github.agadar.nsapi.enums.shard.RegionShard;
+import com.github.agadar.nationstates.NationStates;
+import com.github.agadar.nationstates.domain.region.Embassy;
+import com.github.agadar.nationstates.domain.region.Region;
+import com.github.agadar.nationstates.enumerator.EmbassyStatus;
+import com.github.agadar.nationstates.shard.RegionShard;
+
 import com.github.agadar.nstelegram.filter.abstractfilter.FilterAddOrRemove;
 
 import java.util.HashSet;
@@ -42,11 +44,11 @@ public class FilterEmbassies extends FilterAddOrRemove {
 
                     // If they aren't in the global cache, retrieve from server and cache them.
                     if (currentEmbassies == null) {
-                        final Region curRegion = NSAPI.region(region).shards(RegionShard.Embassies).execute();
+                        final Region curRegion = NationStates.region(region).shards(RegionShard.EMBASSIES).execute();
 
                         // Check copied from FilterRegionByTags.
-                        if (curRegion != null && curRegion.Embassies != null) {
-                            currentEmbassies = new HashSet<>(extractEstablishedEmbassies(curRegion.Embassies));
+                        if (curRegion != null && curRegion.embassies != null) {
+                            currentEmbassies = new HashSet<>(extractEstablishedEmbassies(curRegion.embassies));
                         } else {
                             currentEmbassies = new HashSet<>();
                         }
@@ -56,9 +58,9 @@ public class FilterEmbassies extends FilterAddOrRemove {
                     }
                     return currentEmbassies;
                 }).forEach((currentEmbassies)
-                -> {
-            embassies.addAll(currentEmbassies); // Add current embassies to total set.
-        });
+                        -> {
+                    embassies.addAll(currentEmbassies); // Add current embassies to total set.
+                });
 
         //System.out.println(embassies);  // print for debug purposes.
         // Query global cache. If a region is not found in the global cache,
@@ -66,20 +68,20 @@ public class FilterEmbassies extends FilterAddOrRemove {
         nations = new HashSet<>();
         embassies.stream().forEach((region)
                 -> {
-            Set<String> nationsInRegion = GLOBAL_CACHE.getNationsInRegion(region);   // Check if global cache contains the values.
+                    Set<String> nationsInRegion = GLOBAL_CACHE.getNationsInRegion(region);   // Check if global cache contains the values.
 
-            if (nationsInRegion == null) {
-                GLOBAL_CACHE.importDumpFile();                               // If not, then import dump file.
-                nationsInRegion = GLOBAL_CACHE.getNationsInRegion(region);   // Check if it contains it now.
+                    if (nationsInRegion == null) {
+                        GLOBAL_CACHE.importDumpFile();                               // If not, then import dump file.
+                        nationsInRegion = GLOBAL_CACHE.getNationsInRegion(region);   // Check if it contains it now.
 
-                if (nationsInRegion != null) // If it does, then add the nations to local cache.
-                {
-                    nations.addAll(nationsInRegion);
-                }
-            } else {
-                nations.addAll(nationsInRegion);
-            }
-        });
+                        if (nationsInRegion != null) // If it does, then add the nations to local cache.
+                        {
+                            nations.addAll(nationsInRegion);
+                        }
+                    } else {
+                        nations.addAll(nationsInRegion);
+                    }
+                });
 
         cantRetrieveMoreNations = true;
     }
@@ -92,7 +94,7 @@ public class FilterEmbassies extends FilterAddOrRemove {
      * @return
      */
     private static Set<String> extractEstablishedEmbassies(List<Embassy> embassies) {
-        return embassies.stream().filter(embassy -> embassy.Status == null)
-                .map(embassy -> embassy.RegionName).collect(Collectors.toSet());
+        return embassies.stream().filter(embassy -> embassy.status == EmbassyStatus.ESTABLISHED)
+                .map(embassy -> embassy.regionName).collect(Collectors.toSet());
     }
 }

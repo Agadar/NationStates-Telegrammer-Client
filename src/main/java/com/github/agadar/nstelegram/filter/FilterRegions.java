@@ -1,9 +1,10 @@
 package com.github.agadar.nstelegram.filter;
 
+import com.github.agadar.nationstates.NationStates;
+import com.github.agadar.nationstates.domain.region.Region;
+import com.github.agadar.nationstates.shard.RegionShard;
+
 import com.github.agadar.nstelegram.filter.abstractfilter.FilterAddOrRemove;
-import com.github.agadar.nsapi.NSAPI;
-import com.github.agadar.nsapi.domain.region.Region;
-import com.github.agadar.nsapi.enums.shard.RegionShard;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -43,15 +44,15 @@ public class FilterRegions extends FilterAddOrRemove {
 
             // If not, retrieve them from the server and also update global cache.
             if (nationsInRegion == null) {
-                final Region r = NSAPI.region(region)
-                        .shards(RegionShard.NationNames).execute();
+                final Region r = NationStates.region(region)
+                        .shards(RegionShard.NATION_NAMES).execute();
 
                 // If region does not exist, just add empty map to global cache.
                 if (r == null) {
                     GLOBAL_CACHE.mapNationsToRegion(region, new HashSet<>());
                 } // Else, do proper mapping.
                 else {
-                    nationsInRegion = new HashSet<>(r.NationNames);
+                    nationsInRegion = new HashSet<>(r.nationNames);
                     nations.addAll(nationsInRegion);
                     GLOBAL_CACHE.mapNationsToRegion(region, nationsInRegion);
                 }

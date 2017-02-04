@@ -1,9 +1,11 @@
 package com.github.agadar.nstelegram;
 
-import com.github.agadar.nsapi.NSAPI;
-import com.github.agadar.nsapi.NationStatesAPIException;
-import com.github.agadar.nsapi.event.TelegramSentEvent;
-import com.github.agadar.nsapi.query.TelegramQuery;
+import com.github.agadar.nationstates.NationStates;
+import com.github.agadar.nationstates.NationStatesAPIException;
+import com.github.agadar.nationstates.event.TelegramSentEvent;
+import com.github.agadar.nationstates.query.TelegramQuery;
+
+
 import com.github.agadar.nstelegram.enums.FilterType;
 import com.github.agadar.nstelegram.enums.TelegramType;
 import com.github.agadar.nstelegram.event.NoRecipientsFoundEvent;
@@ -53,7 +55,7 @@ import javax.swing.text.DefaultCaret;
  */
 public final class NSTelegramForm extends javax.swing.JFrame implements TelegramManagerListener {
 
-    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.3.0"; // Form title.  
+    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.3.1"; // Form title.  
     private final static String BORDER = "------------------------------------------";  // Border for output text.
 
     private Thread CompileRecipientsWorker;  // Thread used for compiling address lists.
@@ -92,8 +94,8 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 
         // Attempt to set and verify user agent.
         try {
-            NSAPI.setUserAgent("Agadar's Telegrammer (https://github.com/Agadar/NationStates-Telegrammer)");
-        } catch (NationStatesAPIException ex) {
+            NationStates.setUserAgent("Agadar's Telegrammer (https://github.com/Agadar/NationStates-Telegrammer)");
+        } catch (NationStatesAPIException | IllegalArgumentException ex) {
             TextAreaOutput.setText(ex.getMessage());
         }
     }
@@ -905,7 +907,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         if (!TelegramManager.get().potentiallyInfinite()) {
             int estimatedDuration = Math.max(TelegramManager.get().numberOfRecipients() - 1, 0)
                     * ((ComboBoxTelegramType.getSelectedItem() == TelegramType.RECRUITMENT
-                            ? TelegramQuery.timeBetweenRecruitTGs : TelegramQuery.timeBetweenTGs) / 1000);
+                            ? TelegramQuery.TIME_BETWEEN_RECRUITMENT_TELEGRAMS : TelegramQuery.TIME_BETWEEN_TELEGRAMS) / 1000);
             int hours = estimatedDuration / 3600;
             int minutes = estimatedDuration % 3600 / 60;
             int seconds = estimatedDuration % 3600 % 60;
@@ -1007,11 +1009,11 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         // Print info to output.
         SwingUtilities.invokeLater(()
                 -> {
-            if (event.Queued) {
-                printToOutput("queued telegram for '" + event.Addressee + "'", false);
+            if (event.queued) {
+                printToOutput("queued telegram for '" + event.recipient + "'", false);
             } else {
-                printToOutput("failed to queue telegram for '" + event.Addressee + "':\n"
-                        + event.ErrorMessage, false);
+                printToOutput("failed to queue telegram for '" + event.recipient + "':\n"
+                        + event.errorMessage, false);
             }
         });
     }

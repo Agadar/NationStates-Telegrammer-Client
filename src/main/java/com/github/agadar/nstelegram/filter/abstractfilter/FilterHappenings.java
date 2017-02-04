@@ -1,6 +1,6 @@
 package com.github.agadar.nstelegram.filter.abstractfilter;
 
-import com.github.agadar.nsapi.domain.shared.Happening;
+import com.github.agadar.nationstates.domain.common.Happening;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -53,8 +53,8 @@ public abstract class FilterHappenings extends Filter {
 
         happenings.forEach(h
                 -> {
-            if (h.Description.contains(myKeyWord.toString())) {
-                final Matcher matcher = PATTERN.matcher(h.Description);
+            if (h.description.contains(myKeyWord.toString())) {
+                final Matcher matcher = PATTERN.matcher(h.description);
 
                 if (matcher.find()) {
                     temp.add(matcher.group(1));

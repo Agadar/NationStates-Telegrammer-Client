@@ -1,9 +1,10 @@
 package com.github.agadar.nstelegram.filter;
 
-import com.github.agadar.nsapi.NSAPI;
-import com.github.agadar.nsapi.domain.wa.WorldAssembly;
-import com.github.agadar.nsapi.enums.Council;
-import com.github.agadar.nsapi.enums.shard.WAShard;
+import com.github.agadar.nationstates.NationStates;
+import com.github.agadar.nationstates.domain.worldassembly.WorldAssembly;
+import com.github.agadar.nationstates.enumerator.Council;
+import com.github.agadar.nationstates.shard.WorldAssemblyShard;
+
 import com.github.agadar.nstelegram.filter.abstractfilter.FilterHappenings;
 
 import java.util.HashSet;
@@ -22,11 +23,11 @@ public class FilterDelegatesNew extends FilterHappenings {
     @Override
     public void refresh() {
         // Get fresh new list from server.
-        final WorldAssembly w = NSAPI.wa(Council.SECURITY_COUNCIL)
-                .shards(WAShard.RecentHappenings).execute();
+        final WorldAssembly w = NationStates.worldAssembly(Council.SECURITY_COUNCIL)
+                .shards(WorldAssemblyShard.RECENT_HAPPENINGS).execute();
 
         // Derive new delegates from happenings, and properly set the local cache.
-        nations = this.filterHappenings(new HashSet<>(w.RecentHappenings));
+        nations = this.filterHappenings(new HashSet<>(w.recentHappenings));
     }
 
     @Override

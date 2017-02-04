@@ -1,10 +1,10 @@
 package com.github.agadar.nstelegram.util;
 
-import com.github.agadar.nsapi.NSAPI;
-import com.github.agadar.nsapi.NationStatesAPIException;
-import com.github.agadar.nsapi.domain.DailyDumpNations;
-import com.github.agadar.nsapi.domain.nation.Nation;
-import com.github.agadar.nsapi.enums.DailyDumpMode;
+import com.github.agadar.nationstates.NationStates;
+import com.github.agadar.nationstates.domain.DailyDumpNations;
+import com.github.agadar.nationstates.domain.nation.Nation;
+import com.github.agadar.nationstates.enumerator.DailyDumpMode;
+
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,36 +44,36 @@ public class FilterCache {
         DailyDumpNations ddn;
 
         try {
-            ddn = NSAPI.nationdump(DailyDumpMode.ReadLocal).execute();
-        } catch (NationStatesAPIException ex) {
+            ddn = NationStates.nationdump(DailyDumpMode.READ_LOCAL).execute();
+        } catch (Exception ex) {
             // If the exception isn't just a FileNotFoundException, throw this.
             if (ex.getCause().getClass() != FileNotFoundException.class) {
                 throw ex;
             }
 
             // Else, try download the dump file from the server.
-            ddn = NSAPI.nationdump(DailyDumpMode.DownloadAndRead).execute();
+            ddn = NationStates.nationdump(DailyDumpMode.DOWNLOAD_THEN_READ_LOCAL).execute();
         }
 
         // ddn should now be filled. Use it to fill the caches.
-        for (Nation n : ddn.Nations) {
-            mapNationToRegion(n.RegionName, n.Name);
+        for (Nation n : ddn.nations) {
+            mapNationToRegion(n.regionName, n.name);
 
-            switch (n.WorldAssemblyStatus) // Using hard-coded strings for now. Replace with enum once implemented in wrapper.
+            switch (n.worldAssemblyStatus) // Using hard-coded strings for now. Replace with enum once implemented in wrapper.
             {
-                case "WA Member":
+                case MEMBER:
                     if (WaMembers == null) // Instantiate first if set is null.
                     {
                         WaMembers = new HashSet<>();
                     }
-                    WaMembers.add(n.Name);              // Now add to WA members.
+                    WaMembers.add(n.name);              // Now add to WA members.
                     break;
-                case "WA Delegate":
+                case DELEGATE:
                     if (Delegates == null) // Instantiate first if set is null.
                     {
                         Delegates = new HashSet<>();
                     }
-                    Delegates.add(n.Name);              // Now add to WA delegates.
+                    Delegates.add(n.name);              // Now add to WA delegates.
                     break;
             }
         }

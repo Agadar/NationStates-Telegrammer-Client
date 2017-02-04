@@ -1,6 +1,7 @@
 package com.github.agadar.nstelegram.event;
 
-import com.github.agadar.nsapi.event.TelegramSentEvent;
+import com.github.agadar.nationstates.event.TelegramSentEvent;
+
 
 /**
  * Listener for TelegramManager events.

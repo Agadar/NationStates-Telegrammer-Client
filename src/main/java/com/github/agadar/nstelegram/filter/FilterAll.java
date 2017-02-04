@@ -1,8 +1,9 @@
 package com.github.agadar.nstelegram.filter;
 
-import com.github.agadar.nsapi.NSAPI;
-import com.github.agadar.nsapi.domain.world.World;
-import com.github.agadar.nsapi.enums.shard.WorldShard;
+import com.github.agadar.nationstates.NationStates;
+import com.github.agadar.nationstates.domain.world.World;
+import com.github.agadar.nationstates.shard.WorldShard;
+
 import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
 
 import java.util.HashSet;
@@ -29,8 +30,8 @@ public class FilterAll extends Filter {
 
         // If global cache does not contain what we need, do an API call to
         // retrieve the data, then store it in global cache and local cache.
-        final World w = NSAPI.world(WorldShard.Nations).execute();
-        GLOBAL_CACHE.All = new HashSet<>(w.Nations);
+        final World w = NationStates.world(WorldShard.NATIONS).execute();
+        GLOBAL_CACHE.All = new HashSet<>(w.nations);
         nations = GLOBAL_CACHE.All;
 
         cantRetrieveMoreNations = true;

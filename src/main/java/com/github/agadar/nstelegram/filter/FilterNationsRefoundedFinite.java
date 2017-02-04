@@ -1,10 +1,12 @@
 package com.github.agadar.nstelegram.filter;
 
-import com.github.agadar.nsapi.NSAPI;
-import com.github.agadar.nsapi.domain.world.World;
-import com.github.agadar.nsapi.enums.HapFilter;
-import com.github.agadar.nsapi.enums.shard.WorldShard;
+import com.github.agadar.nationstates.NationStates;
+import com.github.agadar.nationstates.domain.world.World;
+import com.github.agadar.nationstates.enumerator.HappeningsFilter;
+import com.github.agadar.nationstates.shard.WorldShard;
+
 import com.github.agadar.nstelegram.filter.abstractfilter.FilterHappeningsFinite;
+
 import java.util.HashSet;
 
 /**
@@ -21,10 +23,10 @@ public class FilterNationsRefoundedFinite extends FilterHappeningsFinite {
     @Override
     public void refresh() {
         // Get fresh new list from server.
-        final World w = NSAPI.world(WorldShard.Happenings)
-                .happeningsFilter(HapFilter.founding).execute();
+        final World w = NationStates.world(WorldShard.HAPPENINGS)
+                .happeningsFilter(HappeningsFilter.FOUNDING).execute();
 
         // Derive refounded nations from happenings, and properly set the local and global caches.
-        nations = this.filterHappenings(new HashSet<>(w.Happenings));
+        nations = this.filterHappenings(new HashSet<>(w.happenings));
     }
 }

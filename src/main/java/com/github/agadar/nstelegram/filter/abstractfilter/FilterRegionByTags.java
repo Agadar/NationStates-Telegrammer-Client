@@ -1,7 +1,7 @@
 package com.github.agadar.nstelegram.filter.abstractfilter;
 
+import com.github.agadar.nationstates.domain.world.World;
 import static com.github.agadar.nstelegram.filter.abstractfilter.Filter.GLOBAL_CACHE;
-import com.github.agadar.nsapi.domain.world.World;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -40,9 +40,9 @@ public abstract class FilterRegionByTags extends FilterAddOrRemove {
 
             // This check need be done because when no regions are found, the API
             // nevertheless sends back one empty string.
-            if (w != null && w.RegionsByTag() != null && (w.RegionsByTag().size() != 1
-                    || !w.RegionsByTag().get(0).isEmpty())) {
-                regions = new HashSet<>(w.RegionsByTag());
+            if (w != null && w.regionsByTag() != null && (w.regionsByTag().size() != 1
+                    || !w.regionsByTag().get(0).isEmpty())) {
+                regions = new HashSet<>(w.regionsByTag());
             } else {
                 regions = new HashSet<>();
             }
