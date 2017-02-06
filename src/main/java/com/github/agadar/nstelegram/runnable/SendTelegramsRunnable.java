@@ -1,11 +1,12 @@
 package com.github.agadar.nstelegram.runnable;
 
-import com.github.agadar.nsapi.NSAPI;
-import com.github.agadar.nsapi.domain.nation.Nation;
-import com.github.agadar.nsapi.enums.shard.NationShard;
-import com.github.agadar.nsapi.event.TelegramSentEvent;
-import com.github.agadar.nsapi.event.TelegramSentListener;
-import com.github.agadar.nsapi.query.TelegramQuery;
+import com.github.agadar.nationstates.NationStates;
+import com.github.agadar.nationstates.domain.nation.Nation;
+import com.github.agadar.nationstates.event.TelegramSentEvent;
+import com.github.agadar.nationstates.event.TelegramSentListener;
+import com.github.agadar.nationstates.query.TelegramQuery;
+import com.github.agadar.nationstates.shard.NationShard;
+
 import com.github.agadar.nstelegram.enums.SkippedRecipientReason;
 import com.github.agadar.nstelegram.enums.TelegramType;
 import com.github.agadar.nstelegram.event.NoRecipientsFoundEvent;
@@ -162,14 +163,14 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
         // called before this and the Telegram Id didn't change in the meantime,
         // so there is no need to make sure the entry for the current Telegram Id
         // changed.       
-        if (event.Queued) {
+        if (event.queued) {
             // Only add it to the history if this wasn't a dry run, i.e. no actual telegram was sent.
             //if (!PropsManager.dryRun) {
-            History.put(new Tuple(PropsManager.telegramId, event.Addressee), SkippedRecipientReason.PREVIOUS_RECIPIENT);
+            History.put(new Tuple(PropsManager.telegramId, event.recipient), SkippedRecipientReason.PREVIOUS_RECIPIENT);
             //}
-            Stats.registerSucces(event.Addressee);
+            Stats.registerSucces(event.recipient);
         } else {
-            Stats.registerFailure(event.Addressee, null);
+            Stats.registerFailure(event.recipient, null);
         }
         //System.out.println("--------called----1-----");
         synchronized (Listeners) {
@@ -188,7 +189,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
      */
     private void sendTelegram(String... recipients) {
         // Prepare query.
-        final TelegramQuery q = NSAPI.telegram(PropsManager.clientKey, PropsManager.telegramId, PropsManager.secretKey,
+        final TelegramQuery q = NationStates.telegram(PropsManager.clientKey, PropsManager.telegramId, PropsManager.secretKey,
                 recipients).addListeners(this);
 
         // Tag as recruitment telegram if needed.
@@ -215,10 +216,10 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
     private boolean canReceiveRecruitmentTelegrams(String recipient) {
         try {
             // Make server call.
-            Nation n = NSAPI.nation(recipient).shards(NationShard.CanReceiveRecruitmentTelegrams)
+            Nation n = NationStates.nation(recipient).shards(NationShard.CAN_RECEIVE_RECRUITMENT_TELEGRAMS)
                     .canReceiveTelegramFromRegion(PropsManager.fromRegion).execute();
             final SkippedRecipientReason reason = (n == null) ? SkippedRecipientReason.NOT_FOUND
-                    : !n.CanReceiveRecruitmentTelegrams ? SkippedRecipientReason.BLOCKING_RECRUITMENT : null;
+                    : !n.canReceiveRecruitmentTelegrams ? SkippedRecipientReason.BLOCKING_RECRUITMENT : null;
             return canReceiveXTelegrams(reason, recipient);
         } catch (Exception ex) {
             // If for any reason the call failed, just take the gamble and say 
@@ -238,9 +239,9 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
     private boolean canReceiveCampaignTelegrams(String recipient) {
         try {
             // Make server call.
-            Nation n = NSAPI.nation(recipient).shards(NationShard.CanReceiveCampaignTelegrams).execute();
+            Nation n = NationStates.nation(recipient).shards(NationShard.CAN_RECEIVE_CAMPAIGN_TELEGRAMS).execute();
             final SkippedRecipientReason reason = (n == null) ? SkippedRecipientReason.NOT_FOUND
-                    : !n.CanReceiveCampaignTelegrams ? SkippedRecipientReason.BLOCKING_CAMPAIGN : null;
+                    : !n.canReceiveCampaignTelegrams ? SkippedRecipientReason.BLOCKING_CAMPAIGN : null;
             return canReceiveXTelegrams(reason, recipient);
         } catch (Exception ex) {
             // If for any reason the call failed, just take the gamble and say 

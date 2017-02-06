@@ -58,9 +58,9 @@ public class FilterEmbassies extends FilterAddOrRemove {
                     }
                     return currentEmbassies;
                 }).forEach((currentEmbassies)
-                        -> {
-                    embassies.addAll(currentEmbassies); // Add current embassies to total set.
-                });
+                -> {
+            embassies.addAll(currentEmbassies); // Add current embassies to total set.
+        });
 
         //System.out.println(embassies);  // print for debug purposes.
         // Query global cache. If a region is not found in the global cache,
@@ -68,20 +68,20 @@ public class FilterEmbassies extends FilterAddOrRemove {
         nations = new HashSet<>();
         embassies.stream().forEach((region)
                 -> {
-                    Set<String> nationsInRegion = GLOBAL_CACHE.getNationsInRegion(region);   // Check if global cache contains the values.
+            Set<String> nationsInRegion = GLOBAL_CACHE.getNationsInRegion(region);   // Check if global cache contains the values.
 
-                    if (nationsInRegion == null) {
-                        GLOBAL_CACHE.importDumpFile();                               // If not, then import dump file.
-                        nationsInRegion = GLOBAL_CACHE.getNationsInRegion(region);   // Check if it contains it now.
+            if (nationsInRegion == null) {
+                GLOBAL_CACHE.importDumpFile();                               // If not, then import dump file.
+                nationsInRegion = GLOBAL_CACHE.getNationsInRegion(region);   // Check if it contains it now.
 
-                        if (nationsInRegion != null) // If it does, then add the nations to local cache.
-                        {
-                            nations.addAll(nationsInRegion);
-                        }
-                    } else {
-                        nations.addAll(nationsInRegion);
-                    }
-                });
+                if (nationsInRegion != null) // If it does, then add the nations to local cache.
+                {
+                    nations.addAll(nationsInRegion);
+                }
+            } else {
+                nations.addAll(nationsInRegion);
+            }
+        });
 
         cantRetrieveMoreNations = true;
     }

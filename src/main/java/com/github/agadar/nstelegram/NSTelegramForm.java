@@ -2,9 +2,9 @@ package com.github.agadar.nstelegram;
 
 import com.github.agadar.nationstates.NationStates;
 import com.github.agadar.nationstates.NationStatesAPIException;
+import com.github.agadar.nationstates.enumerator.RegionTag;
 import com.github.agadar.nationstates.event.TelegramSentEvent;
 import com.github.agadar.nationstates.query.TelegramQuery;
-
 
 import com.github.agadar.nstelegram.enums.FilterType;
 import com.github.agadar.nstelegram.enums.TelegramType;
@@ -627,27 +627,43 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                 break;
             }
             case REGIONS_WITH_TAGS_EXCL: {
-                Set<String> addressees = stringToStringList(filterValues);
-                f = new FilterRegionsWithTags(addressees, false);
-                textForList += ": " + addressees;
+                Set<RegionTag> recipients = stringsToRegionTags(stringToStringList(filterValues));
+                if (recipients.size() < 1) {
+                    TextAreaOutput.setText("No valid region tags recognized!\n");
+                    return;
+                }
+                f = new FilterRegionsWithTags(recipients, false);
+                textForList += ": " + recipients;
                 break;
             }
             case REGIONS_WITH_TAGS_INCL: {
-                Set<String> addressees = stringToStringList(filterValues);
-                f = new FilterRegionsWithTags(addressees, true);
-                textForList += ": " + addressees;
+                Set<RegionTag> recipients = stringsToRegionTags(stringToStringList(filterValues));
+                if (recipients.size() < 1) {
+                    TextAreaOutput.setText("No valid region tags recognized!\n");
+                    return;
+                }
+                f = new FilterRegionsWithTags(recipients, true);
+                textForList += ": " + recipients;
                 break;
             }
             case REGIONS_WO_TAGS_EXCL: {
-                Set<String> addressees = stringToStringList(filterValues);
-                f = new FilterRegionsWithoutTags(addressees, false);
-                textForList += ": " + addressees;
+                Set<RegionTag> recipients = stringsToRegionTags(stringToStringList(filterValues));
+                if (recipients.size() < 1) {
+                    TextAreaOutput.setText("No valid region tags recognized!\n");
+                    return;
+                }
+                f = new FilterRegionsWithoutTags(recipients, false);
+                textForList += ": " + recipients;
                 break;
             }
             case REGIONS_WO_TAGS_INCL: {
-                Set<String> addressees = stringToStringList(filterValues);
-                f = new FilterRegionsWithoutTags(addressees, true);
-                textForList += ": " + addressees;
+                Set<RegionTag> recipients = stringsToRegionTags(stringToStringList(filterValues));
+                if (recipients.size() < 1) {
+                    TextAreaOutput.setText("No valid region tags recognized!\n");
+                    return;
+                }
+                f = new FilterRegionsWithoutTags(recipients, true);
+                textForList += ": " + recipients;
                 break;
             }
             case WA_MEMBERS_EXCL:
@@ -931,6 +947,25 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     }
 
     /**
+     * Parses the supplied string values to a set of RegionTags. Strings that
+     * cannot be parsed are ignored.
+     *
+     * @param tagsStrSet The strings to parse
+     * @return The resulting RegionTags
+     */
+    private static Set<RegionTag> stringsToRegionTags(Set<String> tagsStrSet) {
+        final Set<RegionTag> tags = new HashSet();
+        tagsStrSet.stream().forEach(tagStr -> {
+            try {
+                tags.add(RegionTag.fromString(tagStr));
+            } catch (IllegalArgumentException ex) {
+                // Ignore because we don't care.
+            }
+        });
+        return tags;
+    }
+
+    /**
      * Utility function for printing messages to the output textarea that are
      * prefixed with a timestamp and suffixed with a newline. If called outside
      * the GUI thread, wrap this in SwingUtilities.invokeLater(...).
@@ -956,7 +991,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param parseMe
      * @return
      */
-    private int stringToUInt(String parseMe) {
+    private static int stringToUInt(String parseMe) {
         if (parseMe == null) {
             return 0;
         }

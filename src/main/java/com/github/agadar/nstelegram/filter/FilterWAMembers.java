@@ -1,9 +1,10 @@
 package com.github.agadar.nstelegram.filter;
 
-import com.github.agadar.nsapi.NSAPI;
-import com.github.agadar.nsapi.domain.wa.WorldAssembly;
-import com.github.agadar.nsapi.enums.Council;
-import com.github.agadar.nsapi.enums.shard.WAShard;
+import com.github.agadar.nationstates.NationStates;
+import com.github.agadar.nationstates.domain.worldassembly.WorldAssembly;
+import com.github.agadar.nationstates.enumerator.Council;
+import com.github.agadar.nationstates.shard.WorldAssemblyShard;
+
 import com.github.agadar.nstelegram.filter.abstractfilter.FilterAddOrRemove;
 
 import java.util.HashSet;
@@ -34,8 +35,8 @@ public class FilterWAMembers extends FilterAddOrRemove {
 
         // If global cache does not contain what we need, do an API call to
         // retrieve the data, then store it in global cache and local cache.
-        final WorldAssembly wa = NSAPI.wa(Council.SECURITY_COUNCIL).shards(WAShard.Members).execute();
-        GLOBAL_CACHE.WaMembers = new HashSet<>(wa.Members);
+        final WorldAssembly wa = NationStates.worldAssembly(Council.SECURITY_COUNCIL).shards(WorldAssemblyShard.MEMBERS).execute();
+        GLOBAL_CACHE.WaMembers = new HashSet<>(wa.members);
         nations = GLOBAL_CACHE.WaMembers;
 
         cantRetrieveMoreNations = true;

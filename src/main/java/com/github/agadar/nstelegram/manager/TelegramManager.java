@@ -1,6 +1,7 @@
 package com.github.agadar.nstelegram.manager;
 
-import com.github.agadar.nsapi.NSAPI;
+import com.github.agadar.nationstates.NationStates;
+
 import com.github.agadar.nstelegram.enums.SkippedRecipientReason;
 import com.github.agadar.nstelegram.event.TelegramManagerListener;
 import com.github.agadar.nstelegram.filter.abstractfilter.Filter;
@@ -160,7 +161,7 @@ public final class TelegramManager {
         }
 
         // removeOldRecipients(true);  // Remove old recipients.
-        NSAPI.setUserAgent(String.format(USER_AGENT, propsManager.clientKey)); // Update user agent.
+        NationStates.setUserAgent(String.format(USER_AGENT, propsManager.clientKey)); // Update user agent.
 
         // Prepare thread, then run it.
         telegramThread = new Thread(new SendTelegramsRunnable(this, recipients, listeners,

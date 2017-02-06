@@ -1,8 +1,10 @@
 package com.github.agadar.nstelegram.filter;
 
-import com.github.agadar.nsapi.NSAPI;
-import com.github.agadar.nsapi.domain.world.World;
-import com.github.agadar.nsapi.enums.shard.WorldShard;
+import com.github.agadar.nationstates.NationStates;
+import com.github.agadar.nationstates.domain.world.World;
+import com.github.agadar.nationstates.enumerator.RegionTag;
+import com.github.agadar.nationstates.shard.WorldShard;
+
 import com.github.agadar.nstelegram.filter.abstractfilter.FilterRegionByTags;
 
 import java.util.Set;
@@ -15,13 +17,13 @@ import java.util.Set;
  */
 public class FilterRegionsWithoutTags extends FilterRegionByTags {
 
-    public FilterRegionsWithoutTags(Set<String> tags, boolean add) {
+    public FilterRegionsWithoutTags(Set<RegionTag> tags, boolean add) {
         super(tags, add);
     }
 
     @Override
     protected World getWorld() {
-        return NSAPI.world(WorldShard.RegionsByTag).regionsWithoutTags(tags
-                .toArray(new String[tags.size()])).execute();
+        return NationStates.world(WorldShard.REGIONS_BY_TAG).regionsWithoutTags(tags
+                .toArray(new RegionTag[tags.size()])).execute();
     }
 }

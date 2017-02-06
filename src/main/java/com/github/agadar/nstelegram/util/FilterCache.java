@@ -4,6 +4,7 @@ import com.github.agadar.nationstates.NationStates;
 import com.github.agadar.nationstates.domain.DailyDumpNations;
 import com.github.agadar.nationstates.domain.nation.Nation;
 import com.github.agadar.nationstates.enumerator.DailyDumpMode;
+import com.github.agadar.nationstates.enumerator.RegionTag;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -19,8 +20,8 @@ import java.util.Set;
 public class FilterCache {
 
     private final Map<String, Set<String>> NationsToRegions;            // nations mapped to regions
-    private final Map<Set<String>, Set<String>> RegionsToTagsWith;      // regions mapped to tags they have
-    private final Map<Set<String>, Set<String>> RegionsToTagsWithout;   // regions mapped to tags they don't have
+    private final Map<Set<RegionTag>, Set<String>> RegionsToTagsWith;      // regions mapped to tags they have
+    private final Map<Set<RegionTag>, Set<String>> RegionsToTagsWithout;   // regions mapped to tags they don't have
     private final Map<String, Set<String>> EmbassiesToRegions;          // embassy regions mapped to regions
     private boolean HasImportedDumpFile = false;                        // indicates whether or not the dump file has been imported yet
 
@@ -161,7 +162,7 @@ public class FilterCache {
      * @param tags
      * @param regions
      */
-    public void mapRegionsToTagsWith(Set<String> tags, Set<String> regions) {
+    public void mapRegionsToTagsWith(Set<RegionTag> tags, Set<String> regions) {
         RegionsToTagsWith.put(tags, regions);
     }
 
@@ -171,7 +172,7 @@ public class FilterCache {
      * @param tags
      * @return
      */
-    public Set<String> getRegionsToTagsWith(Set<String> tags) {
+    public Set<String> getRegionsToTagsWith(Set<RegionTag> tags) {
         return RegionsToTagsWith.get(tags);
     }
 
@@ -181,7 +182,7 @@ public class FilterCache {
      * @param tags
      * @param regions
      */
-    public void mapRegionsToTagsWithout(Set<String> tags, Set<String> regions) {
+    public void mapRegionsToTagsWithout(Set<RegionTag> tags, Set<String> regions) {
         RegionsToTagsWithout.put(tags, regions);
     }
 
@@ -191,7 +192,7 @@ public class FilterCache {
      * @param tags
      * @return
      */
-    public Set<String> getRegionsToTagsWithout(Set<String> tags) {
+    public Set<String> getRegionsToTagsWithout(Set<RegionTag> tags) {
         return RegionsToTagsWithout.get(tags);
     }
 }

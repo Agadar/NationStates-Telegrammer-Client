@@ -1,6 +1,8 @@
 package com.github.agadar.nstelegram.filter.abstractfilter;
 
 import com.github.agadar.nationstates.domain.world.World;
+import com.github.agadar.nationstates.enumerator.RegionTag;
+
 import static com.github.agadar.nstelegram.filter.abstractfilter.Filter.GLOBAL_CACHE;
 
 import java.util.HashSet;
@@ -17,9 +19,9 @@ public abstract class FilterRegionByTags extends FilterAddOrRemove {
     /**
      * This instance's tags.
      */
-    protected final Set<String> tags;
+    protected final Set<RegionTag> tags;
 
-    public FilterRegionByTags(Set<String> tags, boolean add) {
+    public FilterRegionByTags(Set<RegionTag> tags, boolean add) {
         super(add);
         this.tags = tags;
     }
