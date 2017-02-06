@@ -629,6 +629,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             case REGIONS_WITH_TAGS_EXCL: {
                 Set<RegionTag> recipients = stringsToRegionTags(stringToStringList(filterValues));
                 if (recipients.size() < 1) {
+                    updateGui(Status.Idle);
                     TextAreaOutput.setText("No valid region tags recognized!\n");
                     return;
                 }
@@ -639,6 +640,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             case REGIONS_WITH_TAGS_INCL: {
                 Set<RegionTag> recipients = stringsToRegionTags(stringToStringList(filterValues));
                 if (recipients.size() < 1) {
+                    updateGui(Status.Idle);
                     TextAreaOutput.setText("No valid region tags recognized!\n");
                     return;
                 }
@@ -649,6 +651,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             case REGIONS_WO_TAGS_EXCL: {
                 Set<RegionTag> recipients = stringsToRegionTags(stringToStringList(filterValues));
                 if (recipients.size() < 1) {
+                    updateGui(Status.Idle);
                     TextAreaOutput.setText("No valid region tags recognized!\n");
                     return;
                 }
@@ -659,6 +662,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             case REGIONS_WO_TAGS_INCL: {
                 Set<RegionTag> recipients = stringsToRegionTags(stringToStringList(filterValues));
                 if (recipients.size() < 1) {
+                    updateGui(Status.Idle);
                     TextAreaOutput.setText("No valid region tags recognized!\n");
                     return;
                 }
@@ -959,6 +963,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             try {
                 tags.add(RegionTag.fromString(tagStr));
             } catch (IllegalArgumentException ex) {
+                System.out.println(ex.getMessage());
                 // Ignore because we don't care.
             }
         });
