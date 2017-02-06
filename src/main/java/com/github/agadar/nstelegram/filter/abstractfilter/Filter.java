@@ -2,6 +2,7 @@ package com.github.agadar.nstelegram.filter.abstractfilter;
 
 import com.github.agadar.nstelegram.manager.TelegramManager;
 import com.github.agadar.nstelegram.util.FilterCache;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -77,5 +78,13 @@ public abstract class Filter {
      */
     public boolean potentiallyInfinite() {
         return false;
+    }
+    
+    /**
+     * Returns a copy of the nations selected by this filter. Used for debugging purposes.
+     * @return a copy of the nations selected by this filter.
+     */
+    public Set<String> getNations() {
+        return new HashSet<>(nations);
     }
 }
