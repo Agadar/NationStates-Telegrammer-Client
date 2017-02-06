@@ -79,9 +79,11 @@ public abstract class Filter {
     public boolean potentiallyInfinite() {
         return false;
     }
-    
+
     /**
-     * Returns a copy of the nations selected by this filter. Used for debugging purposes.
+     * Returns a copy of the nations selected by this filter. Used for debugging
+     * purposes.
+     *
      * @return a copy of the nations selected by this filter.
      */
     public Set<String> getNations() {

@@ -22,7 +22,7 @@ public enum FilterType {
     REGIONS_WITH_TAGS_INCL("+ regions with tags"),
     REGIONS_WO_TAGS_INCL("+ regions without tags"),
     NATIONS_INCL("+ specific nations"),
-    DELEGATES_INCL("+ WA delegates"),   
+    DELEGATES_INCL("+ WA delegates"),
     WA_MEMBERS_INCL("+ WA members"),
     EMBASSIES_EXCL("- embassies of regions"),
     REGIONS_EXCL("- regions"),

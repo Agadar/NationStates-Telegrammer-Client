@@ -963,7 +963,6 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             try {
                 tags.add(RegionTag.fromString(tagStr));
             } catch (IllegalArgumentException ex) {
-                System.out.println(ex.getMessage());
                 // Ignore because we don't care.
             }
         });
