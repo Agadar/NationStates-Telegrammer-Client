@@ -55,7 +55,7 @@ import javax.swing.text.DefaultCaret;
  */
 public final class NSTelegramForm extends javax.swing.JFrame implements TelegramManagerListener {
 
-    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.3.1"; // Form title.  
+    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.3.2"; // Form title.  
     private final static String BORDER = "------------------------------------------";  // Border for output text.
 
     private Thread CompileRecipientsWorker;  // Thread used for compiling address lists.
@@ -471,6 +471,13 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      */
     private void BtnStartActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_BtnStartActionPerformed
     {//GEN-HEADEREND:event_BtnStartActionPerformed
+        // Make sure there are no spaces in the fields.
+        final PropertiesManager pm = PropertiesManager.get();
+        TxtFieldRegionFrom.setText(pm.fromRegion = pm.fromRegion.trim());
+        TxtFieldClientKey.setText(pm.clientKey = pm.clientKey.replace(" ", ""));
+        TxtFieldSecretKey.setText(pm.secretKey = pm.secretKey.replace(" ", ""));
+        TxtFieldTelegramId.setText(pm.telegramId = pm.telegramId.replace(" ", ""));
+
         updateGui(Status.SendingTelegrams);    // update GUI
         TextAreaOutput.setText(duration());
 
