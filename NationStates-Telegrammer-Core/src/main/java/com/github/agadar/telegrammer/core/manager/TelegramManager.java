@@ -31,7 +31,6 @@ public final class TelegramManager {
 
     private final List<Filter> filters = new ArrayList<>();                 // The filters to apply, in chronological order.
     private final Set<String> recipients = new HashSet<>();                 // Supposedly most up-to-date recipients list, based on Filters.
-    private final Map<Tuple<String, String>, SkippedRecipientReason> HISTORY = new HashMap<>(); // History of recipients, mapped to telegram id's.
     private final Set<TelegramManagerListener> listeners = new HashSet<>(); // Listeners to events thrown by this.
 
     private Thread telegramThread;                                          // The thread on which the TelegramQuery is running.
@@ -165,7 +164,7 @@ public final class TelegramManager {
 
         // Prepare thread, then run it.
         telegramThread = new Thread(new SendTelegramsRunnable(this, recipients, listeners,
-                NO_ADDRESSEES_FOUND_TIMEOUT, HISTORY, propsManager));
+                NO_ADDRESSEES_FOUND_TIMEOUT, propsManager));
         telegramThread.start();
     }
 
@@ -185,7 +184,7 @@ public final class TelegramManager {
      */
     public void removeOldRecipients(Set<String> nations) {
         for (final Iterator<String> it = nations.iterator(); it.hasNext();) {
-            if (HISTORY.get(new Tuple(PropertiesManager.get().telegramId, it.next())) != null) {
+            if (HistoryManager.get().history.get(new Tuple(PropertiesManager.get().telegramId, it.next())) != null) {
                 it.remove();   // Remove recipient
             }
         }

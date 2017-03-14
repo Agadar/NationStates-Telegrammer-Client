@@ -14,6 +14,7 @@ import com.github.agadar.telegrammer.core.event.RecipientRemovedEvent;
 import com.github.agadar.telegrammer.core.event.RecipientsRefreshedEvent;
 import com.github.agadar.telegrammer.core.event.StoppedSendingEvent;
 import com.github.agadar.telegrammer.core.event.TelegramManagerListener;
+import com.github.agadar.telegrammer.core.manager.HistoryManager;
 import com.github.agadar.telegrammer.core.manager.PropertiesManager;
 import com.github.agadar.telegrammer.core.manager.TelegramManager;
 import com.github.agadar.telegrammer.core.util.QueuedStats;
@@ -36,18 +37,16 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
     private final Set<TelegramManagerListener> listeners;
     private final int noRecipientsFoundTimeOut;
     private final QueuedStats queuedStats;
-    private final Map<Tuple<String, String>, SkippedRecipientReason> history;
     private final PropertiesManager propertiesManager;
 
     public SendTelegramsRunnable(TelegramManager telegramManager, Set<String> recipients,
             Set<TelegramManagerListener> listeners, int noRecipientsFoundTimeOut,
-            Map<Tuple<String, String>, SkippedRecipientReason> history, PropertiesManager propsManager) {
+            PropertiesManager propsManager) {
         this.telegramManager = telegramManager;
         this.recipients = recipients;
         this.listeners = listeners;
         this.noRecipientsFoundTimeOut = noRecipientsFoundTimeOut;
         this.queuedStats = new QueuedStats();
-        this.history = history;
         propertiesManager = propsManager;
     }
 
@@ -163,10 +162,9 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
         // so there is no need to make sure the entry for the current Telegram Id
         // changed.       
         if (event.queued) {
-            // Only add it to the history if this wasn't a dry run, i.e. no actual telegram was sent.
-            //if (!PropsManager.dryRun) {
-            history.put(new Tuple(propertiesManager.telegramId, event.recipient), SkippedRecipientReason.PREVIOUS_RECIPIENT);
-            //}
+            HistoryManager.get().history.put(
+                    new Tuple(propertiesManager.telegramId, event.recipient),
+                    SkippedRecipientReason.PREVIOUS_RECIPIENT);
             queuedStats.registerSucces(event.recipient);
         } else {
             queuedStats.registerFailure(event.recipient, null);
@@ -261,7 +259,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
         if (reason != null) {
             queuedStats.registerFailure(recipient, reason);
             recipients.remove(recipient);
-            history.put(new Tuple(propertiesManager.telegramId, recipient), reason);
+            HistoryManager.get().history.put(new Tuple(propertiesManager.telegramId, recipient), reason);
             final RecipientRemovedEvent event = new RecipientRemovedEvent(this, recipient, reason);
 
             synchronized (listeners) {

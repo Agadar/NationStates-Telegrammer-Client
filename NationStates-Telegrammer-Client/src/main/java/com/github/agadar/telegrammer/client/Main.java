@@ -1,5 +1,6 @@
 package com.github.agadar.telegrammer.client;
 
+import com.github.agadar.telegrammer.core.manager.HistoryManager;
 import com.github.agadar.telegrammer.core.manager.PropertiesManager;
 import com.github.agadar.telegrammer.core.manager.TelegramManager;
 
@@ -17,8 +18,9 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class Main {
 
     public static void main(String args[]) {
-        // Retrieve properties.
+        // Retrieve properties and history.
         PropertiesManager.get().loadProperties();
+        HistoryManager.get().loadHistory();
 
         // Set-up graphical form.      
         try {

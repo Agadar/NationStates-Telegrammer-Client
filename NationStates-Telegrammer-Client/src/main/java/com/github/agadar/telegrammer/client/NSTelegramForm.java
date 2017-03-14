@@ -36,6 +36,7 @@ import com.github.agadar.telegrammer.core.manager.PropertiesManager;
 import com.github.agadar.telegrammer.core.manager.TelegramManager;
 
 import com.github.agadar.telegrammer.client.runnable.AddFilterRunnable;
+import com.github.agadar.telegrammer.core.manager.HistoryManager;
 
 import java.awt.event.ItemEvent;
 import java.time.LocalTime;
@@ -57,7 +58,7 @@ import javax.swing.text.DefaultCaret;
  */
 public final class NSTelegramForm extends javax.swing.JFrame implements TelegramManagerListener {
 
-    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.3.2"; // Form title.  
+    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.4.0"; // Form title.  
     private final static String BORDER = "------------------------------------------";  // Border for output text.
 
     private Thread CompileRecipientsWorker;  // Thread used for compiling address lists.
@@ -739,8 +740,9 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      */
     private void formWindowClosing(java.awt.event.WindowEvent evt)//GEN-FIRST:event_formWindowClosing
     {//GEN-HEADEREND:event_formWindowClosing
-        // Store relevant variables to properties file.
+        // Store relevant variables to properties and history files.
         PropertiesManager.get().saveProperties();
+        HistoryManager.get().saveHistory();
     }//GEN-LAST:event_formWindowClosing
 
     /**
