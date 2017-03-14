@@ -1,7 +1,4 @@
-/target/
+target/
+
 *.properties
-/NationStates-Telegrammer-Core/target/
-/NationStates-Telegrammer-GUI/target/
-/NationStates-Telegrammer-GUI (copy)/target/
-/NationStates-Telegrammer-CLI/target/
-/NationStates-Telegrammer-Client/target/
+*.history
