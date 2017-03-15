@@ -28,7 +28,7 @@ public class HistoryManager {
     /**
      * Default file name.
      */
-    private static final String FILENAME = "nationstates-telegrammer.history";
+    private static final String FILENAME = ".nationstates-telegrammer.history";
 
     /**
      * Default split string.

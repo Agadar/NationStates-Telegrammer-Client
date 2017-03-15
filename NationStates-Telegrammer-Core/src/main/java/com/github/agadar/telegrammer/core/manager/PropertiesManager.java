@@ -18,7 +18,7 @@ public class PropertiesManager {
 
     // Standard name for this app's properties file.
     private static PropertiesManager INSTANCE;
-    private static final String FILENAME = "nationstates-telegrammer.properties";
+    private static final String FILENAME = ".nationstates-telegrammer.properties";
     private static final String DEFAULT_STRING_VAL = "";
     private static final String DEFAULT_BOOL_VAL = "false";
 
