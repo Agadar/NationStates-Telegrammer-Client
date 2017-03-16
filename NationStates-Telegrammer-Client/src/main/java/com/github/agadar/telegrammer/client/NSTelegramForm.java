@@ -6,6 +6,8 @@ import com.github.agadar.nationstates.enumerator.RegionTag;
 import com.github.agadar.nationstates.event.TelegramSentEvent;
 import com.github.agadar.nationstates.query.TelegramQuery;
 
+import com.github.agadar.telegrammer.client.runnable.AddFilterRunnable;
+
 import com.github.agadar.telegrammer.core.enums.FilterType;
 import com.github.agadar.telegrammer.core.enums.TelegramType;
 import com.github.agadar.telegrammer.core.event.NoRecipientsFoundEvent;
@@ -34,16 +36,12 @@ import com.github.agadar.telegrammer.core.filter.FilterWAMembersNewFinite;
 import com.github.agadar.telegrammer.core.filter.abstractfilter.Filter;
 import com.github.agadar.telegrammer.core.manager.PropertiesManager;
 import com.github.agadar.telegrammer.core.manager.TelegramManager;
-
-import com.github.agadar.telegrammer.client.runnable.AddFilterRunnable;
 import com.github.agadar.telegrammer.core.manager.HistoryManager;
+import com.github.agadar.telegrammer.core.util.StringFunctions;
 
 import java.awt.event.ItemEvent;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
@@ -568,37 +566,37 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                 f = new FilterDelegatesNew();
                 break;
             case DELEGATES_NEW_MAX: {
-                int amount = stringToUInt(filterValues);
+                int amount = StringFunctions.stringToUInt(filterValues);
                 f = new FilterDelegatesNewFinite(amount);
                 textForList += " (" + amount + ")";
                 break;
             }
             case EMBASSIES_EXCL: {
-                Set<String> addressees = stringToStringList(filterValues);
+                Set<String> addressees = StringFunctions.stringToStringList(filterValues);
                 f = new FilterEmbassies(addressees, false);
                 textForList += ": " + addressees;
                 break;
             }
             case EMBASSIES_INCL: {
-                Set<String> addressees = stringToStringList(filterValues);
+                Set<String> addressees = StringFunctions.stringToStringList(filterValues);
                 f = new FilterEmbassies(addressees, true);
                 textForList += ": " + addressees;
                 break;
             }
             case NATIONS_EXCL: {
-                Set<String> addressees = stringToStringList(filterValues);
+                Set<String> addressees = StringFunctions.stringToStringList(filterValues);
                 f = new FilterNations(addressees, false);
                 textForList += ": " + addressees;
                 break;
             }
             case NATIONS_INCL: {
-                Set<String> addressees = stringToStringList(filterValues);
+                Set<String> addressees = StringFunctions.stringToStringList(filterValues);
                 f = new FilterNations(addressees, true);
                 textForList += ": " + addressees;
                 break;
             }
             case NATIONS_NEW_MAX: {
-                int amount = stringToUInt(filterValues);
+                int amount = StringFunctions.stringToUInt(filterValues);
                 f = new FilterNationsNewFinite(amount);
                 textForList += " (" + amount + ")";
                 break;
@@ -607,7 +605,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                 f = new FilterNationsNew();
                 break;
             case NATIONS_REFOUNDED_MAX: {
-                int amount = stringToUInt(filterValues);
+                int amount = StringFunctions.stringToUInt(filterValues);
                 f = new FilterNationsRefoundedFinite(amount);
                 textForList += " (" + amount + ")";
                 break;
@@ -616,7 +614,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                 f = new FilterNationsRefounded();
                 break;
             case NATIONS_EJECTED_MAX: {
-                int amount = stringToUInt(filterValues);
+                int amount = StringFunctions.stringToUInt(filterValues);
                 f = new FilterNationsEjectedFinite(amount);
                 textForList += " (" + amount + ")";
                 break;
@@ -625,19 +623,21 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                 f = new FilterNationsEjected();
                 break;
             case REGIONS_EXCL: {
-                Set<String> addressees = stringToStringList(filterValues);
+                Set<String> addressees = StringFunctions.stringToStringList(filterValues);
                 f = new FilterRegions(addressees, false);
                 textForList += ": " + addressees;
                 break;
             }
             case REGIONS_INCL: {
-                Set<String> addressees = stringToStringList(filterValues);
+                Set<String> addressees = StringFunctions.stringToStringList(filterValues);
                 f = new FilterRegions(addressees, true);
                 textForList += ": " + addressees;
                 break;
             }
             case REGIONS_WITH_TAGS_EXCL: {
-                Set<RegionTag> recipients = stringsToRegionTags(stringToStringList(filterValues));
+                Set<RegionTag> recipients = StringFunctions.stringsToRegionTags(
+                        StringFunctions.stringToStringList(filterValues));
+
                 if (recipients.size() < 1) {
                     updateGui(Status.Idle);
                     TextAreaOutput.setText("No valid region tags recognized!\n");
@@ -648,7 +648,9 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                 break;
             }
             case REGIONS_WITH_TAGS_INCL: {
-                Set<RegionTag> recipients = stringsToRegionTags(stringToStringList(filterValues));
+                Set<RegionTag> recipients = StringFunctions.stringsToRegionTags(
+                        StringFunctions.stringToStringList(filterValues));
+
                 if (recipients.size() < 1) {
                     updateGui(Status.Idle);
                     TextAreaOutput.setText("No valid region tags recognized!\n");
@@ -659,7 +661,9 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                 break;
             }
             case REGIONS_WO_TAGS_EXCL: {
-                Set<RegionTag> recipients = stringsToRegionTags(stringToStringList(filterValues));
+                Set<RegionTag> recipients = StringFunctions.stringsToRegionTags(
+                        StringFunctions.stringToStringList(filterValues));
+
                 if (recipients.size() < 1) {
                     updateGui(Status.Idle);
                     TextAreaOutput.setText("No valid region tags recognized!\n");
@@ -670,7 +674,9 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                 break;
             }
             case REGIONS_WO_TAGS_INCL: {
-                Set<RegionTag> recipients = stringsToRegionTags(stringToStringList(filterValues));
+                Set<RegionTag> recipients = StringFunctions.stringsToRegionTags(
+                        StringFunctions.stringToStringList(filterValues));
+
                 if (recipients.size() < 1) {
                     updateGui(Status.Idle);
                     TextAreaOutput.setText("No valid region tags recognized!\n");
@@ -687,7 +693,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                 f = new FilterWAMembers(true);
                 break;
             case WA_MEMBERS_NEW_MAX: {
-                int amount = stringToUInt(filterValues);
+                int amount = StringFunctions.stringToUInt(filterValues);
                 f = new FilterWAMembersNewFinite(amount);
                 textForList += " (" + amount + ")";
                 break;
@@ -951,36 +957,6 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     }
 
     /**
-     * Converts a comma-separated string to a list of strings.
-     *
-     * @param string
-     * @return
-     */
-    private static Set<String> stringToStringList(String string) {
-        List<String> asList = Arrays.asList(string.trim().split("\\s*,\\s*"));
-        return asList.size() == 1 && asList.get(0).isEmpty() ? new HashSet<>() : new HashSet<>(asList);
-    }
-
-    /**
-     * Parses the supplied string values to a set of RegionTags. Strings that
-     * cannot be parsed are ignored.
-     *
-     * @param tagsStrSet The strings to parse
-     * @return The resulting RegionTags
-     */
-    private static Set<RegionTag> stringsToRegionTags(Set<String> tagsStrSet) {
-        final Set<RegionTag> tags = new HashSet();
-        tagsStrSet.stream().forEach(tagStr -> {
-            try {
-                tags.add(RegionTag.fromString(tagStr));
-            } catch (IllegalArgumentException ex) {
-                // Ignore because we don't care.
-            }
-        });
-        return tags;
-    }
-
-    /**
      * Utility function for printing messages to the output textarea that are
      * prefixed with a timestamp and suffixed with a newline. If called outside
      * the GUI thread, wrap this in SwingUtilities.invokeLater(...).
@@ -996,25 +972,6 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
             TextAreaOutput.setText(msg);
         } else {
             TextAreaOutput.append(msg);
-        }
-    }
-
-    /**
-     * Parses the supplied string to an unsigned int. If the supplied string is
-     * null or cannot be parsed, then 0 is returned.
-     *
-     * @param parseMe
-     * @return
-     */
-    private static int stringToUInt(String parseMe) {
-        if (parseMe == null) {
-            return 0;
-        }
-
-        try {
-            return Integer.parseUnsignedInt(parseMe);
-        } catch (NumberFormatException ex) {
-            return 0;
         }
     }
 
