@@ -3,6 +3,7 @@ package com.github.agadar.telegrammer.core.util;
 import com.github.agadar.nationstates.enumerator.RegionTag;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +39,7 @@ public final class StringFunctions {
      * @param tagsStrSet The strings to parse
      * @return The resulting RegionTags
      */
-    public static Set<RegionTag> stringsToRegionTags(Set<String> tagsStrSet) {
+    public static Set<RegionTag> stringsToRegionTags(Collection<String> tagsStrSet) {
         final Set<RegionTag> tags = new HashSet();
         tagsStrSet.stream().forEach(tagStr -> {
             try {

@@ -56,7 +56,7 @@ import javax.swing.text.DefaultCaret;
  */
 public final class NSTelegramForm extends javax.swing.JFrame implements TelegramManagerListener {
 
-    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer 1.4.0"; // Form title.  
+    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer Client 1.4.0"; // Form title.  
     private final static String BORDER = "------------------------------------------";  // Border for output text.
 
     private Thread CompileRecipientsWorker;  // Thread used for compiling address lists.
@@ -95,7 +95,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 
         // Attempt to set and verify user agent.
         try {
-            NationStates.setUserAgent("Agadar's Telegrammer (https://github.com/Agadar/NationStates-Telegrammer)");
+            NationStates.setUserAgent("Agadar's Telegrammer Client (https://github.com/Agadar/NationStates-Telegrammer)");
         } catch (NationStatesAPIException | IllegalArgumentException ex) {
             TextAreaOutput.setText(ex.getMessage());
         }

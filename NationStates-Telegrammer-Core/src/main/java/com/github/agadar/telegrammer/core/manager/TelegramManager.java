@@ -133,7 +133,7 @@ public final class TelegramManager {
      *
      */
     public void startSending() {
-        PropertiesManager propsManager = PropertiesManager.get();
+        final PropertiesManager propsManager = PropertiesManager.get();
 
         // Make sure all inputs are valid.
         if (propsManager.clientKey == null || propsManager.clientKey.isEmpty()) {
