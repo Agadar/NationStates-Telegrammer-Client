@@ -60,11 +60,13 @@ public class HistoryManager {
 
     /**
      * Saves the application's history data to the file.
+     * 
+     * @return True if saving succeeded, false otherwise.
      */
-    public void saveHistory() {
+    public boolean saveHistory() {
         // If there is no history, don't even bother.
         if (history == null || history.isEmpty()) {
-            return;
+            return true;
         }
 
         try {
@@ -76,14 +78,17 @@ public class HistoryManager {
                     .collect(Collectors.joining(System.lineSeparator()));
             Files.write(Paths.get(FILENAME), contents.getBytes()); // Write the resulting string to the file.
         } catch (IOException ex) {
-            // Silently ignore, because this is optional anyway.
+            return false;
         }
+        return true;
     }
 
     /**
      * Loads the application's history data from the file.
+     * 
+     * @return True if loading succeeded, false otherwise.
      */
-    public void loadHistory() {
+    public boolean loadHistory() {
         history = new HashMap<>(); // Ensure history is new and empty.
 
         // Break the history file contents into lines and iterate over them.
@@ -100,7 +105,8 @@ public class HistoryManager {
                 }
             });
         } catch (IOException ex) {
-            // History file probably doesn't exist yet, but that's okay.
+            return false;
         }
+        return true;
     }
 }

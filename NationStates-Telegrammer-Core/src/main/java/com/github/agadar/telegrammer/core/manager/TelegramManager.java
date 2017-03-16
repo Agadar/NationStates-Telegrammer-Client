@@ -2,7 +2,6 @@ package com.github.agadar.telegrammer.core.manager;
 
 import com.github.agadar.nationstates.NationStates;
 
-import com.github.agadar.telegrammer.core.enums.SkippedRecipientReason;
 import com.github.agadar.telegrammer.core.event.TelegramManagerListener;
 import com.github.agadar.telegrammer.core.filter.abstractfilter.Filter;
 import com.github.agadar.telegrammer.core.runnable.SendTelegramsRunnable;
@@ -10,11 +9,9 @@ import com.github.agadar.telegrammer.core.util.Tuple;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**

@@ -42,10 +42,12 @@ public class PropertiesManager {
 
     /**
      * Saves the application's properties to the file.
+     * 
+     * @return True if saving succeeded, false otherwise.
      */
-    public void saveProperties() {
+    public boolean saveProperties() {
         // Prepare properties object.
-        Properties props = new Properties();
+        final Properties props = new Properties();
         props.setProperty("clientKey", clientKey == null ? DEFAULT_STRING_VAL : clientKey);
         props.setProperty("telegramId", telegramId == null ? DEFAULT_STRING_VAL : telegramId);
         props.setProperty("secretKey", secretKey == null ? DEFAULT_STRING_VAL : secretKey);
@@ -57,21 +59,24 @@ public class PropertiesManager {
         try (OutputStream output = new FileOutputStream(FILENAME)) {
             props.store(output, null);
         } catch (IOException io) {
-            // Silently ignore this, as saving properties is only optional anyway.
+            return false;
         }
+        return true;
     }
 
     /**
      * Loads the application's properties from the file.
+     * 
+     * @return True if loading succeeded, false otherwise.
      */
-    public void loadProperties() {
-        Properties props = new Properties();
+    public boolean loadProperties() {
+        final Properties props = new Properties();
 
         // Load from file.
         try (InputStream input = new FileInputStream(FILENAME);) {
             props.load(input);
         } catch (IOException ex) {
-            // Properties file doesn't exist yet. We silently ignore this.
+            return false;
         }
 
         // Set variables.
@@ -81,6 +86,7 @@ public class PropertiesManager {
         lastTelegramType = valueOf(TelegramType.class, props.getProperty("telegramType"), TelegramType.NORMAL);
         fromRegion = props.getProperty("fromRegion", DEFAULT_STRING_VAL);
         dryRun = Boolean.valueOf(props.getProperty("dryRun", DEFAULT_BOOL_VAL));
+        return true;
     }
 
     /**
