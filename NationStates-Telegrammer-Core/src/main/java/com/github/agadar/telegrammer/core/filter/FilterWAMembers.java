@@ -28,17 +28,16 @@ public class FilterWAMembers extends FilterAddOrRemove {
         }
 
         // Query global cache, set local cache to it if what we search was found.
-        if (GLOBAL_CACHE.WaMembers != null) {
-            nations = GLOBAL_CACHE.WaMembers;
+        if (GLOBAL_CACHE.waMembers != null) {
+            nations = GLOBAL_CACHE.waMembers;
             return;
         }
 
         // If global cache does not contain what we need, do an API call to
         // retrieve the data, then store it in global cache and local cache.
         final WorldAssembly wa = NationStates.worldAssembly(Council.SECURITY_COUNCIL).shards(WorldAssemblyShard.MEMBERS).execute();
-        GLOBAL_CACHE.WaMembers = new HashSet<>(wa.members);
-        nations = GLOBAL_CACHE.WaMembers;
-
+        GLOBAL_CACHE.waMembers = new HashSet<>(wa.members);
+        nations = GLOBAL_CACHE.waMembers;
         cantRetrieveMoreNations = true;
     }
 }

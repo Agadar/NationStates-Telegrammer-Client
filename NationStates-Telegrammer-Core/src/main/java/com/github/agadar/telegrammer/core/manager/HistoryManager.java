@@ -60,7 +60,7 @@ public class HistoryManager {
 
     /**
      * Saves the application's history data to the file.
-     * 
+     *
      * @return True if saving succeeded, false otherwise.
      */
     public boolean saveHistory() {
@@ -72,8 +72,8 @@ public class HistoryManager {
         try {
             // Parse all entries to a single string.
             final String contents = history.entrySet().stream()
-                    .map(historyEntry -> historyEntry.getKey().X
-                            + SPLITSTRING + historyEntry.getKey().Y
+                    .map(historyEntry -> historyEntry.getKey().x
+                            + SPLITSTRING + historyEntry.getKey().y
                             + SPLITSTRING + historyEntry.getValue().name())
                     .collect(Collectors.joining(System.lineSeparator()));
             Files.write(Paths.get(FILENAME), contents.getBytes()); // Write the resulting string to the file.
@@ -85,7 +85,7 @@ public class HistoryManager {
 
     /**
      * Loads the application's history data from the file.
-     * 
+     *
      * @return True if loading succeeded, false otherwise.
      */
     public boolean loadHistory() {

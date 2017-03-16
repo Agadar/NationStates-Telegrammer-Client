@@ -23,17 +23,16 @@ public class FilterAll extends Filter {
         }
 
         // Query global cache, set local cache to it if what we search was found.
-        if (GLOBAL_CACHE.All != null) {
-            nations = GLOBAL_CACHE.All;
+        if (GLOBAL_CACHE.all != null) {
+            nations = GLOBAL_CACHE.all;
             return;
         }
 
         // If global cache does not contain what we need, do an API call to
         // retrieve the data, then store it in global cache and local cache.
         final World w = NationStates.world(WorldShard.NATIONS).execute();
-        GLOBAL_CACHE.All = new HashSet<>(w.nations);
-        nations = GLOBAL_CACHE.All;
-
+        GLOBAL_CACHE.all = new HashSet<>(w.nations);
+        nations = GLOBAL_CACHE.all;
         cantRetrieveMoreNations = true;
     }
 }

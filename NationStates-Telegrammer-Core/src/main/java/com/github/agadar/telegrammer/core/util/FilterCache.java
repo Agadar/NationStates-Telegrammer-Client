@@ -19,26 +19,26 @@ import java.util.Set;
  */
 public class FilterCache {
 
-    private final Map<String, Set<String>> NationsToRegions;            // nations mapped to regions
-    private final Map<Set<RegionTag>, Set<String>> RegionsToTagsWith;      // regions mapped to tags they have
-    private final Map<Set<RegionTag>, Set<String>> RegionsToTagsWithout;   // regions mapped to tags they don't have
-    private final Map<String, Set<String>> EmbassiesToRegions;          // embassy regions mapped to regions
-    private boolean HasImportedDumpFile = false;                        // indicates whether or not the dump file has been imported yet
+    private final Map<String, Set<String>> nationsToRegions;            // nations mapped to regions
+    private final Map<Set<RegionTag>, Set<String>> regionsToTagsWith;      // regions mapped to tags they have
+    private final Map<Set<RegionTag>, Set<String>> regionsToTagsWithout;   // regions mapped to tags they don't have
+    private final Map<String, Set<String>> embassiesToRegions;          // embassy regions mapped to regions
+    private boolean hasImportedDumpFile = false;                        // indicates whether or not the dump file has been imported yet
 
-    public Set<String> Delegates;   // world assembly delegates
-    public Set<String> WaMembers;   // world assembly members
-    public Set<String> All;         // all nations
+    public Set<String> delegates;   // world assembly delegates
+    public Set<String> waMembers;   // world assembly members
+    public Set<String> all;         // all nations
 
     public FilterCache() {
-        NationsToRegions = new HashMap<>();
-        RegionsToTagsWith = new HashMap<>();
-        RegionsToTagsWithout = new HashMap<>();
-        EmbassiesToRegions = new HashMap<>();
+        nationsToRegions = new HashMap<>();
+        regionsToTagsWith = new HashMap<>();
+        regionsToTagsWithout = new HashMap<>();
+        embassiesToRegions = new HashMap<>();
     }
 
     public void importDumpFile() {
         // Only if the dump file hasn't already been imported, import the dump file.
-        if (HasImportedDumpFile) {
+        if (hasImportedDumpFile) {
             return;
         }
 
@@ -63,23 +63,23 @@ public class FilterCache {
             switch (n.worldAssemblyStatus) // Using hard-coded strings for now. Replace with enum once implemented in wrapper.
             {
                 case MEMBER:
-                    if (WaMembers == null) // Instantiate first if set is null.
+                    if (waMembers == null) // Instantiate first if set is null.
                     {
-                        WaMembers = new HashSet<>();
+                        waMembers = new HashSet<>();
                     }
-                    WaMembers.add(n.name);              // Now add to WA members.
+                    waMembers.add(n.name);              // Now add to WA members.
                     break;
                 case DELEGATE:
-                    if (Delegates == null) // Instantiate first if set is null.
+                    if (delegates == null) // Instantiate first if set is null.
                     {
-                        Delegates = new HashSet<>();
+                        delegates = new HashSet<>();
                     }
-                    Delegates.add(n.name);              // Now add to WA delegates.
+                    delegates.add(n.name);              // Now add to WA delegates.
                     break;
             }
         }
 
-        HasImportedDumpFile = true;
+        hasImportedDumpFile = true;
     }
 
     /**
@@ -89,11 +89,11 @@ public class FilterCache {
      * @param embassy
      */
     public void mapEmbassyToRegion(String region, String embassy) {
-        Set<String> embassies = EmbassiesToRegions.get(region);
+        Set<String> embassies = embassiesToRegions.get(region);
 
         if (embassies == null) {
             embassies = new HashSet<>();
-            EmbassiesToRegions.put(region, embassies);
+            embassiesToRegions.put(region, embassies);
         }
 
         embassies.add(embassy);
@@ -106,7 +106,7 @@ public class FilterCache {
      * @param embassies
      */
     public void mapEmbassiesToRegion(String region, Set<String> embassies) {
-        EmbassiesToRegions.put(region, embassies);
+        embassiesToRegions.put(region, embassies);
     }
 
     /**
@@ -116,7 +116,7 @@ public class FilterCache {
      * @return
      */
     public Set<String> getEmbassies(String region) {
-        return EmbassiesToRegions.get(region);
+        return embassiesToRegions.get(region);
     }
 
     /**
@@ -126,11 +126,11 @@ public class FilterCache {
      * @param nation
      */
     public void mapNationToRegion(String region, String nation) {
-        Set<String> nations = NationsToRegions.get(region);
+        Set<String> nations = nationsToRegions.get(region);
 
         if (nations == null) {
             nations = new HashSet<>();
-            NationsToRegions.put(region, nations);
+            nationsToRegions.put(region, nations);
         }
 
         nations.add(nation);
@@ -143,7 +143,7 @@ public class FilterCache {
      * @param nations
      */
     public void mapNationsToRegion(String region, Set<String> nations) {
-        NationsToRegions.put(region, nations);
+        nationsToRegions.put(region, nations);
     }
 
     /**
@@ -153,7 +153,7 @@ public class FilterCache {
      * @return
      */
     public Set<String> getNationsInRegion(String region) {
-        return NationsToRegions.get(region);
+        return nationsToRegions.get(region);
     }
 
     /**
@@ -163,7 +163,7 @@ public class FilterCache {
      * @param regions
      */
     public void mapRegionsToTagsWith(Set<RegionTag> tags, Set<String> regions) {
-        RegionsToTagsWith.put(tags, regions);
+        regionsToTagsWith.put(tags, regions);
     }
 
     /**
@@ -173,7 +173,7 @@ public class FilterCache {
      * @return
      */
     public Set<String> getRegionsToTagsWith(Set<RegionTag> tags) {
-        return RegionsToTagsWith.get(tags);
+        return regionsToTagsWith.get(tags);
     }
 
     /**
@@ -183,7 +183,7 @@ public class FilterCache {
      * @param regions
      */
     public void mapRegionsToTagsWithout(Set<RegionTag> tags, Set<String> regions) {
-        RegionsToTagsWithout.put(tags, regions);
+        regionsToTagsWithout.put(tags, regions);
     }
 
     /**
@@ -193,6 +193,6 @@ public class FilterCache {
      * @return
      */
     public Set<String> getRegionsToTagsWithout(Set<RegionTag> tags) {
-        return RegionsToTagsWithout.get(tags);
+        return regionsToTagsWithout.get(tags);
     }
 }

@@ -12,19 +12,19 @@ import java.util.Objects;
  */
 public class Tuple<X, Y> {
 
-    public final X X;
-    public final Y Y;
+    public final X x;
+    public final Y y;
 
     public Tuple(X x, Y y) {
-        this.X = x;
-        this.Y = y;
+        this.x = x;
+        this.y = y;
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 53 * hash + Objects.hashCode(this.X);
-        hash = 53 * hash + Objects.hashCode(this.Y);
+        hash = 53 * hash + Objects.hashCode(this.x);
+        hash = 53 * hash + Objects.hashCode(this.y);
         return hash;
     }
 
@@ -40,9 +40,9 @@ public class Tuple<X, Y> {
             return false;
         }
         final Tuple<?, ?> other = (Tuple<?, ?>) obj;
-        if (!Objects.equals(this.X, other.X)) {
+        if (!Objects.equals(this.x, other.x)) {
             return false;
         }
-        return Objects.equals(this.Y, other.Y);
+        return Objects.equals(this.y, other.y);
     }
 }

@@ -28,17 +28,16 @@ public class FilterDelegates extends FilterAddOrRemove {
         }
 
         // Query global cache, set local cache to it if what we search was found.
-        if (GLOBAL_CACHE.Delegates != null) {
-            nations = GLOBAL_CACHE.Delegates;
+        if (GLOBAL_CACHE.delegates != null) {
+            nations = GLOBAL_CACHE.delegates;
             return;
         }
 
         // If global cache does not contain what we need, do an API call to
         // retrieve the data, then store it in global cache and local cache.
         final WorldAssembly wa = NationStates.worldAssembly(Council.SECURITY_COUNCIL).shards(WorldAssemblyShard.DELEGATES).execute();
-        GLOBAL_CACHE.Delegates = new HashSet<>(wa.delegates);
-        nations = GLOBAL_CACHE.Delegates;
-
+        GLOBAL_CACHE.delegates = new HashSet<>(wa.delegates);
+        nations = GLOBAL_CACHE.delegates;
         cantRetrieveMoreNations = true;
     }
 }
