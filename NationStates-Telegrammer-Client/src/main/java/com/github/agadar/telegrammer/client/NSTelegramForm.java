@@ -36,7 +36,6 @@ import com.github.agadar.telegrammer.core.filter.FilterWAMembersNewFinite;
 import com.github.agadar.telegrammer.core.filter.abstractfilter.Filter;
 import com.github.agadar.telegrammer.core.manager.PropertiesManager;
 import com.github.agadar.telegrammer.core.manager.TelegramManager;
-import com.github.agadar.telegrammer.core.manager.HistoryManager;
 import com.github.agadar.telegrammer.core.util.StringFunctions;
 
 import java.awt.event.ItemEvent;
@@ -748,7 +747,6 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     {//GEN-HEADEREND:event_formWindowClosing
         // Store relevant variables to properties and history files.
         PropertiesManager.get().saveProperties();
-        HistoryManager.get().saveHistory();
     }//GEN-LAST:event_formWindowClosing
 
     /**

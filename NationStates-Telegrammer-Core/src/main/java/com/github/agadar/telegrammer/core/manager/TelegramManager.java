@@ -5,7 +5,6 @@ import com.github.agadar.nationstates.NationStates;
 import com.github.agadar.telegrammer.core.event.TelegramManagerListener;
 import com.github.agadar.telegrammer.core.filter.abstractfilter.Filter;
 import com.github.agadar.telegrammer.core.runnable.SendTelegramsRunnable;
-import com.github.agadar.telegrammer.core.util.Tuple;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -192,7 +191,7 @@ public final class TelegramManager {
      */
     public void removeOldRecipients(Set<String> nations) {
         for (final Iterator<String> it = nations.iterator(); it.hasNext();) {
-            if (HistoryManager.get().history.get(new Tuple(PropertiesManager.get().telegramId, it.next())) != null) {
+            if (HistoryManager.get().getSkippedRecipientReason(PropertiesManager.get().telegramId, it.next()) != null) {
                 it.remove();   // Remove recipient
             }
         }

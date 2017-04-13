@@ -6,11 +6,13 @@ import com.github.agadar.telegrammer.core.util.Tuple;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -18,7 +20,7 @@ import java.util.stream.Stream;
  *
  * @author Agadar (https://github.com/Agadar/)
  */
-public class HistoryManager {
+public final class HistoryManager {
 
     /**
      * The singleton.
@@ -28,7 +30,7 @@ public class HistoryManager {
     /**
      * Default file name.
      */
-    private static final String FILENAME = ".nationstates-telegrammer.history";
+    private static final Path HISTORY_FILE = Paths.get(".nationstates-telegrammer.history");
 
     /**
      * Default split string.
@@ -38,7 +40,7 @@ public class HistoryManager {
     /**
      * The history data retrieved from and saved to the file.
      */
-    public Map<Tuple<String, String>, SkippedRecipientReason> history;
+    private Map<Tuple<String, String>, SkippedRecipientReason> history;
 
     /**
      * Gets this class's singleton.
@@ -59,24 +61,50 @@ public class HistoryManager {
     }
 
     /**
-     * Saves the application's history data to the file.
+     * Gets the SkippedRecipientReason mapped to the given telegramId and
+     * recipient.
      *
-     * @return True if saving succeeded, false otherwise.
+     * @param telegramId
+     * @param recipient
+     * @return The SkippedRecipientReason mapped to the given telegramId and
+     * recipient, otherwise null.
      */
-    public boolean saveHistory() {
-        // If there is no history, don't even bother.
-        if (history == null || history.isEmpty()) {
-            return true;
+    public SkippedRecipientReason getSkippedRecipientReason(String telegramId, String recipient) {
+        return history.get(new Tuple(telegramId, recipient));
+    }
+
+    /**
+     * Saves a new entry in the telegram history and persists it to the history
+     * file.
+     *
+     * @param telegramId Id of the sent telegram.
+     * @param recipient Recipient of the sent telegram.
+     * @param reason The reason for storing in history.
+     * @return True if successful, otherwise false.
+     */
+    public boolean saveHistory(String telegramId, String recipient, SkippedRecipientReason reason) {
+        // If the history is null, instantiate it.
+        if (history == null) {
+            history = new HashMap<>();
         }
 
+        // Add the new entry to the history.
+        history.put(new Tuple(telegramId, recipient), reason);
+
+        // Make sure the history file exists. If not, create it.
+        if (!Files.exists(HISTORY_FILE)) {
+            try {
+                Files.createFile(HISTORY_FILE);
+            } catch (IOException ex) {
+                return false;
+            }
+        }
+
+        // Persist the new entry to the history file.
+        final String entry = telegramId + SPLITSTRING + recipient + SPLITSTRING
+                + reason.name() + System.lineSeparator();
         try {
-            // Parse all entries to a single string.
-            final String contents = history.entrySet().stream()
-                    .map(historyEntry -> historyEntry.getKey().x
-                            + SPLITSTRING + historyEntry.getKey().y
-                            + SPLITSTRING + historyEntry.getValue().name())
-                    .collect(Collectors.joining(System.lineSeparator()));
-            Files.write(Paths.get(FILENAME), contents.getBytes()); // Write the resulting string to the file.
+            Files.write(HISTORY_FILE, entry.getBytes(), StandardOpenOption.APPEND);
         } catch (IOException ex) {
             return false;
         }
@@ -92,7 +120,7 @@ public class HistoryManager {
         history = new HashMap<>(); // Ensure history is new and empty.
 
         // Break the history file contents into lines and iterate over them.
-        try (final Stream<String> lines = Files.lines(Paths.get(FILENAME), Charset.defaultCharset())) {
+        try (final Stream<String> lines = Files.lines(HISTORY_FILE, Charset.defaultCharset())) {
             lines.map(line -> line.split(SPLITSTRING)).filter(splitLine -> splitLine.length >= 3).forEach(splitLine -> {
                 try {
                     // Try parse the reason string to the correct type. If this succeeds, the line was succesfully parsed,

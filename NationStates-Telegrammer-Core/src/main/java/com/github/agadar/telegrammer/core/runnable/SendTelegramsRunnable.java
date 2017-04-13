@@ -18,7 +18,6 @@ import com.github.agadar.telegrammer.core.manager.HistoryManager;
 import com.github.agadar.telegrammer.core.manager.PropertiesManager;
 import com.github.agadar.telegrammer.core.manager.TelegramManager;
 import com.github.agadar.telegrammer.core.util.QueuedStats;
-import com.github.agadar.telegrammer.core.util.Tuple;
 
 import java.util.Set;
 
@@ -161,9 +160,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
         // so there is no need to make sure the entry for the current Telegram Id
         // changed.       
         if (event.queued) {
-            HistoryManager.get().history.put(
-                    new Tuple(propertiesManager.telegramId, event.recipient),
-                    SkippedRecipientReason.PREVIOUS_RECIPIENT);
+            HistoryManager.get().saveHistory(propertiesManager.telegramId, event.recipient, SkippedRecipientReason.PREVIOUS_RECIPIENT);
             queuedStats.registerSucces(event.recipient);
         } else {
             queuedStats.registerFailure(event.recipient, null);
@@ -258,7 +255,7 @@ public class SendTelegramsRunnable implements Runnable, TelegramSentListener {
         if (reason != null) {
             queuedStats.registerFailure(recipient, reason);
             recipients.remove(recipient);
-            HistoryManager.get().history.put(new Tuple(propertiesManager.telegramId, recipient), reason);
+            HistoryManager.get().saveHistory(propertiesManager.telegramId, recipient, reason);
             final RecipientRemovedEvent event = new RecipientRemovedEvent(this, recipient, reason);
 
             synchronized (listeners) {
