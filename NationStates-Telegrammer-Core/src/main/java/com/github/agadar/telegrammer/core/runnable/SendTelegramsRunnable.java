@@ -20,7 +20,6 @@ import com.github.agadar.telegrammer.core.manager.TelegramManager;
 import com.github.agadar.telegrammer.core.util.QueuedStats;
 import com.github.agadar.telegrammer.core.util.Tuple;
 
-import java.util.Map;
 import java.util.Set;
 
 /**

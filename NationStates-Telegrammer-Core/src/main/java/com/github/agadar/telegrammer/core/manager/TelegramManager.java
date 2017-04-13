@@ -128,11 +128,13 @@ public final class TelegramManager {
     }
 
     /**
-     * Starts sending the telegram to the recipients in a new thread. Throws
-     * IllegalArgumentException if the variables are not properly set.
+     * Starts sending the telegram to the recipients.
      *
+     * @param nonblocking If true, then the telegrams will be sent in a new
+     * thread.
+     * @throws IllegalArgumentException If the variables are not properly set.
      */
-    public void startSending() {
+    public void startSending(boolean nonblocking) {
         final PropertiesManager propsManager = PropertiesManager.get();
 
         // Make sure all inputs are valid.
@@ -151,22 +153,31 @@ public final class TelegramManager {
             throw new IllegalThreadStateException("Telegram thread already running!");
         }
 
-        //refreshFilters(true);   // Refresh filters one last time before checking # of recipients
+        // Make sure there is at least one recipient to send the telegram to.
         if (numberOfRecipients() == 0 && cantRetrieveMoreNations()) {
             throw new IllegalArgumentException("Please supply at least one recipient!");
         }
 
-        // removeOldRecipients(true);  // Remove old recipients.
-        NationStates.setUserAgent(String.format(USER_AGENT, propsManager.clientKey)); // Update user agent.
+        // Update user agent.
+        NationStates.setUserAgent(String.format(USER_AGENT, propsManager.clientKey));
 
-        // Prepare thread, then run it.
-        telegramThread = new Thread(new SendTelegramsRunnable(this, recipients, listeners,
-                NO_ADDRESSEES_FOUND_TIMEOUT, propsManager));
-        telegramThread.start();
+        // Prepare the runnable.
+        final SendTelegramsRunnable sendTelegramsRunnable
+                = new SendTelegramsRunnable(this, recipients, listeners, NO_ADDRESSEES_FOUND_TIMEOUT, propsManager);
+
+        // Depending on the 'nonblocking' choice, either run the runnable in a new thread,
+        // or just call its start() method on this thread.
+        if (nonblocking) {
+            telegramThread = new Thread(sendTelegramsRunnable);
+            telegramThread.start();
+        } else {
+            sendTelegramsRunnable.run();
+        }
     }
 
     /**
-     * Stops sending the telegram to the recipients.
+     * Stops sending the telegram to the recipients. Does nothing if
+     * startSending
      */
     public void stopSending() {
         if (telegramThread != null) {

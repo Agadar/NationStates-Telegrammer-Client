@@ -483,7 +483,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         TextAreaOutput.setText(duration());
 
         try {
-            TelegramManager.get().startSending();  // start sending telegrams
+            TelegramManager.get().startSending(true);  // start sending telegrams
         } catch (Exception ex) {
             // if something went wrong while starting sending telegrams, reset GUI
             TextAreaOutput.setText(ex.getMessage() + "\n");

@@ -23,7 +23,6 @@ import com.github.agadar.telegrammer.core.filter.FilterRegionsWithoutTags;
 import com.github.agadar.telegrammer.core.filter.FilterWAMembers;
 import com.github.agadar.telegrammer.core.filter.FilterWAMembersNew;
 import com.github.agadar.telegrammer.core.filter.FilterWAMembersNewFinite;
-import com.github.agadar.telegrammer.core.filter.abstractfilter.Filter;
 import com.github.agadar.telegrammer.core.manager.HistoryManager;
 import com.github.agadar.telegrammer.core.manager.PropertiesManager;
 import com.github.agadar.telegrammer.core.manager.TelegramManager;
@@ -64,7 +63,7 @@ public class Main {
      * Default split string.
      */
     private static final String SPLITSTRING = ",";
-    
+
     /**
      * The TelegramManager used throughout the program.
      */
@@ -94,143 +93,9 @@ public class Main {
         // Retrieve history.
         HistoryManager.get().loadHistory();
 
-        // Break the filters file contents into lines and iterate over them.
-        try (final Stream<String> lines = Files.lines(Paths.get(FILTERS_FILENAME), Charset.defaultCharset())) {
-            lines.filter(line -> line != null && !line.isEmpty()).map(line -> line.split(SPLITSTRING)).forEach(splitLine -> {
-
-                // Try parsing the filter type, which should be the first item in line.
-                FilterType filterType;
-                try {
-                    filterType = FilterType.valueOf(splitLine[0]);
-                } catch (IllegalArgumentException | NullPointerException ex) {
-                    // Failed to parse the filter type, so we log it and skip it.
-                    LOGGER.log(Level.WARNING, "Failed to parse value ''{0}'' to a filter type", splitLine[0]);
-                    return;
-                }
-
-                // If the FilterType is any of the given types but does not list
-                // at least one parameter, then log it and skip it.
-                if (!(filterType == FilterType.ALL || filterType == FilterType.DELEGATES_EXCL
-                        || filterType == FilterType.DELEGATES_INCL || filterType == FilterType.DELEGATES_NEW
-                        || filterType == FilterType.NATIONS_NEW || filterType == FilterType.NATIONS_REFOUNDED
-                        || filterType == FilterType.NATIONS_EJECTED || filterType == FilterType.WA_MEMBERS_EXCL
-                        || filterType == FilterType.WA_MEMBERS_INCL || filterType == FilterType.WA_MEMBERS_NEW)
-                        && splitLine.length < 2) {
-                    LOGGER.log(Level.WARNING, "Parsed filter type requires parameters, but none supplied");
-                    return;
-                }
-                final List<String> argumentsList = new ArrayList<>(Arrays.asList(splitLine));
-                argumentsList.remove(0);    // Remove first element, which is the filter type.
-
-                // Instantiate a new filter according to the type and the parameters.
-                switch (filterType) {
-                    case ALL:
-                        TG_MANAGER.addFilter(new FilterAll());
-                        break;
-                    case DELEGATES_EXCL:
-                        TG_MANAGER.addFilter(new FilterDelegates(false));
-                        break;
-                    case DELEGATES_INCL:
-                        TG_MANAGER.addFilter(new FilterDelegates(true));
-                        break;
-                    case DELEGATES_NEW:
-                        TG_MANAGER.addFilter(new FilterDelegatesNew());
-                        break;
-                    case DELEGATES_NEW_MAX: {
-                        final int amount = StringFunctions.stringToUInt(argumentsList.get(0));
-                        TG_MANAGER.addFilter(new FilterDelegatesNewFinite(amount));
-                        break;
-                    }
-                    case EMBASSIES_EXCL:
-                        TG_MANAGER.addFilter(new FilterEmbassies(new HashSet<>(argumentsList), false));
-                        break;
-                    case EMBASSIES_INCL:
-                        TG_MANAGER.addFilter(new FilterEmbassies(new HashSet<>(argumentsList), true));
-                        break;
-                    case NATIONS_EXCL:
-                        TG_MANAGER.addFilter(new FilterNations(new HashSet<>(argumentsList), false));
-                        break;
-                    case NATIONS_INCL:
-                        TG_MANAGER.addFilter(new FilterNations(new HashSet<>(argumentsList), true));
-                        break;
-                    case NATIONS_NEW_MAX: {
-                        final int amount = StringFunctions.stringToUInt(argumentsList.get(0));
-                        TG_MANAGER.addFilter(new FilterNationsNewFinite(amount));
-                        break;
-                    }
-                    case NATIONS_NEW:
-                        TG_MANAGER.addFilter(new FilterNationsNew());
-                        break;
-                    case NATIONS_REFOUNDED_MAX: {
-                        final int amount = StringFunctions.stringToUInt(argumentsList.get(0));
-                        TG_MANAGER.addFilter(new FilterNationsRefoundedFinite(amount));
-                        break;
-                    }
-                    case NATIONS_REFOUNDED:
-                        TG_MANAGER.addFilter(new FilterNationsRefounded());
-                        break;
-                    case NATIONS_EJECTED_MAX: {
-                        final int amount = StringFunctions.stringToUInt(argumentsList.get(0));
-                        TG_MANAGER.addFilter(new FilterNationsEjectedFinite(amount));
-                        break;
-                    }
-                    case NATIONS_EJECTED:
-                        TG_MANAGER.addFilter(new FilterNationsEjected());
-                        break;
-                    case REGIONS_EXCL:
-                        TG_MANAGER.addFilter(new FilterRegions(new HashSet<>(argumentsList), false));
-                        break;
-                    case REGIONS_INCL:
-                        TG_MANAGER.addFilter(new FilterRegions(new HashSet<>(argumentsList), true));
-                        break;
-                    case REGIONS_WITH_TAGS_EXCL: {
-                        final Set<RegionTag> recipients = StringFunctions.stringsToRegionTags(argumentsList);
-                        if (recipients.size() > 0) {
-                            TG_MANAGER.addFilter(new FilterRegionsWithTags(recipients, false));
-                        }
-                        break;
-                    }
-                    case REGIONS_WITH_TAGS_INCL: {
-                        final Set<RegionTag> recipients = StringFunctions.stringsToRegionTags(argumentsList);
-                        if (recipients.size() > 0) {
-                            TG_MANAGER.addFilter(new FilterRegionsWithTags(recipients, true));
-                        }
-                        break;
-                    }
-                    case REGIONS_WO_TAGS_EXCL: {
-                        final Set<RegionTag> recipients = StringFunctions.stringsToRegionTags(argumentsList);
-                        if (recipients.size() > 0) {
-                            TG_MANAGER.addFilter(new FilterRegionsWithoutTags(recipients, false));
-                        }
-                        break;
-                    }
-                    case REGIONS_WO_TAGS_INCL: {
-                        final Set<RegionTag> recipients = StringFunctions.stringsToRegionTags(argumentsList);
-                        if (recipients.size() > 0) {
-                            TG_MANAGER.addFilter(new FilterRegionsWithoutTags(recipients, true));
-                        }
-                        break;
-                    }
-                    case WA_MEMBERS_EXCL:
-                        TG_MANAGER.addFilter(new FilterWAMembers(false));
-                        break;
-                    case WA_MEMBERS_INCL:
-                        TG_MANAGER.addFilter(new FilterWAMembers(true));
-                        break;
-                    case WA_MEMBERS_NEW_MAX: {
-                        final int amount = StringFunctions.stringToUInt(argumentsList.get(0));
-                        TG_MANAGER.addFilter(new FilterWAMembersNewFinite(amount));
-                        break;
-                    }
-                    case WA_MEMBERS_NEW:
-                        TG_MANAGER.addFilter(new FilterWAMembersNew());
-                        break;
-                    default:
-                        LOGGER.log(Level.WARNING, "Unsupported filter type: ''{0}''", filterType.name());
-                        break;
-                }
-
-            });
+        // Retrieve and parse filters.
+        try {
+            retrieveAndParseFilters(FILTERS_FILENAME, SPLITSTRING, TG_MANAGER, LOGGER);
         } catch (IOException ex) {
             // The file probably doesn't exist. Log it and exit.
             LOGGER.log(Level.WARNING, "Failed to load filters file", ex);
@@ -242,10 +107,162 @@ public class Main {
             LOGGER.log(Level.WARNING, "No recipients could be generated with the supplied filters");
             System.exit(1);
         }
-        TG_MANAGER.startSending();
-        
-        // solve threading problem with startSending
+        TG_MANAGER.startSending(false);
+
         
     }
 
+    /**
+     * Retrieves and parses the filters from the filter file, adding them to the
+     * telegram manager.
+     *
+     * @param fileName
+     * @param splitter
+     * @param telegramManager
+     * @param logger
+     * @throws IOException if the file was not found
+     */
+    private static void retrieveAndParseFilters(String fileName, String splitter,
+            TelegramManager telegramManager, Logger logger) throws IOException {
+        // Break the filters file contents into lines and iterate over them.
+        try (final Stream<String> lines = Files.lines(Paths.get(fileName), Charset.defaultCharset())) {
+            lines.filter(line -> line != null && !line.isEmpty()).map(line -> line.split(splitter)).forEach(splitLine -> {
+
+                // Try parsing the filter type, which should be the first item in line.
+                FilterType filterType;
+                try {
+                    filterType = FilterType.valueOf(splitLine[0]);
+                } catch (IllegalArgumentException | NullPointerException ex) {
+                    // Failed to parse the filter type, so we log it and skip it.
+                    logger.log(Level.WARNING, "Failed to parse value ''{0}'' to a filter type", splitLine[0]);
+                    return;
+                }
+
+                // If the FilterType is any of the given types but does not list
+                // at least one parameter, then log it and skip it.
+                if (!(filterType == FilterType.ALL || filterType == FilterType.DELEGATES_EXCL
+                        || filterType == FilterType.DELEGATES_INCL || filterType == FilterType.DELEGATES_NEW
+                        || filterType == FilterType.NATIONS_NEW || filterType == FilterType.NATIONS_REFOUNDED
+                        || filterType == FilterType.NATIONS_EJECTED || filterType == FilterType.WA_MEMBERS_EXCL
+                        || filterType == FilterType.WA_MEMBERS_INCL || filterType == FilterType.WA_MEMBERS_NEW)
+                        && splitLine.length < 2) {
+                    logger.log(Level.WARNING, "Parsed filter type requires parameters, but none supplied");
+                    return;
+                }
+                final List<String> argumentsList = new ArrayList<>(Arrays.asList(splitLine));
+                argumentsList.remove(0);    // Remove first element, which is the filter type.
+
+                // Instantiate a new filter according to the type and the parameters.
+                switch (filterType) {
+                    case ALL:
+                        telegramManager.addFilter(new FilterAll());
+                        break;
+                    case DELEGATES_EXCL:
+                        telegramManager.addFilter(new FilterDelegates(false));
+                        break;
+                    case DELEGATES_INCL:
+                        telegramManager.addFilter(new FilterDelegates(true));
+                        break;
+                    case DELEGATES_NEW:
+                        telegramManager.addFilter(new FilterDelegatesNew());
+                        break;
+                    case DELEGATES_NEW_MAX: {
+                        final int amount = StringFunctions.stringToUInt(argumentsList.get(0));
+                        telegramManager.addFilter(new FilterDelegatesNewFinite(amount));
+                        break;
+                    }
+                    case EMBASSIES_EXCL:
+                        telegramManager.addFilter(new FilterEmbassies(new HashSet<>(argumentsList), false));
+                        break;
+                    case EMBASSIES_INCL:
+                        telegramManager.addFilter(new FilterEmbassies(new HashSet<>(argumentsList), true));
+                        break;
+                    case NATIONS_EXCL:
+                        telegramManager.addFilter(new FilterNations(new HashSet<>(argumentsList), false));
+                        break;
+                    case NATIONS_INCL:
+                        telegramManager.addFilter(new FilterNations(new HashSet<>(argumentsList), true));
+                        break;
+                    case NATIONS_NEW_MAX: {
+                        final int amount = StringFunctions.stringToUInt(argumentsList.get(0));
+                        telegramManager.addFilter(new FilterNationsNewFinite(amount));
+                        break;
+                    }
+                    case NATIONS_NEW:
+                        telegramManager.addFilter(new FilterNationsNew());
+                        break;
+                    case NATIONS_REFOUNDED_MAX: {
+                        final int amount = StringFunctions.stringToUInt(argumentsList.get(0));
+                        telegramManager.addFilter(new FilterNationsRefoundedFinite(amount));
+                        break;
+                    }
+                    case NATIONS_REFOUNDED:
+                        telegramManager.addFilter(new FilterNationsRefounded());
+                        break;
+                    case NATIONS_EJECTED_MAX: {
+                        final int amount = StringFunctions.stringToUInt(argumentsList.get(0));
+                        telegramManager.addFilter(new FilterNationsEjectedFinite(amount));
+                        break;
+                    }
+                    case NATIONS_EJECTED:
+                        telegramManager.addFilter(new FilterNationsEjected());
+                        break;
+                    case REGIONS_EXCL:
+                        telegramManager.addFilter(new FilterRegions(new HashSet<>(argumentsList), false));
+                        break;
+                    case REGIONS_INCL:
+                        telegramManager.addFilter(new FilterRegions(new HashSet<>(argumentsList), true));
+                        break;
+                    case REGIONS_WITH_TAGS_EXCL: {
+                        final Set<RegionTag> recipients = StringFunctions.stringsToRegionTags(argumentsList);
+                        if (recipients.size() > 0) {
+                            telegramManager.addFilter(new FilterRegionsWithTags(recipients, false));
+                        }
+                        break;
+                    }
+                    case REGIONS_WITH_TAGS_INCL: {
+                        final Set<RegionTag> recipients = StringFunctions.stringsToRegionTags(argumentsList);
+                        if (recipients.size() > 0) {
+                            telegramManager.addFilter(new FilterRegionsWithTags(recipients, true));
+                        }
+                        break;
+                    }
+                    case REGIONS_WO_TAGS_EXCL: {
+                        final Set<RegionTag> recipients = StringFunctions.stringsToRegionTags(argumentsList);
+                        if (recipients.size() > 0) {
+                            telegramManager.addFilter(new FilterRegionsWithoutTags(recipients, false));
+                        }
+                        break;
+                    }
+                    case REGIONS_WO_TAGS_INCL: {
+                        final Set<RegionTag> recipients = StringFunctions.stringsToRegionTags(argumentsList);
+                        if (recipients.size() > 0) {
+                            telegramManager.addFilter(new FilterRegionsWithoutTags(recipients, true));
+                        }
+                        break;
+                    }
+                    case WA_MEMBERS_EXCL:
+                        telegramManager.addFilter(new FilterWAMembers(false));
+                        break;
+                    case WA_MEMBERS_INCL:
+                        telegramManager.addFilter(new FilterWAMembers(true));
+                        break;
+                    case WA_MEMBERS_NEW_MAX: {
+                        final int amount = StringFunctions.stringToUInt(argumentsList.get(0));
+                        telegramManager.addFilter(new FilterWAMembersNewFinite(amount));
+                        break;
+                    }
+                    case WA_MEMBERS_NEW:
+                        telegramManager.addFilter(new FilterWAMembersNew());
+                        break;
+                    default:
+                        logger.log(Level.WARNING, "Unsupported filter type: ''{0}''", filterType.name());
+                        break;
+                }
+
+            });
+        } catch (IOException ex) {
+            throw ex;
+        }
+    }
 }
