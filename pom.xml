@@ -9,7 +9,7 @@
     <packaging>jar</packaging>   
     <name>NationStates Telegrammer Client</name>
     <description>Desktop client for consuming the NationStates telegram API.</description>
-    <url>https://github.com/Agadar/NationStates-Telegrammer</url>
+    <url>https://github.com/Agadar/NationStates-Telegrammer-Client</url>
     
     <!-- License -->
     <licenses>
@@ -28,13 +28,6 @@
             <organizationUrl>https://github.com/Agadar</organizationUrl>
         </developer>
     </developers>
-    
-    <!-- SCM info -->
-    <scm>
-        <connection>scm:git:git@github.com:agadar/nationstates-telegrammer.git</connection>
-        <developerConnection>scm:git:git@github.com:agadar/nationstates-telegrammer.git</developerConnection>
-        <url>git@github.com:agadar/nationstates-telegrammer.git</url>
-    </scm>
     
     <!-- Dependencies -->
     <dependencies>
