@@ -3,7 +3,7 @@ package com.github.agadar.telegrammer.client.runnable;
 import com.github.agadar.telegrammer.client.NSTelegramForm;
 import com.github.agadar.telegrammer.client.NSTelegramForm.Status;
 
-import com.github.agadar.telegrammer.core.manager.TelegramManager;
+import com.github.agadar.telegrammer.core.manager.ITelegramManager;
 import com.github.agadar.telegrammer.core.filter.abstractfilter.Filter;
 
 import javax.swing.DefaultListModel;
@@ -17,11 +17,11 @@ import javax.swing.SwingUtilities;
 public class AddFilterRunnable implements Runnable {
 
     private final NSTelegramForm Form;
-    private final TelegramManager Tm;
+    private final ITelegramManager Tm;
     private final Filter F;
     private final String TextForList;
 
-    public AddFilterRunnable(NSTelegramForm form, TelegramManager tm, Filter f, String textForList) {
+    public AddFilterRunnable(NSTelegramForm form, ITelegramManager tm, Filter f, String textForList) {
         this.Form = form;
         this.Tm = tm;
         this.F = f;

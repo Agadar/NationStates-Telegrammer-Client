@@ -1,10 +1,8 @@
 package com.github.agadar.telegrammer.client;
 
-import com.github.agadar.nationstates.NationStates;
-import com.github.agadar.nationstates.NationStatesAPIException;
+import com.github.agadar.nationstates.INationStates;
 import com.github.agadar.nationstates.enumerator.RegionTag;
 import com.github.agadar.nationstates.event.TelegramSentEvent;
-import com.github.agadar.nationstates.query.TelegramQuery;
 
 import com.github.agadar.telegrammer.client.runnable.AddFilterRunnable;
 
@@ -34,8 +32,10 @@ import com.github.agadar.telegrammer.core.filter.FilterWAMembers;
 import com.github.agadar.telegrammer.core.filter.FilterWAMembersNew;
 import com.github.agadar.telegrammer.core.filter.FilterWAMembersNewFinite;
 import com.github.agadar.telegrammer.core.filter.abstractfilter.Filter;
-import com.github.agadar.telegrammer.core.manager.PropertiesManager;
-import com.github.agadar.telegrammer.core.manager.TelegramManager;
+import com.github.agadar.telegrammer.core.manager.IHistoryManager;
+import com.github.agadar.telegrammer.core.manager.IPropertiesManager;
+import com.github.agadar.telegrammer.core.manager.ITelegramManager;
+import com.github.agadar.telegrammer.core.util.IFilterCache;
 import com.github.agadar.telegrammer.core.util.StringFunctions;
 
 import java.awt.event.ItemEvent;
@@ -55,10 +55,16 @@ import javax.swing.text.DefaultCaret;
  */
 public final class NSTelegramForm extends javax.swing.JFrame implements TelegramManagerListener {
 
-    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer Client 1.4.0"; // Form title.  
+    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer Client 1.5.0-alpha"; // Form title.  
     private final static String BORDER = "------------------------------------------";  // Border for output text.
 
     private Thread CompileRecipientsWorker;  // Thread used for compiling address lists.
+
+    private final INationStates nationStates;
+    private final ITelegramManager telegramManager;
+    private final IHistoryManager historyManager;
+    private final IPropertiesManager propertiesManager;
+    private final IFilterCache filterCache;
 
     /**
      * Enumerator for different states.
@@ -69,35 +75,33 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         SendingTelegrams;
     }
 
-    public NSTelegramForm() {
+    public NSTelegramForm(INationStates nationStates, ITelegramManager telegramManager,
+            IHistoryManager historyManager, IPropertiesManager propertiesManager,
+            IFilterCache filterCache) {
         initComponents();
 
-        // Set managers.
-        PropertiesManager propsManager = PropertiesManager.get();
+        this.nationStates = nationStates;
+        this.telegramManager = telegramManager;
+        this.historyManager = historyManager;
+        this.propertiesManager = propertiesManager;
+        this.filterCache = filterCache;
 
         // Sets the output textarea such that it auto-scrolls down.
         ((DefaultCaret) TextAreaOutput.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
         // Set fields according to values retrieved from properties file.
-        TxtFieldClientKey.setText(propsManager.clientKey);
-        TxtFieldTelegramId.setText(propsManager.telegramId);
-        TxtFieldSecretKey.setText(propsManager.secretKey);
-        ComboBoxTelegramType.setSelectedItem(propsManager.lastTelegramType);
-        TxtFieldRegionFrom.setText(propsManager.fromRegion);
-        CheckBoxDryRun.setSelected(propsManager.dryRun);
+        TxtFieldClientKey.setText(propertiesManager.getClientKey());
+        TxtFieldTelegramId.setText(propertiesManager.getTelegramId());
+        TxtFieldSecretKey.setText(propertiesManager.getSecretKey());
+        ComboBoxTelegramType.setSelectedItem(propertiesManager.getLastTelegramType());
+        TxtFieldRegionFrom.setText(propertiesManager.getFromRegion());
+        CheckBoxDryRun.setSelected(propertiesManager.getDoDryRun());
 
         updateGui(Status.Idle);                   // Update entire GUI in case we missed something in visual designer.
         TextAreaOutput.setText(duration()); // Set output textarea, for consistency's sake.
 
         // Set hint properly.
         setInputHint((FilterType) ComboBoxFilterType.getSelectedItem());
-
-        // Attempt to set and verify user agent.
-        try {
-            NationStates.setUserAgent("Agadar's Telegrammer Client (https://github.com/Agadar/NationStates-Telegrammer)");
-        } catch (NationStatesAPIException | IllegalArgumentException ex) {
-            TextAreaOutput.setText(ex.getMessage());
-        }
     }
 
     /**
@@ -472,17 +476,16 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     private void BtnStartActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_BtnStartActionPerformed
     {//GEN-HEADEREND:event_BtnStartActionPerformed
         // Make sure there are no spaces in the fields.
-        final PropertiesManager pm = PropertiesManager.get();
-        TxtFieldRegionFrom.setText(pm.fromRegion = pm.fromRegion.trim());
-        TxtFieldClientKey.setText(pm.clientKey = pm.clientKey.replace(" ", ""));
-        TxtFieldSecretKey.setText(pm.secretKey = pm.secretKey.replace(" ", ""));
-        TxtFieldTelegramId.setText(pm.telegramId = pm.telegramId.replace(" ", ""));
+        TxtFieldRegionFrom.setText(propertiesManager.getFromRegion().trim());
+        TxtFieldClientKey.setText(propertiesManager.getClientKey().replace(" ", ""));
+        TxtFieldSecretKey.setText(propertiesManager.getSecretKey().replace(" ", ""));
+        TxtFieldTelegramId.setText(propertiesManager.getTelegramId().replace(" ", ""));
 
         updateGui(Status.SendingTelegrams);    // update GUI
         TextAreaOutput.setText(duration());
 
         try {
-            TelegramManager.get().startSending(true);  // start sending telegrams
+            telegramManager.startSending(true);  // start sending telegrams
         } catch (Exception ex) {
             // if something went wrong while starting sending telegrams, reset GUI
             TextAreaOutput.setText(ex.getMessage() + "\n");
@@ -498,7 +501,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      */
     private void BtnStopActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_BtnStopActionPerformed
     {//GEN-HEADEREND:event_BtnStopActionPerformed
-        TelegramManager.get().stopSending(); // Call telegram manager to stop sending.
+        telegramManager.stopSending(); // Call telegram manager to stop sending.
     }//GEN-LAST:event_BtnStopActionPerformed
 
     /**
@@ -553,83 +556,83 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         // Set above variables according to addressees type selected.
         switch (filter) {
             case ALL:
-                f = new FilterAll();
+                f = new FilterAll(nationStates, historyManager, filterCache);
                 break;
             case DELEGATES_EXCL:
-                f = new FilterDelegates(false);
+                f = new FilterDelegates(nationStates, historyManager, filterCache, false);
                 break;
             case DELEGATES_INCL:
-                f = new FilterDelegates(true);
+                f = new FilterDelegates(nationStates, historyManager, filterCache, true);
                 break;
             case DELEGATES_NEW:
-                f = new FilterDelegatesNew();
+                f = new FilterDelegatesNew(nationStates, historyManager, filterCache);
                 break;
             case DELEGATES_NEW_MAX: {
                 int amount = StringFunctions.stringToUInt(filterValues);
-                f = new FilterDelegatesNewFinite(amount);
+                f = new FilterDelegatesNewFinite(nationStates, historyManager, filterCache, amount);
                 textForList += " (" + amount + ")";
                 break;
             }
             case EMBASSIES_EXCL: {
                 Set<String> addressees = StringFunctions.stringToStringList(filterValues);
-                f = new FilterEmbassies(addressees, false);
+                f = new FilterEmbassies(nationStates, historyManager, filterCache, addressees, false);
                 textForList += ": " + addressees;
                 break;
             }
             case EMBASSIES_INCL: {
                 Set<String> addressees = StringFunctions.stringToStringList(filterValues);
-                f = new FilterEmbassies(addressees, true);
+                f = new FilterEmbassies(nationStates, historyManager, filterCache, addressees, true);
                 textForList += ": " + addressees;
                 break;
             }
             case NATIONS_EXCL: {
                 Set<String> addressees = StringFunctions.stringToStringList(filterValues);
-                f = new FilterNations(addressees, false);
+                f = new FilterNations(nationStates, historyManager, filterCache, addressees, false);
                 textForList += ": " + addressees;
                 break;
             }
             case NATIONS_INCL: {
                 Set<String> addressees = StringFunctions.stringToStringList(filterValues);
-                f = new FilterNations(addressees, true);
+                f = new FilterNations(nationStates, historyManager, filterCache, addressees, true);
                 textForList += ": " + addressees;
                 break;
             }
             case NATIONS_NEW_MAX: {
                 int amount = StringFunctions.stringToUInt(filterValues);
-                f = new FilterNationsNewFinite(amount);
+                f = new FilterNationsNewFinite(nationStates, historyManager, filterCache, amount);
                 textForList += " (" + amount + ")";
                 break;
             }
             case NATIONS_NEW:
-                f = new FilterNationsNew();
+                f = new FilterNationsNew(nationStates, historyManager, filterCache);
                 break;
             case NATIONS_REFOUNDED_MAX: {
                 int amount = StringFunctions.stringToUInt(filterValues);
-                f = new FilterNationsRefoundedFinite(amount);
+                f = new FilterNationsRefoundedFinite(nationStates, historyManager, filterCache, amount);
                 textForList += " (" + amount + ")";
                 break;
             }
             case NATIONS_REFOUNDED:
-                f = new FilterNationsRefounded();
+                f = new FilterNationsRefounded(nationStates, historyManager, filterCache);
                 break;
             case NATIONS_EJECTED_MAX: {
                 int amount = StringFunctions.stringToUInt(filterValues);
-                f = new FilterNationsEjectedFinite(amount);
+                f = new FilterNationsEjectedFinite(nationStates, historyManager, filterCache, amount);
                 textForList += " (" + amount + ")";
                 break;
             }
             case NATIONS_EJECTED:
-                f = new FilterNationsEjected();
+                f = new FilterNationsEjected(nationStates, historyManager, filterCache);
                 break;
             case REGIONS_EXCL: {
                 Set<String> addressees = StringFunctions.stringToStringList(filterValues);
-                f = new FilterRegions(addressees, false);
+                f = new FilterRegions(nationStates, historyManager, filterCache, addressees, false);
                 textForList += ": " + addressees;
                 break;
             }
             case REGIONS_INCL: {
                 Set<String> addressees = StringFunctions.stringToStringList(filterValues);
-                f = new FilterRegions(addressees, true);
+                f = new FilterRegions(nationStates, historyManager, filterCache, addressees, true);
                 textForList += ": " + addressees;
                 break;
             }
@@ -642,7 +645,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                     TextAreaOutput.setText("No valid region tags recognized!\n");
                     return;
                 }
-                f = new FilterRegionsWithTags(recipients, false);
+                f = new FilterRegionsWithTags(nationStates, historyManager, filterCache, recipients, false);
                 textForList += ": " + recipients;
                 break;
             }
@@ -655,7 +658,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                     TextAreaOutput.setText("No valid region tags recognized!\n");
                     return;
                 }
-                f = new FilterRegionsWithTags(recipients, true);
+                f = new FilterRegionsWithTags(nationStates, historyManager, filterCache, recipients, true);
                 textForList += ": " + recipients;
                 break;
             }
@@ -668,7 +671,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                     TextAreaOutput.setText("No valid region tags recognized!\n");
                     return;
                 }
-                f = new FilterRegionsWithoutTags(recipients, false);
+                f = new FilterRegionsWithoutTags(nationStates, historyManager, filterCache, recipients, false);
                 textForList += ": " + recipients;
                 break;
             }
@@ -681,24 +684,24 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
                     TextAreaOutput.setText("No valid region tags recognized!\n");
                     return;
                 }
-                f = new FilterRegionsWithoutTags(recipients, true);
+                f = new FilterRegionsWithoutTags(nationStates, historyManager, filterCache, recipients, true);
                 textForList += ": " + recipients;
                 break;
             }
             case WA_MEMBERS_EXCL:
-                f = new FilterWAMembers(false);
+                f = new FilterWAMembers(nationStates, historyManager, filterCache, false);
                 break;
             case WA_MEMBERS_INCL:
-                f = new FilterWAMembers(true);
+                f = new FilterWAMembers(nationStates, historyManager, filterCache, true);
                 break;
             case WA_MEMBERS_NEW_MAX: {
                 int amount = StringFunctions.stringToUInt(filterValues);
-                f = new FilterWAMembersNewFinite(amount);
+                f = new FilterWAMembersNewFinite(nationStates, historyManager, filterCache, amount);
                 textForList += " (" + amount + ")";
                 break;
             }
             case WA_MEMBERS_NEW:
-                f = new FilterWAMembersNew();
+                f = new FilterWAMembersNew(nationStates, historyManager, filterCache);
                 break;
             default:
                 return;
@@ -711,7 +714,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         }
 
         // Prepare thread, then run it.
-        CompileRecipientsWorker = new Thread(new AddFilterRunnable(this, TelegramManager.get(), f, textForList));
+        CompileRecipientsWorker = new Thread(new AddFilterRunnable(this, telegramManager, f, textForList));
         CompileRecipientsWorker.start();
     }//GEN-LAST:event_ButtonAddFilterActionPerformed
 
@@ -726,7 +729,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     {//GEN-HEADEREND:event_ButtonRemoveFilterActionPerformed
         // Retrieve selected index, remove filter from telegram manager.
         int index = JListFilters.getSelectedIndex();
-        TelegramManager.get().removeFilterAt(index);
+        telegramManager.removeFilterAt(index);
 
         // Remove filter from GUI, try select preceding filter.
         ((DefaultListModel) JListFilters.getModel()).remove(index);
@@ -746,7 +749,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     private void formWindowClosing(java.awt.event.WindowEvent evt)//GEN-FIRST:event_formWindowClosing
     {//GEN-HEADEREND:event_formWindowClosing
         // Store relevant variables to properties and history files.
-        PropertiesManager.get().saveProperties();
+        propertiesManager.saveProperties();
     }//GEN-LAST:event_formWindowClosing
 
     /**
@@ -786,7 +789,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         // Enable or disable TxtFieldRegionFrom.
         final TelegramType selected = (TelegramType) evt.getItem();
         setFromRegionTextAndEnabled(selected, Status.Idle);
-        PropertiesManager.get().lastTelegramType = selected;
+        propertiesManager.setLastTelegramType(selected);
 
         TextAreaOutput.setText(duration()); // Print new duration to output textarea.
     }//GEN-LAST:event_ComboBoxTelegramTypeItemStateChanged
@@ -797,7 +800,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void TxtFieldRegionFromKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldRegionFromKeyReleased
-        PropertiesManager.get().fromRegion = TxtFieldRegionFrom.getText();
+        propertiesManager.setFromRegion(TxtFieldRegionFrom.getText());
     }//GEN-LAST:event_TxtFieldRegionFromKeyReleased
 
     /**
@@ -806,22 +809,22 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void CheckBoxDryRunItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_CheckBoxDryRunItemStateChanged
-        PropertiesManager.get().dryRun = CheckBoxDryRun.isSelected();
+        propertiesManager.setDoDryRun(CheckBoxDryRun.isSelected());
     }//GEN-LAST:event_CheckBoxDryRunItemStateChanged
 
     private void TxtFieldClientKeyKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldClientKeyKeyReleased
-        PropertiesManager.get().clientKey = TxtFieldClientKey.getText();
+        propertiesManager.setClientKey(TxtFieldClientKey.getText());
     }//GEN-LAST:event_TxtFieldClientKeyKeyReleased
 
     private void TxtFieldSecretKeyKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldSecretKeyKeyReleased
-        PropertiesManager.get().secretKey = TxtFieldSecretKey.getText();
+        propertiesManager.setSecretKey(TxtFieldSecretKey.getText());
     }//GEN-LAST:event_TxtFieldSecretKeyKeyReleased
 
     private void TxtFieldTelegramIdKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TxtFieldTelegramIdKeyReleased
-        PropertiesManager.get().telegramId = TxtFieldTelegramId.getText();
+        propertiesManager.setTelegramId(TxtFieldTelegramId.getText());
 
         // Update recipients list, because some recipients may be valid or invalid for the new telegram id.
-        TelegramManager.get().resetAndReapplyFilters();
+        telegramManager.resetAndReapplyFilters();
         TextAreaOutput.setText(duration());
     }//GEN-LAST:event_TxtFieldTelegramIdKeyReleased
 
@@ -939,15 +942,15 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @return
      */
     public final String duration() {
-        if (!TelegramManager.get().potentiallyInfinite()) {
-            int estimatedDuration = Math.max(TelegramManager.get().numberOfRecipients() - 1, 0)
+        if (!telegramManager.potentiallyInfinite()) {
+            int estimatedDuration = Math.max(telegramManager.numberOfRecipients() - 1, 0)
                     * ((ComboBoxTelegramType.getSelectedItem() == TelegramType.RECRUITMENT
-                            ? TelegramQuery.TIME_BETWEEN_RECRUITMENT_TELEGRAMS : TelegramQuery.TIME_BETWEEN_TELEGRAMS) / 1000);
+                    ? 180050 : 30050) / 1000);
             int hours = estimatedDuration / 3600;
             int minutes = estimatedDuration % 3600 / 60;
             int seconds = estimatedDuration % 3600 % 60;
             return String.format(BORDER + "%naddressees selected: %s%nestimated duration: "
-                    + "%s hours, %s minutes, %s seconds%n" + BORDER + "%n", TelegramManager.get().numberOfRecipients(), hours, minutes, seconds);
+                    + "%s hours, %s minutes, %s seconds%n" + BORDER + "%n", telegramManager.numberOfRecipients(), hours, minutes, seconds);
         } else {
             return String.format(BORDER + "%naddressees selected: ∞%nestimated duration: "
                     + "∞%n" + BORDER + "%n");

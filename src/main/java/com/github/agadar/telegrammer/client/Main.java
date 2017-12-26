@@ -1,8 +1,10 @@
 package com.github.agadar.telegrammer.client;
 
+import com.github.agadar.nationstates.NationStates;
 import com.github.agadar.telegrammer.core.manager.HistoryManager;
 import com.github.agadar.telegrammer.core.manager.PropertiesManager;
 import com.github.agadar.telegrammer.core.manager.TelegramManager;
+import com.github.agadar.telegrammer.core.util.FilterCache;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,9 +20,17 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class Main {
 
     public static void main(String args[]) {
+
+        // Create context root.
+        final NationStates nationStates = new NationStates("Agadar's Telegrammer Client (https://github.com/Agadar/NationStates-Telegrammer-Client)");
+        final PropertiesManager propertiesManager = new PropertiesManager();
+        final HistoryManager historyManager = new HistoryManager(propertiesManager);
+        final FilterCache filterCache = new FilterCache(nationStates);
+        final TelegramManager telegramManager = new TelegramManager(nationStates, historyManager, propertiesManager);
+
         // Retrieve properties and history.
-        PropertiesManager.get().loadProperties();
-        HistoryManager.get().loadHistory();
+        propertiesManager.loadProperties();
+        historyManager.loadHistory();
 
         // Set-up graphical form.      
         try {
@@ -30,14 +40,14 @@ public class Main {
             // Create and display the form.
             java.awt.EventQueue.invokeLater(()
                     -> {
-                final NSTelegramForm form = new NSTelegramForm();
-                TelegramManager.get().addListeners(form);   // subscribe form to TelegramManager.
+                final NSTelegramForm form = new NSTelegramForm(nationStates, telegramManager, historyManager, propertiesManager, filterCache);
+                telegramManager.addListeners(form);   // subscribe form to TelegramManager.
                 form.setLocationRelativeTo(null);
                 form.setVisible(true);
             });
-        } catch (ClassNotFoundException | InstantiationException |
-                IllegalAccessException |
-                UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException
+                | IllegalAccessException
+                | UnsupportedLookAndFeelException ex) {
             Logger.getLogger(NSTelegramForm.class.getName()).
                     log(Level.SEVERE, null, ex);
         }
