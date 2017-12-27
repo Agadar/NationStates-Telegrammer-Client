@@ -2,9 +2,7 @@ package com.github.agadar.telegrammer.client.runnable;
 
 import com.github.agadar.telegrammer.client.NSTelegramForm;
 import com.github.agadar.telegrammer.client.NSTelegramForm.Status;
-
-import com.github.agadar.telegrammer.core.manager.ITelegramManager;
-import com.github.agadar.telegrammer.core.filter.abstractfilter.Filter;
+import com.github.agadar.telegrammer.core.recipientsfilter.IRecipientsFilter;
 
 import javax.swing.DefaultListModel;
 import javax.swing.SwingUtilities;
@@ -14,42 +12,39 @@ import javax.swing.SwingUtilities;
  *
  * @author Agadar (https://github.com/Agadar/)
  */
-public class AddFilterRunnable implements Runnable {
+public class RefreshFilterRunnable implements Runnable {
 
-    private final NSTelegramForm Form;
-    private final ITelegramManager Tm;
-    private final Filter F;
-    private final String TextForList;
+    private final NSTelegramForm form;
+    private final IRecipientsFilter recipientsFilterToRefresh;
+    private final String textForList;
 
-    public AddFilterRunnable(NSTelegramForm form, ITelegramManager tm, Filter f, String textForList) {
-        this.Form = form;
-        this.Tm = tm;
-        this.F = f;
-        this.TextForList = textForList;
+    public RefreshFilterRunnable(NSTelegramForm form, IRecipientsFilter recipientsFilterToRefresh, String textForList) {
+        this.form = form;
+        this.recipientsFilterToRefresh = recipientsFilterToRefresh;
+        this.textForList = textForList;
     }
 
     @Override
     public void run() {
         try {
-            // Add filter to telegram manager, then update GUI.
-            Tm.addFilter(F);
+            recipientsFilterToRefresh.refreshFilter();
             SwingUtilities.invokeLater(()
                     -> {
-                ((DefaultListModel) Form.JListFilters.getModel()).addElement(TextForList);
-                Form.TextAreaOutput.setText(Form.duration());
+                ((DefaultListModel) form.JListFilters.getModel()).addElement(textForList);
+                form.TextAreaOutput.setText(form.duration());
             });
 
         } catch (Exception | OutOfMemoryError ex) {
             // If an exception occured, print it to the output textarea.
             SwingUtilities.invokeLater(()
                     -> {
-                Form.printToOutput("a fatal error occured:\n" + ex.getMessage(), false);
+                form.printToOutput("a fatal error occured:\n" + ex.getMessage(), false);
             });
         } finally {
             // Always re-enable the 'add filter' and 'start sending' buttons.
             SwingUtilities.invokeLater(()
                     -> {
-                Form.updateGui(Status.Idle);
+                form.updateGui(Status.Idle);
             });
         }
     }

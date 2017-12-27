@@ -1,10 +1,11 @@
 package com.github.agadar.telegrammer.client;
 
 import com.github.agadar.nationstates.NationStates;
-import com.github.agadar.telegrammer.core.manager.HistoryManager;
-import com.github.agadar.telegrammer.core.manager.PropertiesManager;
-import com.github.agadar.telegrammer.core.manager.TelegramManager;
-import com.github.agadar.telegrammer.core.util.FilterCache;
+import com.github.agadar.telegrammer.core.nationdumpaccess.NationDumpAccess;
+import com.github.agadar.telegrammer.core.propertiesmanager.PropertiesManager;
+import com.github.agadar.telegrammer.core.recipientslistbuilder.RecipientsListBuilder;
+import com.github.agadar.telegrammer.core.telegramhistory.TelegramHistory;
+import com.github.agadar.telegrammer.core.telegramsender.TelegramSender;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,11 +23,12 @@ public class Main {
     public static void main(String args[]) {
 
         // Create context root.
-        final NationStates nationStates = new NationStates("Agadar's Telegrammer Client (https://github.com/Agadar/NationStates-Telegrammer-Client)");
         final PropertiesManager propertiesManager = new PropertiesManager();
-        final HistoryManager historyManager = new HistoryManager(propertiesManager);
-        final FilterCache filterCache = new FilterCache(nationStates);
-        final TelegramManager telegramManager = new TelegramManager(nationStates, historyManager, propertiesManager);
+        final NationStates nationStates = new NationStates("Agadar's Telegrammer Client (https://github.com/Agadar/NationStates-Telegrammer-Client)");
+        final TelegramHistory historyManager = new TelegramHistory(propertiesManager);
+        final NationDumpAccess filterCache = new NationDumpAccess(nationStates);
+        final TelegramSender telegramManager = new TelegramSender(nationStates, historyManager, propertiesManager);
+        final RecipientsListBuilder recipientsListBuilder = new RecipientsListBuilder(historyManager);
 
         // Retrieve properties and history.
         propertiesManager.loadProperties();
@@ -40,7 +42,7 @@ public class Main {
             // Create and display the form.
             java.awt.EventQueue.invokeLater(()
                     -> {
-                final NSTelegramForm form = new NSTelegramForm(nationStates, telegramManager, historyManager, propertiesManager, filterCache);
+                final NSTelegramForm form = new NSTelegramForm(telegramManager, propertiesManager, recipientsListBuilder);
                 telegramManager.addListeners(form);   // subscribe form to TelegramManager.
                 form.setLocationRelativeTo(null);
                 form.setVisible(true);
