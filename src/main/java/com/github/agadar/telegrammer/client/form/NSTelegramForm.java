@@ -779,7 +779,6 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         int hours = estimatedDuration / 3600;
         int minutes = estimatedDuration % 3600 / 60;
         int seconds = estimatedDuration % 3600 % 60;
-        System.out.println(recipients);
         return String.format(BORDER + "%naddressees selected: %s%nestimated duration: "
                 + "%s hours, %s minutes, %s seconds%n" + BORDER + "%n", recipients.size(), hours, minutes, seconds);
 
