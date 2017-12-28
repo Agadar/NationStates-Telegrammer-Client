@@ -275,17 +275,18 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
+              <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="TextFieldFilterValues" max="32767" attributes="0"/>
-                      <Component id="ComboBoxFilterType" max="32767" attributes="0"/>
+                      <Component id="ComboBoxProviderType" max="32767" attributes="0"/>
                       <Component id="ScrollPaneFilters" pref="310" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="ButtonRemoveFilter" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="ButtonAddFilter" max="32767" attributes="0"/>
                       </Group>
+                      <Component id="ComboBoxFilterType" alignment="1" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -295,9 +296,11 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="ScrollPaneFilters" pref="135" max="32767" attributes="0"/>
+                  <Component id="ScrollPaneFilters" pref="96" max="32767" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="ComboBoxFilterType" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="ComboBoxProviderType" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="TextFieldFilterValues" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
@@ -348,18 +351,18 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ButtonRemoveFilterActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JComboBox" name="ComboBoxFilterType">
+        <Component class="javax.swing.JComboBox" name="ComboBoxProviderType">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="new DefaultComboBoxModel(FilterType.values())" type="code"/>
+              <Connection code="new DefaultComboBoxModel(com.github.agadar.telegrammer.core.recipients.RecipientsProviderType.values())" type="code"/>
             </Property>
-            <Property name="name" type="java.lang.String" value="ComboBoxFilterType" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="ComboBoxProviderType" noResource="true"/>
           </Properties>
           <Events>
-            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="ComboBoxFilterTypeItemStateChanged"/>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="ComboBoxProviderTypeItemStateChanged"/>
           </Events>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;FilterType&gt;"/>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;com.github.agadar.telegrammer.core.recipients.RecipientsProviderType&gt;"/>
           </AuxValues>
         </Component>
         <Component class="javax.swing.JButton" name="ButtonAddFilter">
@@ -374,10 +377,24 @@
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
           </AuxValues>
         </Component>
-        <Component class="com.github.agadar.telegrammer.client.HintTextField" name="TextFieldFilterValues">
+        <Component class="com.github.agadar.telegrammer.client.form.HintTextField" name="TextFieldFilterValues">
           <Properties>
             <Property name="hint" type="java.lang.String" value=""/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="ComboBoxFilterType">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="new DefaultComboBoxModel(com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterType.values())" type="code"/>
+            </Property>
+            <Property name="name" type="java.lang.String" value="ComboBoxFilterType" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="ComboBoxFilterTypeItemStateChanged"/>
+          </Events>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterType&gt;"/>
+          </AuxValues>
         </Component>
       </SubComponents>
     </Container>

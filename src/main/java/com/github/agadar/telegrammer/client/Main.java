@@ -1,11 +1,14 @@
 package com.github.agadar.telegrammer.client;
 
+import com.github.agadar.telegrammer.client.form.NSTelegramForm;
 import com.github.agadar.nationstates.NationStates;
 import com.github.agadar.telegrammer.core.nationdumpaccess.NationDumpAccess;
 import com.github.agadar.telegrammer.core.propertiesmanager.PropertiesManager;
-import com.github.agadar.telegrammer.core.recipientslistbuilder.RecipientsListBuilder;
-import com.github.agadar.telegrammer.core.telegramhistory.TelegramHistory;
-import com.github.agadar.telegrammer.core.telegramsender.TelegramSender;
+import com.github.agadar.telegrammer.core.recipients.listbuilder.RecipientsListBuilder;
+import com.github.agadar.telegrammer.core.recipients.translator.RecipientsFilterTranslator;
+import com.github.agadar.telegrammer.core.recipients.translator.RecipientsProviderTranslator;
+import com.github.agadar.telegrammer.core.telegram.history.TelegramHistory;
+import com.github.agadar.telegrammer.core.telegram.sender.TelegramSender;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,14 +28,16 @@ public class Main {
         // Create context root.
         final PropertiesManager propertiesManager = new PropertiesManager();
         final NationStates nationStates = new NationStates("Agadar's Telegrammer Client (https://github.com/Agadar/NationStates-Telegrammer-Client)");
-        final TelegramHistory historyManager = new TelegramHistory(propertiesManager);
-        final NationDumpAccess filterCache = new NationDumpAccess(nationStates);
-        final TelegramSender telegramManager = new TelegramSender(nationStates, historyManager, propertiesManager);
-        final RecipientsListBuilder recipientsListBuilder = new RecipientsListBuilder(historyManager);
+        final TelegramHistory telegramHistory = new TelegramHistory(propertiesManager);
+        final NationDumpAccess nationDumpAccess = new NationDumpAccess(nationStates);
+        final TelegramSender telegramSender = new TelegramSender(nationStates, telegramHistory, propertiesManager);
+        final RecipientsListBuilder recipientsListBuilder = new RecipientsListBuilder(telegramHistory);
+        final RecipientsProviderTranslator providerTranslator = new RecipientsProviderTranslator(nationStates, nationDumpAccess);
+        final RecipientsFilterTranslator filterTranslator = new RecipientsFilterTranslator(providerTranslator);
 
         // Retrieve properties and history.
         propertiesManager.loadProperties();
-        historyManager.loadHistory();
+        telegramHistory.loadHistory();
 
         // Set-up graphical form.      
         try {
@@ -42,8 +47,8 @@ public class Main {
             // Create and display the form.
             java.awt.EventQueue.invokeLater(()
                     -> {
-                final NSTelegramForm form = new NSTelegramForm(telegramManager, propertiesManager, recipientsListBuilder);
-                telegramManager.addListeners(form);   // subscribe form to TelegramManager.
+                final NSTelegramForm form = new NSTelegramForm(telegramSender, propertiesManager, recipientsListBuilder, filterTranslator);
+                telegramSender.addListeners(form);   // subscribe form to TelegramManager.
                 form.setLocationRelativeTo(null);
                 form.setVisible(true);
             });
