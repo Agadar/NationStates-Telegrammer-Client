@@ -6,11 +6,11 @@ Before you use this program, make sure you're familiar with the [Telegrams API](
 
 **_If you're looking for a guide on how to obtain the keys and a Telegram Id, check out [Ever-Wandering Souls](https://www.nationstates.net/nation=ever-wandering_souls)' [Simple Guide to Sending Telegrams via API](http://forum.nationstates.net/viewtopic.php?f=15&t=350586)!_**
 
-This program uses my own [NationStates API Java Wrapper](https://github.com/Agadar/NationStates-api-java-wrapper) to communicate with the NationStates API.
+This program uses the [NationStates Telegrammer Core](https://github.com/Agadar/NationStates-Telegrammer-Core) library to communicate with the NationStates API.
 
 ## Screenshot
 
-![Screenshot](https://github.com/Agadar/NationStates-Telegrammer/blob/master/images/Screenshot%20NationStates%20Telegrammer%201.3.0.png)
+![Screenshot](https://raw.githubusercontent.com/Agadar/NationStates-Telegrammer-Client/master/images/Screenshot%20NationStates%20Telegrammer%201.5.0.png)
 
 ## Links
 
