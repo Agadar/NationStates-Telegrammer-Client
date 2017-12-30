@@ -5,7 +5,7 @@
     <!-- General properties -->
     <groupId>com.github.agadar.telegrammer</groupId>
     <artifactId>nationstates-telegrammer-client</artifactId>
-    <version>1.5.0-alpha</version>
+    <version>1.5.0</version>
     <packaging>jar</packaging>   
     <name>NationStates Telegrammer Client</name>
     <description>Desktop client for consuming the NationStates telegram API.</description>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>com.github.agadar.telegrammer</groupId>
             <artifactId>nationstates-telegrammer-core</artifactId>
-            <version>2.0.0-alpha</version>
+            <version>2.0.0</version>
         </dependency>
     </dependencies>
     
