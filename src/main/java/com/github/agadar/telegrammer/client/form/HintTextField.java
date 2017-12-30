@@ -1,4 +1,4 @@
-package com.github.agadar.telegrammer.client;
+package com.github.agadar.telegrammer.client.form;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
