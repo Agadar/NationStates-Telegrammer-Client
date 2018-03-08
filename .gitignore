@@ -1,5 +1,9 @@
 target/
+.settings/
 
 *.properties
 *.history
 *.filters
+
+.classpath
+.project
