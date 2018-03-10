@@ -12,4 +12,5 @@ public class TelegrammerClientProperties extends ApplicationProperties {
 
     public boolean startSendingOnStartup;
     public boolean hideSkippedRecipients;
+    public boolean startMinimized;
 }

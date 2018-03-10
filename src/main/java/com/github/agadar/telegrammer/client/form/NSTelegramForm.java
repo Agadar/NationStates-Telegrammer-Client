@@ -90,6 +90,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     private javax.swing.JTextField TxtFieldRegionFrom;
     private javax.swing.JTextField TxtFieldSecretKey;
     private javax.swing.JTextField TxtFieldTelegramId;
+    private JCheckBoxMenuItem chckbxmntmStartMinimized;
 
     public NSTelegramForm(ITelegramSender telegramSender, IPropertiesManager propertiesManager,
             TelegrammerClientProperties properties, IRecipientsFilterTranslator filterTranslator) {
@@ -112,6 +113,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 	chckbxmntmRunIndefinitely.setSelected(properties.runIndefinitely);
 	chckbxmntmHideSkippedRecipients.setSelected(properties.hideSkippedRecipients);
 	chckbxmntmStartSendingOn.setSelected(properties.startSendingOnStartup);
+	chckbxmntmStartMinimized.setSelected(properties.startMinimized);
 	final DefaultListModel filtersModel = (DefaultListModel) this.JListFilters.getModel();
 	properties.recipientsListBuilder.getFilters().forEach(filter -> {
 	    filtersModel.addElement(filter.toString());
@@ -126,6 +128,11 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 	    TextAreaOutput.setText(duration()); // Set output textarea, for consistency's sake.
 	} else {
 	    this.startSendingTelegrams();
+	}
+
+	// Minimize if so configured.
+	if (this.properties.startMinimized) {
+	    this.setExtendedState(java.awt.Frame.ICONIFIED);
 	}
     }
 
@@ -156,7 +163,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 	TxtFieldSecretKey.setText(properties.secretKey.replace(" ", ""));
 	TxtFieldTelegramId.setText(properties.telegramId.replace(" ", ""));
 
-	updateGui(Status.SendingTelegrams); // update GUI
+	updateGui(Status.SendingTelegrams);
 	TextAreaOutput.setText(duration());
 
 	try {
@@ -175,7 +182,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void BtnStopActionPerformed(java.awt.event.ActionEvent evt) {
-	telegramSender.stopSending(); // Call telegram manager to stop sending.
+	telegramSender.stopSending();
     }
 
     /**
@@ -229,29 +236,19 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 	TextAreaOutput.setText(duration());
     }
 
-    /**
-     * Called when selected status of looping checkbox has changed.
-     *
-     * @param evt
-     */
-    private void chckbxmntmRunIndefinitelyItemStateChanged(java.awt.event.ItemEvent evt) {
+    private void chckbxmntmStartMinimizedOnItemStateChanged(ItemEvent evt) {
+	properties.startMinimized = chckbxmntmStartMinimized.isSelected();
+
+    }
+
+    private void chckbxmntmRunIndefinitelyItemStateChanged(ItemEvent evt) {
 	properties.runIndefinitely = chckbxmntmRunIndefinitely.isSelected();
     }
 
-    /**
-     * Called when selected status of looping checkbox has changed.
-     *
-     * @param evt
-     */
-    private void chckbxmntmHideSkippedRecipientsItemStateChanged(java.awt.event.ItemEvent evt) {
+    private void chckbxmntmHideSkippedRecipientsItemStateChanged(ItemEvent evt) {
 	properties.hideSkippedRecipients = chckbxmntmHideSkippedRecipients.isSelected();
     }
 
-    /**
-     * Called when selected status of looping checkbox has changed.
-     *
-     * @param evt
-     */
     private void chckbxmntmStartSendingOnItemStateChanged(java.awt.event.ItemEvent evt) {
 	properties.startSendingOnStartup = chckbxmntmStartSendingOn.isSelected();
     }
@@ -397,6 +394,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 	chckbxmntmRunIndefinitely.setEnabled(status == Status.Idle);
 	chckbxmntmHideSkippedRecipients.setEnabled(status == Status.Idle);
 	chckbxmntmStartSendingOn.setEnabled(status == Status.Idle);
+	chckbxmntmStartMinimized.setEnabled(status == Status.Idle);
 	ComboBoxFilterType.setEnabled(status == Status.Idle);
 	ComboBoxProviderType.setEnabled(status == Status.Idle);
 	BtnStop.setEnabled(status == Status.SendingTelegrams);
@@ -722,6 +720,14 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 	    }
 	});
 	mnNewMenu.add(chckbxmntmStartSendingOn);
+
+	chckbxmntmStartMinimized = new JCheckBoxMenuItem("Start minimized");
+	mnNewMenu.add(chckbxmntmStartMinimized);
+	chckbxmntmStartMinimized.addItemListener(new java.awt.event.ItemListener() {
+	    public void itemStateChanged(java.awt.event.ItemEvent evt) {
+		chckbxmntmStartMinimizedOnItemStateChanged(evt);
+	    }
+	});
 
 	javax.swing.GroupLayout PanelActionsLayout = new javax.swing.GroupLayout(PanelActions);
 	PanelActions.setLayout(PanelActionsLayout);

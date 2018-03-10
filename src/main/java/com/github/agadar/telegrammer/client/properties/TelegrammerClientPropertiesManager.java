@@ -30,6 +30,7 @@ public class TelegrammerClientPropertiesManager extends AbstractPropertiesManage
 	        .valueOf(source.getProperty("hideSkippedRecipients", defaultBooleanValue));
 	target.startSendingOnStartup = Boolean
 	        .valueOf(source.getProperty("startSendingOnStartup", defaultBooleanValue));
+	target.startMinimized = Boolean.valueOf(source.getProperty("startMinimized", defaultBooleanValue));
     }
 
     @Override
@@ -37,6 +38,7 @@ public class TelegrammerClientPropertiesManager extends AbstractPropertiesManage
 	super.setPropertiesFromApplicationProperties(target, source);
 	target.setProperty("hideSkippedRecipients", Boolean.toString(source.hideSkippedRecipients));
 	target.setProperty("startSendingOnStartup", Boolean.toString(source.startSendingOnStartup));
+	target.setProperty("startMinimized", Boolean.toString(source.startMinimized));
     }
 
 }
