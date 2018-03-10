@@ -9,10 +9,10 @@ import javax.swing.UnsupportedLookAndFeelException;
 import com.github.agadar.nationstates.INationStates;
 import com.github.agadar.nationstates.NationStates;
 import com.github.agadar.telegrammer.client.form.NSTelegramForm;
+import com.github.agadar.telegrammer.client.properties.TelegrammerClientProperties;
+import com.github.agadar.telegrammer.client.properties.TelegrammerClientPropertiesManager;
 import com.github.agadar.telegrammer.core.nationdumpaccess.INationDumpAccess;
 import com.github.agadar.telegrammer.core.nationdumpaccess.NationDumpAccess;
-import com.github.agadar.telegrammer.core.properties.ApplicationProperties;
-import com.github.agadar.telegrammer.core.properties.manager.BasicPropertiesManager;
 import com.github.agadar.telegrammer.core.properties.manager.IPropertiesManager;
 import com.github.agadar.telegrammer.core.recipients.translator.IRecipientsFilterTranslator;
 import com.github.agadar.telegrammer.core.recipients.translator.IRecipientsListBuilderTranslator;
@@ -35,24 +35,23 @@ public class Main {
 
 	// Context root.
 	final INationStates nationStates = new NationStates(
-		"Agadar's Telegrammer Client (https://github.com/Agadar/NationStates-Telegrammer-Client)");
-	final ApplicationProperties applicationProperties = new ApplicationProperties();
-	final ITelegramHistory telegramHistory = new TelegramHistory(applicationProperties,
-		".nationstates-telegrammer.history");
+	        "Agadar's Telegrammer Client (https://github.com/Agadar/NationStates-Telegrammer-Client)");
+	final TelegrammerClientProperties properties = new TelegrammerClientProperties();
+	final ITelegramHistory telegramHistory = new TelegramHistory(properties, ".nationstates-telegrammer.history");
 	final INationDumpAccess nationDumpAccess = new NationDumpAccess(nationStates);
 	final IRecipientsProviderTranslator providerTranslator = new RecipientsProviderTranslator(nationStates,
-		nationDumpAccess);
+	        nationDumpAccess);
 	final IRecipientsFilterTranslator filterTranslator = new RecipientsFilterTranslator(providerTranslator);
 	final IRecipientsListBuilderTranslator recipientsListBuilderTranslator = new RecipientsListBuilderTranslator(
-		telegramHistory, filterTranslator);
-	final IPropertiesManager propertiesManager = new BasicPropertiesManager(recipientsListBuilderTranslator,
-		".nationstates-telegrammer.properties");
-	final TelegramSender telegramSender = new TelegramSender(nationStates, telegramHistory, applicationProperties);
+	        telegramHistory, filterTranslator);
+	final IPropertiesManager propertiesManager = new TelegrammerClientPropertiesManager(
+	        recipientsListBuilderTranslator, ".nationstates-telegrammer.properties");
+	final TelegramSender telegramSender = new TelegramSender(nationStates, telegramHistory, properties);
 
 	// Retrieve properties and history.
-	propertiesManager.loadProperties(applicationProperties);
+	propertiesManager.loadProperties(properties);
 	telegramHistory.loadHistory();
-	applicationProperties.recipientsListBuilder.refreshFilters();
+	properties.recipientsListBuilder.refreshFilters();
 
 	// Set-up graphical form.
 	try {
@@ -61,14 +60,14 @@ public class Main {
 
 	    // Create and display the form.
 	    java.awt.EventQueue.invokeLater(() -> {
-		final NSTelegramForm form = new NSTelegramForm(telegramSender, propertiesManager, applicationProperties,
-			filterTranslator);
+		final NSTelegramForm form = new NSTelegramForm(telegramSender, propertiesManager, properties,
+		        filterTranslator);
 		telegramSender.addListeners(form); // subscribe form to TelegramManager.
 		form.setLocationRelativeTo(null);
 		form.setVisible(true);
 	    });
 	} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-		| UnsupportedLookAndFeelException ex) {
+	        | UnsupportedLookAndFeelException ex) {
 	    Logger.getLogger(NSTelegramForm.class.getName()).log(Level.SEVERE, null, ex);
 	}
     }
