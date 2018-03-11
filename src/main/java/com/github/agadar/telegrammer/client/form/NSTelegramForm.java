@@ -735,7 +735,6 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 		chckbxmntmStartSendingOnItemStateChanged(evt);
 	    }
 	});
-	mnNewMenu.add(chckbxmntmStartSendingOn);
 
 	chckbxmntmStartMinimized = new JCheckBoxMenuItem("Start minimized");
 	mnNewMenu.add(chckbxmntmStartMinimized);
@@ -744,6 +743,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 		chckbxmntmStartMinimizedOnItemStateChanged(evt);
 	    }
 	});
+	mnNewMenu.add(chckbxmntmStartSendingOn);
 
 	javax.swing.GroupLayout PanelActionsLayout = new javax.swing.GroupLayout(PanelActions);
 	PanelActions.setLayout(PanelActionsLayout);
@@ -866,8 +866,9 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     private void setFromRegionTextAndEnabled(TelegramType type, Status status) {
 	if (status != Status.Idle) {
 	    TxtFieldRegionFrom.setEditable(false);
-	} else if (type == TelegramType.RECRUITMENT) {
+	} else if (type == TelegramType.RECRUITMENT || type == TelegramType.CAMPAIGN) {
 	    TxtFieldRegionFrom.setEditable(true);
+	    TxtFieldRegionFrom.setText(properties.fromRegion);
 	} else {
 	    TxtFieldRegionFrom.setEditable(false);
 	    TxtFieldRegionFrom.setText("");
