@@ -33,6 +33,7 @@ import com.github.agadar.telegrammer.core.telegram.event.StoppedSendingEvent;
 import com.github.agadar.telegrammer.core.telegram.event.TelegramManagerListener;
 import com.github.agadar.telegrammer.core.telegram.sender.ITelegramSender;
 import com.github.agadar.telegrammer.core.util.StringFunctions;
+import java.awt.event.ItemListener;
 
 /**
  * The main GUI of this application.
@@ -91,6 +92,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     private javax.swing.JTextField TxtFieldSecretKey;
     private javax.swing.JTextField TxtFieldTelegramId;
     private JCheckBoxMenuItem chckbxmntmStartMinimized;
+    private JCheckBoxMenuItem chckbxmntmRefreshRecipientsAfter;
 
     public NSTelegramForm(ITelegramSender telegramSender, IPropertiesManager propertiesManager,
             TelegrammerClientProperties properties, IRecipientsFilterTranslator filterTranslator) {
@@ -114,6 +116,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 	chckbxmntmHideSkippedRecipients.setSelected(properties.hideSkippedRecipients);
 	chckbxmntmStartSendingOn.setSelected(properties.startSendingOnStartup);
 	chckbxmntmStartMinimized.setSelected(properties.startMinimized);
+	chckbxmntmRefreshRecipientsAfter.setSelected(properties.updateRecipientsAfterEveryTelegram);
 	final DefaultListModel filtersModel = (DefaultListModel) this.JListFilters.getModel();
 	properties.recipientsListBuilder.getFilters().forEach(filter -> {
 	    filtersModel.addElement(filter.toString());
@@ -194,7 +197,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void ButtonAddFilterActionPerformed(java.awt.event.ActionEvent evt) {
-	TextAreaOutput.setText("compiling recipient list...\n"); // Inform user, as this might take a while.
+	TextAreaOutput.setText("updating recipient list...\n"); // Inform user, as this might take a while.
 	updateGui(Status.CompilingRecipients);
 	final HashSet<String> filterValues = StringFunctions.stringToHashSet(TextFieldFilterValues.getText());
 	TextFieldFilterValues.setText("");
@@ -251,6 +254,10 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 
     private void chckbxmntmStartSendingOnItemStateChanged(java.awt.event.ItemEvent evt) {
 	properties.startSendingOnStartup = chckbxmntmStartSendingOn.isSelected();
+    }
+
+    private void chckbxmntmRefreshRecipientsAfterItemStateChanged(ItemEvent e) {
+	properties.updateRecipientsAfterEveryTelegram = chckbxmntmRefreshRecipientsAfter.isSelected();
     }
 
     /**
@@ -332,7 +339,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     @Override
     public void handleNoRecipientsFound(NoRecipientsFoundEvent event) {
 	SwingUtilities.invokeLater(() -> {
-	    printToOutput("no new recipients found, timing out for " + event.TimeOut / 1000 + " seconds...", false);
+	    printToOutput("no new recipients found, timing out for " + event.timeOut / 1000 + " seconds...", false);
 	});
     }
 
@@ -340,7 +347,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     public void handleRecipientRemoved(RecipientRemovedEvent event) {
 	if (!this.properties.hideSkippedRecipients) {
 	    SwingUtilities.invokeLater(() -> {
-		printToOutput("skipping recipient '" + event.Recipient + "': " + event.Reason, false);
+		printToOutput("skipping recipient '" + event.recipient + "': " + event.reason, false);
 	    });
 	}
     }
@@ -348,7 +355,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     @Override
     public void handleRecipientsRefreshed(RecipientsRefreshedEvent event) {
 	SwingUtilities.invokeLater(() -> {
-	    printToOutput("out of recipients, refreshing recipients list...", false);
+	    printToOutput("updating recipients list...", false);
 	});
     }
 
@@ -357,10 +364,10 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 	SwingUtilities.invokeLater(() -> {
 	    updateGui(Status.Idle);
 	    final String message = BORDER + "\nfinished"
-	            + (event.CausedByError ? " with error: " + event.ErrorMsg + "\n" : " without fatal errors\n")
-	            + "telegrams queued: " + event.QueuedSucces + "\n" + "blocked by category: "
-	            + event.RecipientIsBlocking + "\n" + "recipients not found: " + event.RecipientDidntExist + "\n"
-	            + "failed b/c other reasons: " + event.DisconnectOrOtherReason + "\n" + BORDER + "\n";
+	            + (event.causedByError ? " with error: " + event.errorMsg + "\n" : " without fatal errors\n")
+	            + "telegrams queued: " + event.queuedSucces + "\n" + "blocked by category: "
+	            + event.recipientIsBlocking + "\n" + "recipients not found: " + event.recipientDidntExist + "\n"
+	            + "failed b/c other reasons: " + event.disconnectOrOtherReason + "\n" + BORDER + "\n";
 	    TextAreaOutput.append(message);
 	});
     }
@@ -395,6 +402,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 	chckbxmntmHideSkippedRecipients.setEnabled(status == Status.Idle);
 	chckbxmntmStartSendingOn.setEnabled(status == Status.Idle);
 	chckbxmntmStartMinimized.setEnabled(status == Status.Idle);
+	chckbxmntmRefreshRecipientsAfter.setEnabled(status == Status.Idle);
 	ComboBoxFilterType.setEnabled(status == Status.Idle);
 	ComboBoxProviderType.setEnabled(status == Status.Idle);
 	BtnStop.setEnabled(status == Status.SendingTelegrams);
@@ -711,6 +719,14 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 		chckbxmntmRunIndefinitelyItemStateChanged(evt);
 	    }
 	});
+
+	chckbxmntmRefreshRecipientsAfter = new JCheckBoxMenuItem("Refresh recipients after every telegram");
+	chckbxmntmRefreshRecipientsAfter.addItemListener(new ItemListener() {
+	    public void itemStateChanged(ItemEvent e) {
+		chckbxmntmRefreshRecipientsAfterItemStateChanged(e);
+	    }
+	});
+	mnNewMenu.add(chckbxmntmRefreshRecipientsAfter);
 	mnNewMenu.add(chckbxmntmRunIndefinitely);
 
 	chckbxmntmStartSendingOn = new JCheckBoxMenuItem("Start sending on startup");

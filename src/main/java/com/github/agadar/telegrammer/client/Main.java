@@ -11,8 +11,6 @@ import com.github.agadar.nationstates.NationStates;
 import com.github.agadar.telegrammer.client.form.NSTelegramForm;
 import com.github.agadar.telegrammer.client.properties.TelegrammerClientProperties;
 import com.github.agadar.telegrammer.client.properties.TelegrammerClientPropertiesManager;
-import com.github.agadar.telegrammer.core.nationdumpaccess.INationDumpAccess;
-import com.github.agadar.telegrammer.core.nationdumpaccess.NationDumpAccess;
 import com.github.agadar.telegrammer.core.properties.manager.IPropertiesManager;
 import com.github.agadar.telegrammer.core.recipients.translator.IRecipientsFilterTranslator;
 import com.github.agadar.telegrammer.core.recipients.translator.IRecipientsListBuilderTranslator;
@@ -20,6 +18,8 @@ import com.github.agadar.telegrammer.core.recipients.translator.IRecipientsProvi
 import com.github.agadar.telegrammer.core.recipients.translator.RecipientsFilterTranslator;
 import com.github.agadar.telegrammer.core.recipients.translator.RecipientsListBuilderTranslator;
 import com.github.agadar.telegrammer.core.recipients.translator.RecipientsProviderTranslator;
+import com.github.agadar.telegrammer.core.regiondumpaccess.IRegionDumpAccess;
+import com.github.agadar.telegrammer.core.regiondumpaccess.RegionDumpAccess;
 import com.github.agadar.telegrammer.core.telegram.history.ITelegramHistory;
 import com.github.agadar.telegrammer.core.telegram.history.TelegramHistory;
 import com.github.agadar.telegrammer.core.telegram.sender.TelegramSender;
@@ -38,9 +38,9 @@ public class Main {
 	        "Agadar's Telegrammer Client (https://github.com/Agadar/NationStates-Telegrammer-Client)");
 	final TelegrammerClientProperties properties = new TelegrammerClientProperties();
 	final ITelegramHistory telegramHistory = new TelegramHistory(properties, ".nationstates-telegrammer.history");
-	final INationDumpAccess nationDumpAccess = new NationDumpAccess(nationStates);
+	final IRegionDumpAccess regionDumpAccess = new RegionDumpAccess(nationStates);
 	final IRecipientsProviderTranslator providerTranslator = new RecipientsProviderTranslator(nationStates,
-	        nationDumpAccess);
+	        regionDumpAccess);
 	final IRecipientsFilterTranslator filterTranslator = new RecipientsFilterTranslator(providerTranslator);
 	final IRecipientsListBuilderTranslator recipientsListBuilderTranslator = new RecipientsListBuilderTranslator(
 	        telegramHistory, filterTranslator);
