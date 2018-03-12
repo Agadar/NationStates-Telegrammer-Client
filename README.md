@@ -10,7 +10,7 @@ This program uses the [NationStates Telegrammer Core](https://github.com/Agadar/
 
 ## Screenshot
 
-![Screenshot](https://raw.githubusercontent.com/Agadar/NationStates-Telegrammer-Client/master/images/Screenshot%20NationStates%20Telegrammer%201.5.0.png)
+![Screenshot](https://raw.githubusercontent.com/Agadar/NationStates-Telegrammer-Client/master/images/Screenshot%20NationStates%20Telegrammer%201.6.0.png)
 
 ## Links
 
