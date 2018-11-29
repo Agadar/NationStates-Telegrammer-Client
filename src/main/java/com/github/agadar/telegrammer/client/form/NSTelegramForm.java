@@ -42,21 +42,23 @@ import java.awt.event.ItemListener;
  */
 public final class NSTelegramForm extends javax.swing.JFrame implements TelegramManagerListener {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Enumerator for different states.
      */
     public enum Status {
-	CompilingRecipients, Idle, SendingTelegrams;
+        CompilingRecipients, Idle, SendingTelegrams;
     }
 
-    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer Client 1.6.0";
+    public final static String FORM_TITLE = "Agadar's NationStates Telegrammer Client 2.0.0";
 
     private final static String BORDER = "------------------------------------------";
 
     private Thread compileRecipientsWorker;
     private final IRecipientsFilterTranslator filterTranslator;
     private final TelegrammerClientProperties properties;
-    private final IPropertiesManager propertiesManager;
+    private final IPropertiesManager<TelegrammerClientProperties> propertiesManager;
     private final ITelegramSender telegramSender;
 
     // GUI elements.
@@ -94,49 +96,50 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     private JCheckBoxMenuItem chckbxmntmStartMinimized;
     private JCheckBoxMenuItem chckbxmntmRefreshRecipientsAfter;
 
-    public NSTelegramForm(ITelegramSender telegramSender, IPropertiesManager propertiesManager,
-            TelegrammerClientProperties properties, IRecipientsFilterTranslator filterTranslator) {
-	initComponents();
+    public NSTelegramForm(ITelegramSender telegramSender,
+            IPropertiesManager<TelegrammerClientProperties> propertiesManager, TelegrammerClientProperties properties,
+            IRecipientsFilterTranslator filterTranslator) {
+        initComponents();
 
-	this.telegramSender = telegramSender;
-	this.propertiesManager = propertiesManager;
-	this.filterTranslator = filterTranslator;
-	this.properties = properties;
+        this.telegramSender = telegramSender;
+        this.propertiesManager = propertiesManager;
+        this.filterTranslator = filterTranslator;
+        this.properties = properties;
 
-	// Sets the output textarea such that it auto-scrolls down.
-	((DefaultCaret) TextAreaOutput.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        // Sets the output textarea such that it auto-scrolls down.
+        ((DefaultCaret) TextAreaOutput.getCaret()).setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
-	// Set fields according to values retrieved from properties file.
-	TxtFieldClientKey.setText(properties.clientKey);
-	TxtFieldTelegramId.setText(properties.telegramId);
-	TxtFieldSecretKey.setText(properties.secretKey);
-	ComboBoxTelegramType.setSelectedItem(properties.lastTelegramType);
-	TxtFieldRegionFrom.setText(properties.fromRegion);
-	chckbxmntmRunIndefinitely.setSelected(properties.runIndefinitely);
-	chckbxmntmHideSkippedRecipients.setSelected(properties.hideSkippedRecipients);
-	chckbxmntmStartSendingOn.setSelected(properties.startSendingOnStartup);
-	chckbxmntmStartMinimized.setSelected(properties.startMinimized);
-	chckbxmntmRefreshRecipientsAfter.setSelected(properties.updateRecipientsAfterEveryTelegram);
-	final DefaultListModel filtersModel = (DefaultListModel) this.JListFilters.getModel();
-	properties.recipientsListBuilder.getFilters().forEach(filter -> {
-	    filtersModel.addElement(filter.toString());
-	});
+        // Set fields according to values retrieved from properties file.
+        TxtFieldClientKey.setText(properties.clientKey);
+        TxtFieldTelegramId.setText(properties.telegramId);
+        TxtFieldSecretKey.setText(properties.secretKey);
+        ComboBoxTelegramType.setSelectedItem(properties.lastTelegramType);
+        TxtFieldRegionFrom.setText(properties.fromRegion);
+        chckbxmntmRunIndefinitely.setSelected(properties.runIndefinitely);
+        chckbxmntmHideSkippedRecipients.setSelected(properties.hideSkippedRecipients);
+        chckbxmntmStartSendingOn.setSelected(properties.startSendingOnStartup);
+        chckbxmntmStartMinimized.setSelected(properties.startMinimized);
+        chckbxmntmRefreshRecipientsAfter.setSelected(properties.updateRecipientsAfterEveryTelegram);
+        var filtersModel = (DefaultListModel<String>) this.JListFilters.getModel();
+        properties.recipientsListBuilder.getFilters().forEach(filter -> {
+            filtersModel.addElement(filter.toString());
+        });
 
-	// Set hint properly.
-	setInputHint((RecipientsProviderType) ComboBoxProviderType.getSelectedItem());
+        // Set hint properly.
+        setInputHint((RecipientsProviderType) ComboBoxProviderType.getSelectedItem());
 
-	// Start sending telegrams right away if so configured.
-	if (!this.properties.startSendingOnStartup) {
-	    updateGui(Status.Idle); // Update entire GUI in case we missed something in visual designer.
-	    TextAreaOutput.setText(duration()); // Set output textarea, for consistency's sake.
-	} else {
-	    this.startSendingTelegrams();
-	}
+        // Start sending telegrams right away if so configured.
+        if (!this.properties.startSendingOnStartup) {
+            updateGui(Status.Idle); // Update entire GUI in case we missed something in visual designer.
+            TextAreaOutput.setText(duration()); // Set output textarea, for consistency's sake.
+        } else {
+            this.startSendingTelegrams();
+        }
 
-	// Minimize if so configured.
-	if (this.properties.startMinimized) {
-	    this.setExtendedState(java.awt.Frame.ICONIFIED);
-	}
+        // Minimize if so configured.
+        if (this.properties.startMinimized) {
+            this.setExtendedState(java.awt.Frame.ICONIFIED);
+        }
     }
 
     /**
@@ -145,7 +148,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void BtnClearOutputActionPerformed(java.awt.event.ActionEvent evt) {
-	TextAreaOutput.setText("");
+        TextAreaOutput.setText("");
     }
 
     /**
@@ -155,27 +158,27 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void BtnStartActionPerformed(java.awt.event.ActionEvent evt) {
-	startSendingTelegrams();
+        startSendingTelegrams();
     }
 
     private void startSendingTelegrams() {
 
-	// Make sure there are no spaces in the fields.
-	TxtFieldRegionFrom.setText(properties.fromRegion.trim());
-	TxtFieldClientKey.setText(properties.clientKey.replace(" ", ""));
-	TxtFieldSecretKey.setText(properties.secretKey.replace(" ", ""));
-	TxtFieldTelegramId.setText(properties.telegramId.replace(" ", ""));
+        // Make sure there are no spaces in the fields.
+        TxtFieldRegionFrom.setText(properties.fromRegion.trim());
+        TxtFieldClientKey.setText(properties.clientKey.replace(" ", ""));
+        TxtFieldSecretKey.setText(properties.secretKey.replace(" ", ""));
+        TxtFieldTelegramId.setText(properties.telegramId.replace(" ", ""));
 
-	updateGui(Status.SendingTelegrams);
-	TextAreaOutput.setText(duration());
+        updateGui(Status.SendingTelegrams);
+        TextAreaOutput.setText(duration());
 
-	try {
-	    telegramSender.startSending(properties.recipientsListBuilder); // start sending telegrams
-	} catch (Exception ex) {
-	    // if something went wrong while starting sending telegrams, reset GUI
-	    TextAreaOutput.setText(ex.getMessage() + "\n");
-	    updateGui(Status.Idle);
-	}
+        try {
+            telegramSender.startSending(properties.recipientsListBuilder); // start sending telegrams
+        } catch (Exception ex) {
+            // if something went wrong while starting sending telegrams, reset GUI
+            TextAreaOutput.setText(ex.getMessage() + "\n");
+            updateGui(Status.Idle);
+        }
     }
 
     /**
@@ -185,7 +188,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void BtnStopActionPerformed(java.awt.event.ActionEvent evt) {
-	telegramSender.stopSending();
+        telegramSender.stopSending();
     }
 
     /**
@@ -197,25 +200,25 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void ButtonAddFilterActionPerformed(java.awt.event.ActionEvent evt) {
-	TextAreaOutput.setText("updating recipient list...\n"); // Inform user, as this might take a while.
-	updateGui(Status.CompilingRecipients);
-	final HashSet<String> filterValues = StringFunctions.stringToHashSet(TextFieldFilterValues.getText());
-	TextFieldFilterValues.setText("");
-	final RecipientsProviderType providerType = (RecipientsProviderType) ComboBoxProviderType.getSelectedItem();
-	final RecipientsFilterType filterType = (RecipientsFilterType) ComboBoxFilterType.getSelectedItem();
-	final IRecipientsFilter filter = filterTranslator.toFilter(filterType, providerType, filterValues);
+        TextAreaOutput.setText("updating recipient list...\n"); // Inform user, as this might take a while.
+        updateGui(Status.CompilingRecipients);
+        final HashSet<String> filterValues = StringFunctions.stringToHashSet(TextFieldFilterValues.getText());
+        TextFieldFilterValues.setText("");
+        final RecipientsProviderType providerType = (RecipientsProviderType) ComboBoxProviderType.getSelectedItem();
+        final RecipientsFilterType filterType = (RecipientsFilterType) ComboBoxFilterType.getSelectedItem();
+        final IRecipientsFilter filter = filterTranslator.toFilter(filterType, providerType, filterValues);
 
-	// Check to make sure the thread is not already running to prevent
-	// synchronization issues.
-	if (compileRecipientsWorker != null && compileRecipientsWorker.isAlive()) {
-	    TextAreaOutput.setText("Compile recipient list thread already running!\n");
-	    return;
-	}
+        // Check to make sure the thread is not already running to prevent
+        // synchronization issues.
+        if (compileRecipientsWorker != null && compileRecipientsWorker.isAlive()) {
+            TextAreaOutput.setText("Compile recipient list thread already running!\n");
+            return;
+        }
 
-	// Prepare thread, then run it.
-	properties.recipientsListBuilder.addFilter(filter);
-	compileRecipientsWorker = new Thread(new RefreshFilterRunnable(this, filter));
-	compileRecipientsWorker.start();
+        // Prepare thread, then run it.
+        properties.recipientsListBuilder.addFilter(filter);
+        compileRecipientsWorker = new Thread(new RefreshFilterRunnable(this, filter));
+        compileRecipientsWorker.start();
     }
 
     /**
@@ -226,38 +229,38 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void ButtonRemoveFilterActionPerformed(java.awt.event.ActionEvent evt) {
-	// Retrieve selected index, remove filter from telegram manager.
-	int index = JListFilters.getSelectedIndex();
-	properties.recipientsListBuilder.removeFilterAt(index);
+        // Retrieve selected index, remove filter from telegram manager.
+        int index = JListFilters.getSelectedIndex();
+        properties.recipientsListBuilder.removeFilterAt(index);
 
-	// Remove filter from GUI, try select preceding filter.
-	((DefaultListModel) JListFilters.getModel()).remove(index);
-	JListFilters.setSelectedIndex(Math.max(0, --index));
+        // Remove filter from GUI, try select preceding filter.
+        ((DefaultListModel<String>) JListFilters.getModel()).remove(index);
+        JListFilters.setSelectedIndex(Math.max(0, --index));
 
-	// Update rest of GUI.
-	ButtonRemoveFilter.setEnabled(!JListFilters.isSelectionEmpty());
-	TextAreaOutput.setText(duration());
+        // Update rest of GUI.
+        ButtonRemoveFilter.setEnabled(!JListFilters.isSelectionEmpty());
+        TextAreaOutput.setText(duration());
     }
 
     private void chckbxmntmStartMinimizedOnItemStateChanged(ItemEvent evt) {
-	properties.startMinimized = chckbxmntmStartMinimized.isSelected();
+        properties.startMinimized = chckbxmntmStartMinimized.isSelected();
 
     }
 
     private void chckbxmntmRunIndefinitelyItemStateChanged(ItemEvent evt) {
-	properties.runIndefinitely = chckbxmntmRunIndefinitely.isSelected();
+        properties.runIndefinitely = chckbxmntmRunIndefinitely.isSelected();
     }
 
     private void chckbxmntmHideSkippedRecipientsItemStateChanged(ItemEvent evt) {
-	properties.hideSkippedRecipients = chckbxmntmHideSkippedRecipients.isSelected();
+        properties.hideSkippedRecipients = chckbxmntmHideSkippedRecipients.isSelected();
     }
 
     private void chckbxmntmStartSendingOnItemStateChanged(java.awt.event.ItemEvent evt) {
-	properties.startSendingOnStartup = chckbxmntmStartSendingOn.isSelected();
+        properties.startSendingOnStartup = chckbxmntmStartSendingOn.isSelected();
     }
 
     private void chckbxmntmRefreshRecipientsAfterItemStateChanged(ItemEvent e) {
-	properties.updateRecipientsAfterEveryTelegram = chckbxmntmRefreshRecipientsAfter.isSelected();
+        properties.updateRecipientsAfterEveryTelegram = chckbxmntmRefreshRecipientsAfter.isSelected();
     }
 
     /**
@@ -267,14 +270,14 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void ComboBoxProviderTypeItemStateChanged(java.awt.event.ItemEvent evt) {
-	// Only run this code if something was SELECTED.
-	if (evt.getStateChange() != ItemEvent.SELECTED) {
-	    return;
-	}
+        // Only run this code if something was SELECTED.
+        if (evt.getStateChange() != ItemEvent.SELECTED) {
+            return;
+        }
 
-	setInputHint((RecipientsProviderType) evt.getItem()); // Set the tooltip.
-	TextFieldFilterValues.setText(""); // Clear the textfield in question.
-	setFilterComboBoxEnabled((RecipientsProviderType) evt.getItem(), Status.Idle);
+        setInputHint((RecipientsProviderType) evt.getItem()); // Set the tooltip.
+        TextFieldFilterValues.setText(""); // Clear the textfield in question.
+        setFilterComboBoxEnabled((RecipientsProviderType) evt.getItem(), Status.Idle);
     }
 
     /**
@@ -283,17 +286,17 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void ComboBoxTelegramTypeItemStateChanged(java.awt.event.ItemEvent evt) {
-	// Only run this code if something was SELECTED.
-	if (evt.getStateChange() != ItemEvent.SELECTED) {
-	    return;
-	}
+        // Only run this code if something was SELECTED.
+        if (evt.getStateChange() != ItemEvent.SELECTED) {
+            return;
+        }
 
-	// Enable or disable TxtFieldRegionFrom.
-	final TelegramType selected = (TelegramType) evt.getItem();
-	setFromRegionTextAndEnabled(selected, Status.Idle);
-	properties.lastTelegramType = selected;
+        // Enable or disable TxtFieldRegionFrom.
+        final TelegramType selected = (TelegramType) evt.getItem();
+        setFromRegionTextAndEnabled(selected, Status.Idle);
+        properties.lastTelegramType = selected;
 
-	TextAreaOutput.setText(duration()); // Print new duration to output textarea.
+        TextAreaOutput.setText(duration()); // Print new duration to output textarea.
     }
 
     /**
@@ -303,14 +306,14 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @return
      */
     public final String duration() {
-	final Set<String> recipients = properties.recipientsListBuilder.getRecipients();
-	int estimatedDuration = Math.max(recipients.size() - 1, 0)
-	        * ((ComboBoxTelegramType.getSelectedItem() == TelegramType.RECRUITMENT ? 180050 : 30050) / 1000);
-	int hours = estimatedDuration / 3600;
-	int minutes = estimatedDuration % 3600 / 60;
-	int seconds = estimatedDuration % 3600 % 60;
-	return String.format(BORDER + "%naddressees selected: %s%nestimated duration: "
-	        + "%s hours, %s minutes, %s seconds%n" + BORDER + "%n", recipients.size(), hours, minutes, seconds);
+        final Set<String> recipients = properties.recipientsListBuilder.getRecipients();
+        int estimatedDuration = Math.max(recipients.size() - 1, 0)
+                * ((ComboBoxTelegramType.getSelectedItem() == TelegramType.RECRUITMENT ? 180050 : 30050) / 1000);
+        int hours = estimatedDuration / 3600;
+        int minutes = estimatedDuration % 3600 / 60;
+        int seconds = estimatedDuration % 3600 % 60;
+        return String.format(BORDER + "%naddressees selected: %s%nestimated duration: "
+                + "%s hours, %s minutes, %s seconds%n" + BORDER + "%n", recipients.size(), hours, minutes, seconds);
 
     }
 
@@ -321,8 +324,8 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void formMouseClicked(java.awt.event.MouseEvent evt) {
-	JListFilters.clearSelection();
-	ButtonRemoveFilter.setEnabled(false);
+        JListFilters.clearSelection();
+        ButtonRemoveFilter.setEnabled(false);
     }
 
     /**
@@ -332,56 +335,58 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void formWindowClosing(java.awt.event.WindowEvent evt) {
-	// Store relevant variables to properties and history files.
-	propertiesManager.saveProperties(properties);
+        // Store relevant variables to properties and history files.
+        propertiesManager.saveProperties(properties);
     }
 
     @Override
     public void handleNoRecipientsFound(NoRecipientsFoundEvent event) {
-	SwingUtilities.invokeLater(() -> {
-	    printToOutput("no new recipients found, timing out for " + event.timeOut / 1000 + " seconds...", false);
-	});
+        SwingUtilities.invokeLater(() -> {
+            printToOutput("no new recipients found, timing out for " + event.timeOut / 1000 + " seconds...", false);
+        });
     }
 
     @Override
     public void handleRecipientRemoved(RecipientRemovedEvent event) {
-	if (!this.properties.hideSkippedRecipients) {
-	    SwingUtilities.invokeLater(() -> {
-		printToOutput("skipping recipient '" + event.recipient + "': " + event.reason, false);
-	    });
-	}
+        if (!this.properties.hideSkippedRecipients) {
+            SwingUtilities.invokeLater(() -> {
+                printToOutput("skipping recipient '" + event.recipient + "': " + event.reason, false);
+            });
+        }
     }
 
     @Override
     public void handleRecipientsRefreshed(RecipientsRefreshedEvent event) {
-	SwingUtilities.invokeLater(() -> {
-	    printToOutput("updating recipients list...", false);
-	});
+        SwingUtilities.invokeLater(() -> {
+            printToOutput("updating recipients list...", false);
+        });
     }
 
     @Override
     public void handleStoppedSending(StoppedSendingEvent event) {
-	SwingUtilities.invokeLater(() -> {
-	    updateGui(Status.Idle);
-	    final String message = BORDER + "\nfinished"
-	            + (event.causedByError ? " with error: " + event.errorMsg + "\n" : " without fatal errors\n")
-	            + "telegrams queued: " + event.queuedSucces + "\n" + "blocked by category: "
-	            + event.recipientIsBlocking + "\n" + "recipients not found: " + event.recipientDidntExist + "\n"
-	            + "failed b/c other reasons: " + event.disconnectOrOtherReason + "\n" + BORDER + "\n";
-	    TextAreaOutput.append(message);
-	});
+        SwingUtilities.invokeLater(() -> {
+            updateGui(Status.Idle);
+            final String message = BORDER + "\nfinished"
+                    + (event.causedByError ? " with error: " + event.errorMsg + "\n" : " without fatal errors\n")
+                    + "telegrams queued: " + event.queuedSucces + "\n" + "blocked by category: "
+                    + event.recipientIsBlocking + "\n" + "recipients not found: " + event.recipientDidntExist + "\n"
+                    + "failed b/c other reasons: " + event.disconnectOrOtherReason + "\n" + BORDER + "\n";
+            TextAreaOutput.append(message);
+        });
     }
 
     @Override
     public void handleTelegramSent(TelegramSentEvent event) {
-	// Print info to output.
-	SwingUtilities.invokeLater(() -> {
-	    if (event.queued) {
-		printToOutput("queued telegram for '" + event.recipient + "'", false);
-	    } else {
-		printToOutput("failed to queue telegram for '" + event.recipient + "':\n" + event.errorMessage, false);
-	    }
-	});
+        // Print info to output.
+        SwingUtilities.invokeLater(() -> {
+            if (event.isQueued()) {
+                printToOutput("queued telegram for '" + event.getRecipient() + "'", false);
+            } else {
+                printToOutput(
+                        "failed to queue telegram for '" + event.getRecipient() + "':\n" + event.getErrorMessage(),
+                        false);
+            }
+        });
     }
 
     /**
@@ -390,414 +395,413 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param status
      */
     public void updateGui(Status status) {
-	BtnStart.setEnabled(status == Status.Idle);
-	JListFilters.setEnabled(status == Status.Idle);
-	ButtonAddFilter.setEnabled(status == Status.Idle);
-	TxtFieldClientKey.setEditable(status == Status.Idle);
-	TxtFieldTelegramId.setEditable(status == Status.Idle);
-	TxtFieldSecretKey.setEditable(status == Status.Idle);
-	TextFieldFilterValues.setEditable(status == Status.Idle);
-	ComboBoxTelegramType.setEnabled(status == Status.Idle);
-	chckbxmntmRunIndefinitely.setEnabled(status == Status.Idle);
-	chckbxmntmHideSkippedRecipients.setEnabled(status == Status.Idle);
-	chckbxmntmStartSendingOn.setEnabled(status == Status.Idle);
-	chckbxmntmStartMinimized.setEnabled(status == Status.Idle);
-	chckbxmntmRefreshRecipientsAfter.setEnabled(status == Status.Idle);
-	ComboBoxFilterType.setEnabled(status == Status.Idle);
-	ComboBoxProviderType.setEnabled(status == Status.Idle);
-	BtnStop.setEnabled(status == Status.SendingTelegrams);
-	ButtonRemoveFilter.setEnabled(status == Status.Idle && JListFilters.getSelectedValue() != null);
-	setFilterComboBoxEnabled((RecipientsProviderType) ComboBoxProviderType.getSelectedItem(), status);
-	setFromRegionTextAndEnabled((TelegramType) ComboBoxTelegramType.getSelectedItem(), status);
+        BtnStart.setEnabled(status == Status.Idle);
+        JListFilters.setEnabled(status == Status.Idle);
+        ButtonAddFilter.setEnabled(status == Status.Idle);
+        TxtFieldClientKey.setEditable(status == Status.Idle);
+        TxtFieldTelegramId.setEditable(status == Status.Idle);
+        TxtFieldSecretKey.setEditable(status == Status.Idle);
+        TextFieldFilterValues.setEditable(status == Status.Idle);
+        ComboBoxTelegramType.setEnabled(status == Status.Idle);
+        chckbxmntmRunIndefinitely.setEnabled(status == Status.Idle);
+        chckbxmntmHideSkippedRecipients.setEnabled(status == Status.Idle);
+        chckbxmntmStartSendingOn.setEnabled(status == Status.Idle);
+        chckbxmntmStartMinimized.setEnabled(status == Status.Idle);
+        chckbxmntmRefreshRecipientsAfter.setEnabled(status == Status.Idle);
+        ComboBoxFilterType.setEnabled(status == Status.Idle);
+        ComboBoxProviderType.setEnabled(status == Status.Idle);
+        BtnStop.setEnabled(status == Status.SendingTelegrams);
+        ButtonRemoveFilter.setEnabled(status == Status.Idle && JListFilters.getSelectedValue() != null);
+        setFilterComboBoxEnabled((RecipientsProviderType) ComboBoxProviderType.getSelectedItem(), status);
+        setFromRegionTextAndEnabled((TelegramType) ComboBoxTelegramType.getSelectedItem(), status);
     }
 
     private void initComponents() {
-	new javax.swing.ButtonGroup();
-	PanelTelegram = new javax.swing.JPanel();
-	LabelTelegramId = new javax.swing.JLabel();
-	TxtFieldTelegramId = new javax.swing.JTextField();
-	LabelSecretKey = new javax.swing.JLabel();
-	TxtFieldSecretKey = new javax.swing.JTextField();
-	LabelClientKey = new javax.swing.JLabel();
-	LabelTelegramType = new javax.swing.JLabel();
-	TxtFieldClientKey = new javax.swing.JTextField();
-	TxtFieldRegionFrom = new javax.swing.JTextField();
-	LabelRegionFrom = new javax.swing.JLabel();
-	ComboBoxTelegramType = new javax.swing.JComboBox<>();
-	PanelFilters = new javax.swing.JPanel();
-	ScrollPaneFilters = new javax.swing.JScrollPane();
-	JListFilters = new javax.swing.JList<>();
-	ButtonRemoveFilter = new javax.swing.JButton();
-	ComboBoxProviderType = new javax.swing.JComboBox<>();
-	ButtonAddFilter = new javax.swing.JButton();
-	TextFieldFilterValues = new com.github.agadar.telegrammer.client.form.HintTextField();
-	ComboBoxFilterType = new javax.swing.JComboBox<>();
-	PanelOutput = new javax.swing.JPanel();
-	ScrollPaneOutput = new javax.swing.JScrollPane();
-	TextAreaOutput = new javax.swing.JTextArea();
-	PanelActions = new javax.swing.JPanel();
-	BtnStart = new javax.swing.JButton();
-	BtnStop = new javax.swing.JButton();
-	BtnClearOutput = new javax.swing.JButton();
+        new javax.swing.ButtonGroup();
+        PanelTelegram = new javax.swing.JPanel();
+        LabelTelegramId = new javax.swing.JLabel();
+        TxtFieldTelegramId = new javax.swing.JTextField();
+        LabelSecretKey = new javax.swing.JLabel();
+        TxtFieldSecretKey = new javax.swing.JTextField();
+        LabelClientKey = new javax.swing.JLabel();
+        LabelTelegramType = new javax.swing.JLabel();
+        TxtFieldClientKey = new javax.swing.JTextField();
+        TxtFieldRegionFrom = new javax.swing.JTextField();
+        LabelRegionFrom = new javax.swing.JLabel();
+        ComboBoxTelegramType = new javax.swing.JComboBox<>();
+        PanelFilters = new javax.swing.JPanel();
+        ScrollPaneFilters = new javax.swing.JScrollPane();
+        JListFilters = new javax.swing.JList<>();
+        ButtonRemoveFilter = new javax.swing.JButton();
+        ComboBoxProviderType = new javax.swing.JComboBox<>();
+        ButtonAddFilter = new javax.swing.JButton();
+        TextFieldFilterValues = new com.github.agadar.telegrammer.client.form.HintTextField();
+        ComboBoxFilterType = new javax.swing.JComboBox<>();
+        PanelOutput = new javax.swing.JPanel();
+        ScrollPaneOutput = new javax.swing.JScrollPane();
+        TextAreaOutput = new javax.swing.JTextArea();
+        PanelActions = new javax.swing.JPanel();
+        BtnStart = new javax.swing.JButton();
+        BtnStop = new javax.swing.JButton();
+        BtnClearOutput = new javax.swing.JButton();
 
-	setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-	setTitle(NSTelegramForm.FORM_TITLE);
-	setName("NSTelegramFrame"); // NOI18N
-	setResizable(false);
-	addMouseListener(new java.awt.event.MouseAdapter() {
-	    public void mouseClicked(java.awt.event.MouseEvent evt) {
-		formMouseClicked(evt);
-	    }
-	});
-	addWindowListener(new java.awt.event.WindowAdapter() {
-	    public void windowClosing(java.awt.event.WindowEvent evt) {
-		formWindowClosing(evt);
-	    }
-	});
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle(NSTelegramForm.FORM_TITLE);
+        setName("NSTelegramFrame"); // NOI18N
+        setResizable(false);
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                formMouseClicked(evt);
+            }
+        });
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
-	PanelTelegram.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Telegram",
-	        javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION,
-	        new java.awt.Font("Tahoma", 1, 11))); // NOI18N
+        PanelTelegram.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Telegram",
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                new java.awt.Font("Tahoma", 1, 11))); // NOI18N
 
-	LabelTelegramId.setLabelFor(TxtFieldTelegramId);
-	LabelTelegramId.setText("Telegram Id:");
-	LabelTelegramId.setName("LabelTelegramId"); // NOI18N
+        LabelTelegramId.setLabelFor(TxtFieldTelegramId);
+        LabelTelegramId.setText("Telegram Id:");
+        LabelTelegramId.setName("LabelTelegramId"); // NOI18N
 
-	TxtFieldTelegramId.setName("TxtFieldTelegramId"); // NOI18N
-	TxtFieldTelegramId.addKeyListener(new java.awt.event.KeyAdapter() {
-	    public void keyReleased(java.awt.event.KeyEvent evt) {
-		TxtFieldTelegramIdKeyReleased(evt);
-	    }
-	});
+        TxtFieldTelegramId.setName("TxtFieldTelegramId"); // NOI18N
+        TxtFieldTelegramId.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                TxtFieldTelegramIdKeyReleased(evt);
+            }
+        });
 
-	LabelSecretKey.setLabelFor(TxtFieldSecretKey);
-	LabelSecretKey.setText("Secret Key:");
-	LabelSecretKey.setName("LabelSecretKey"); // NOI18N
+        LabelSecretKey.setLabelFor(TxtFieldSecretKey);
+        LabelSecretKey.setText("Secret Key:");
+        LabelSecretKey.setName("LabelSecretKey"); // NOI18N
 
-	TxtFieldSecretKey.setName("TxtFieldSecretKey"); // NOI18N
-	TxtFieldSecretKey.addKeyListener(new java.awt.event.KeyAdapter() {
-	    public void keyReleased(java.awt.event.KeyEvent evt) {
-		TxtFieldSecretKeyKeyReleased(evt);
-	    }
-	});
+        TxtFieldSecretKey.setName("TxtFieldSecretKey"); // NOI18N
+        TxtFieldSecretKey.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                TxtFieldSecretKeyKeyReleased(evt);
+            }
+        });
 
-	LabelClientKey.setLabelFor(TxtFieldClientKey);
-	LabelClientKey.setText("Client Key:");
-	LabelClientKey.setName("LabelClientKey"); // NOI18N
+        LabelClientKey.setLabelFor(TxtFieldClientKey);
+        LabelClientKey.setText("Client Key:");
+        LabelClientKey.setName("LabelClientKey"); // NOI18N
 
-	LabelTelegramType.setText("Type:");
-	LabelTelegramType.setName("LabelTelegramType"); // NOI18N
+        LabelTelegramType.setText("Type:");
+        LabelTelegramType.setName("LabelTelegramType"); // NOI18N
 
-	TxtFieldClientKey.setName("TxtFieldClientKey"); // NOI18N
-	TxtFieldClientKey.addKeyListener(new java.awt.event.KeyAdapter() {
-	    public void keyReleased(java.awt.event.KeyEvent evt) {
-		TxtFieldClientKeyKeyReleased(evt);
-	    }
-	});
+        TxtFieldClientKey.setName("TxtFieldClientKey"); // NOI18N
+        TxtFieldClientKey.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                TxtFieldClientKeyKeyReleased(evt);
+            }
+        });
 
-	TxtFieldRegionFrom.setEditable(false);
-	TxtFieldRegionFrom.setName("TxtFieldSecretKey"); // NOI18N
-	TxtFieldRegionFrom.addKeyListener(new java.awt.event.KeyAdapter() {
-	    public void keyReleased(java.awt.event.KeyEvent evt) {
-		TxtFieldRegionFromKeyReleased(evt);
-	    }
-	});
+        TxtFieldRegionFrom.setEditable(false);
+        TxtFieldRegionFrom.setName("TxtFieldSecretKey"); // NOI18N
+        TxtFieldRegionFrom.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                TxtFieldRegionFromKeyReleased(evt);
+            }
+        });
 
-	LabelRegionFrom.setText("For region:");
-	LabelRegionFrom.setName("LabelRecruiting"); // NOI18N
+        LabelRegionFrom.setText("For region:");
+        LabelRegionFrom.setName("LabelRecruiting"); // NOI18N
 
-	ComboBoxTelegramType.setModel(new DefaultComboBoxModel(TelegramType.values()));
-	ComboBoxTelegramType.addItemListener(new java.awt.event.ItemListener() {
-	    public void itemStateChanged(java.awt.event.ItemEvent evt) {
-		ComboBoxTelegramTypeItemStateChanged(evt);
-	    }
-	});
+        ComboBoxTelegramType.setModel(new DefaultComboBoxModel<TelegramType>(TelegramType.values()));
+        ComboBoxTelegramType.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                ComboBoxTelegramTypeItemStateChanged(evt);
+            }
+        });
 
-	javax.swing.GroupLayout PanelTelegramLayout = new javax.swing.GroupLayout(PanelTelegram);
-	PanelTelegramLayout
-	        .setHorizontalGroup(PanelTelegramLayout.createParallelGroup(Alignment.LEADING)
-	                .addGroup(PanelTelegramLayout.createSequentialGroup().addContainerGap()
-	                        .addGroup(PanelTelegramLayout.createParallelGroup(Alignment.LEADING)
-	                                .addComponent(LabelRegionFrom).addComponent(LabelTelegramType)
-	                                .addComponent(LabelSecretKey).addComponent(LabelTelegramId)
-	                                .addComponent(LabelClientKey))
-	                        .addGap(71)
-	                        .addGroup(PanelTelegramLayout.createParallelGroup(Alignment.LEADING, false)
-	                                .addComponent(TxtFieldRegionFrom, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE,
-	                                        150, Short.MAX_VALUE)
-	                                .addComponent(TxtFieldClientKey, GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
-	                                .addComponent(TxtFieldTelegramId, GroupLayout.DEFAULT_SIZE, 150,
-	                                        Short.MAX_VALUE)
-	                                .addComponent(TxtFieldSecretKey, GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
-	                                .addComponent(ComboBoxTelegramType, 0, GroupLayout.DEFAULT_SIZE,
-	                                        Short.MAX_VALUE))
-	                        .addGap(0, 32, Short.MAX_VALUE)));
-	PanelTelegramLayout
-	        .setVerticalGroup(
-	                PanelTelegramLayout.createParallelGroup(Alignment.LEADING)
-	                        .addGroup(PanelTelegramLayout.createSequentialGroup().addContainerGap()
-	                                .addGroup(PanelTelegramLayout.createParallelGroup(Alignment.BASELINE)
-	                                        .addComponent(LabelClientKey).addComponent(TxtFieldClientKey,
-	                                                GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-	                                                GroupLayout.PREFERRED_SIZE))
-	                                .addPreferredGap(ComponentPlacement.UNRELATED)
-	                                .addGroup(PanelTelegramLayout.createParallelGroup(Alignment.BASELINE)
-	                                        .addComponent(LabelTelegramId).addComponent(TxtFieldTelegramId,
-	                                                GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-	                                                GroupLayout.PREFERRED_SIZE))
-	                                .addPreferredGap(ComponentPlacement.UNRELATED)
-	                                .addGroup(PanelTelegramLayout.createParallelGroup(Alignment.BASELINE)
-	                                        .addComponent(LabelSecretKey).addComponent(TxtFieldSecretKey,
-	                                                GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-	                                                GroupLayout.PREFERRED_SIZE))
-	                                .addPreferredGap(ComponentPlacement.UNRELATED)
-	                                .addGroup(PanelTelegramLayout.createParallelGroup(Alignment.BASELINE)
-	                                        .addComponent(LabelTelegramType).addComponent(ComboBoxTelegramType,
-	                                                GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-	                                                GroupLayout.PREFERRED_SIZE))
-	                                .addPreferredGap(ComponentPlacement.UNRELATED)
-	                                .addGroup(PanelTelegramLayout.createParallelGroup(Alignment.BASELINE)
-	                                        .addComponent(TxtFieldRegionFrom, GroupLayout.PREFERRED_SIZE,
-	                                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-	                                        .addComponent(LabelRegionFrom))
-	                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
-	PanelTelegram.setLayout(PanelTelegramLayout);
+        javax.swing.GroupLayout PanelTelegramLayout = new javax.swing.GroupLayout(PanelTelegram);
+        PanelTelegramLayout
+                .setHorizontalGroup(PanelTelegramLayout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(PanelTelegramLayout.createSequentialGroup().addContainerGap()
+                                .addGroup(PanelTelegramLayout.createParallelGroup(Alignment.LEADING)
+                                        .addComponent(LabelRegionFrom).addComponent(LabelTelegramType)
+                                        .addComponent(LabelSecretKey).addComponent(LabelTelegramId)
+                                        .addComponent(LabelClientKey))
+                                .addGap(71)
+                                .addGroup(PanelTelegramLayout.createParallelGroup(Alignment.LEADING, false)
+                                        .addComponent(TxtFieldRegionFrom, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE,
+                                                150, Short.MAX_VALUE)
+                                        .addComponent(TxtFieldClientKey, GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                                        .addComponent(TxtFieldTelegramId, GroupLayout.DEFAULT_SIZE, 150,
+                                                Short.MAX_VALUE)
+                                        .addComponent(TxtFieldSecretKey, GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                                        .addComponent(ComboBoxTelegramType, 0, GroupLayout.DEFAULT_SIZE,
+                                                Short.MAX_VALUE))
+                                .addGap(0, 32, Short.MAX_VALUE)));
+        PanelTelegramLayout
+                .setVerticalGroup(
+                        PanelTelegramLayout.createParallelGroup(Alignment.LEADING)
+                                .addGroup(PanelTelegramLayout.createSequentialGroup().addContainerGap()
+                                        .addGroup(PanelTelegramLayout.createParallelGroup(Alignment.BASELINE)
+                                                .addComponent(LabelClientKey).addComponent(TxtFieldClientKey,
+                                                        GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                                        GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(ComponentPlacement.UNRELATED)
+                                        .addGroup(PanelTelegramLayout.createParallelGroup(Alignment.BASELINE)
+                                                .addComponent(LabelTelegramId).addComponent(TxtFieldTelegramId,
+                                                        GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                                        GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(ComponentPlacement.UNRELATED)
+                                        .addGroup(PanelTelegramLayout.createParallelGroup(Alignment.BASELINE)
+                                                .addComponent(LabelSecretKey).addComponent(TxtFieldSecretKey,
+                                                        GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                                        GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(ComponentPlacement.UNRELATED)
+                                        .addGroup(PanelTelegramLayout.createParallelGroup(Alignment.BASELINE)
+                                                .addComponent(LabelTelegramType).addComponent(ComboBoxTelegramType,
+                                                        GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                                        GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(ComponentPlacement.UNRELATED)
+                                        .addGroup(PanelTelegramLayout.createParallelGroup(Alignment.BASELINE)
+                                                .addComponent(TxtFieldRegionFrom, GroupLayout.PREFERRED_SIZE,
+                                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(LabelRegionFrom))
+                                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+        PanelTelegram.setLayout(PanelTelegramLayout);
 
-	PanelFilters.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Filters",
-	        javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION,
-	        new java.awt.Font("Tahoma", 1, 11))); // NOI18N
-	PanelFilters.setPreferredSize(new java.awt.Dimension(289, 172));
+        PanelFilters.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Filters",
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                new java.awt.Font("Tahoma", 1, 11))); // NOI18N
+        PanelFilters.setPreferredSize(new java.awt.Dimension(289, 172));
 
-	ScrollPaneFilters.setName("ScrollPaneFilters"); // NOI18N
+        ScrollPaneFilters.setName("ScrollPaneFilters"); // NOI18N
 
-	JListFilters.setModel(new DefaultListModel());
-	JListFilters.setName("JListFilters"); // NOI18N
-	JListFilters.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-	    public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-		JListFiltersValueChanged(evt);
-	    }
-	});
-	ScrollPaneFilters.setViewportView(JListFilters);
+        JListFilters.setModel(new DefaultListModel<String>());
+        JListFilters.setName("JListFilters"); // NOI18N
+        JListFilters.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                JListFiltersValueChanged(evt);
+            }
+        });
+        ScrollPaneFilters.setViewportView(JListFilters);
 
-	ButtonRemoveFilter.setText("Remove filter");
-	ButtonRemoveFilter.setEnabled(false);
-	ButtonRemoveFilter.setName("ButtonRemoveFilter"); // NOI18N
-	ButtonRemoveFilter.addActionListener(new java.awt.event.ActionListener() {
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		ButtonRemoveFilterActionPerformed(evt);
-	    }
-	});
+        ButtonRemoveFilter.setText("Remove filter");
+        ButtonRemoveFilter.setEnabled(false);
+        ButtonRemoveFilter.setName("ButtonRemoveFilter"); // NOI18N
+        ButtonRemoveFilter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ButtonRemoveFilterActionPerformed(evt);
+            }
+        });
 
-	ComboBoxProviderType.setModel(new DefaultComboBoxModel(
-	        com.github.agadar.telegrammer.core.recipients.RecipientsProviderType.values()));
-	ComboBoxProviderType.setName("ComboBoxProviderType"); // NOI18N
-	ComboBoxProviderType.addItemListener(new java.awt.event.ItemListener() {
-	    public void itemStateChanged(java.awt.event.ItemEvent evt) {
-		ComboBoxProviderTypeItemStateChanged(evt);
-	    }
-	});
+        ComboBoxProviderType
+                .setModel(new DefaultComboBoxModel<RecipientsProviderType>(RecipientsProviderType.values()));
+        ComboBoxProviderType.setName("ComboBoxProviderType"); // NOI18N
+        ComboBoxProviderType.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                ComboBoxProviderTypeItemStateChanged(evt);
+            }
+        });
 
-	ButtonAddFilter.setText("Add filter");
-	ButtonAddFilter.setName("ButtonAddFilter"); // NOI18N
-	ButtonAddFilter.addActionListener(new java.awt.event.ActionListener() {
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		ButtonAddFilterActionPerformed(evt);
-	    }
-	});
+        ButtonAddFilter.setText("Add filter");
+        ButtonAddFilter.setName("ButtonAddFilter"); // NOI18N
+        ButtonAddFilter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ButtonAddFilterActionPerformed(evt);
+            }
+        });
 
-	TextFieldFilterValues.setHint("");
+        TextFieldFilterValues.setHint("");
 
-	ComboBoxFilterType.setModel(new DefaultComboBoxModel(
-	        com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterType.values()));
-	ComboBoxFilterType.setName("ComboBoxFilterType"); // NOI18N
+        ComboBoxFilterType.setModel(new DefaultComboBoxModel<RecipientsFilterType>(RecipientsFilterType.values()));
+        ComboBoxFilterType.setName("ComboBoxFilterType"); // NOI18N
 
-	javax.swing.GroupLayout PanelFiltersLayout = new javax.swing.GroupLayout(PanelFilters);
-	PanelFilters.setLayout(PanelFiltersLayout);
-	PanelFiltersLayout.setHorizontalGroup(PanelFiltersLayout
-	        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	        .addGroup(PanelFiltersLayout.createSequentialGroup().addContainerGap().addGroup(PanelFiltersLayout
-	                .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	                .addComponent(TextFieldFilterValues, javax.swing.GroupLayout.DEFAULT_SIZE,
-	                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-	                .addComponent(ComboBoxProviderType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-	                .addComponent(ScrollPaneFilters, javax.swing.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
-	                .addGroup(PanelFiltersLayout.createSequentialGroup().addComponent(ButtonRemoveFilter)
-	                        .addGap(18, 18, 18).addComponent(ButtonAddFilter, javax.swing.GroupLayout.DEFAULT_SIZE,
-	                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-	                .addComponent(ComboBoxFilterType, javax.swing.GroupLayout.Alignment.TRAILING, 0,
-	                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-	                .addContainerGap()));
-	PanelFiltersLayout.setVerticalGroup(PanelFiltersLayout
-	        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelFiltersLayout.createSequentialGroup()
-	                .addContainerGap()
-	                .addComponent(ScrollPaneFilters, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
-	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-	                .addComponent(ComboBoxFilterType, javax.swing.GroupLayout.PREFERRED_SIZE,
-	                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-	                .addComponent(ComboBoxProviderType, javax.swing.GroupLayout.PREFERRED_SIZE,
-	                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-	                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-	                .addComponent(TextFieldFilterValues, javax.swing.GroupLayout.PREFERRED_SIZE,
-	                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-	                .addGap(12, 12, 12)
-	                .addGroup(PanelFiltersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-	                        .addComponent(ButtonRemoveFilter).addComponent(ButtonAddFilter))
-	                .addContainerGap()));
+        javax.swing.GroupLayout PanelFiltersLayout = new javax.swing.GroupLayout(PanelFilters);
+        PanelFilters.setLayout(PanelFiltersLayout);
+        PanelFiltersLayout.setHorizontalGroup(PanelFiltersLayout
+                .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(PanelFiltersLayout.createSequentialGroup().addContainerGap().addGroup(PanelFiltersLayout
+                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(TextFieldFilterValues, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(ComboBoxProviderType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(ScrollPaneFilters, javax.swing.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
+                        .addGroup(PanelFiltersLayout.createSequentialGroup().addComponent(ButtonRemoveFilter)
+                                .addGap(18, 18, 18).addComponent(ButtonAddFilter, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(ComboBoxFilterType, javax.swing.GroupLayout.Alignment.TRAILING, 0,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap()));
+        PanelFiltersLayout.setVerticalGroup(PanelFiltersLayout
+                .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, PanelFiltersLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(ScrollPaneFilters, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(ComboBoxFilterType, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(ComboBoxProviderType, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(TextFieldFilterValues, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(12, 12, 12)
+                        .addGroup(PanelFiltersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(ButtonRemoveFilter).addComponent(ButtonAddFilter))
+                        .addContainerGap()));
 
-	PanelOutput.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Output",
-	        javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION,
-	        new java.awt.Font("Tahoma", 1, 11))); // NOI18N
+        PanelOutput.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Output",
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                new java.awt.Font("Tahoma", 1, 11))); // NOI18N
 
-	TextAreaOutput.setEditable(false);
-	TextAreaOutput.setColumns(20);
-	TextAreaOutput.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
-	TextAreaOutput.setRows(5);
-	ScrollPaneOutput.setViewportView(TextAreaOutput);
+        TextAreaOutput.setEditable(false);
+        TextAreaOutput.setColumns(20);
+        TextAreaOutput.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        TextAreaOutput.setRows(5);
+        ScrollPaneOutput.setViewportView(TextAreaOutput);
 
-	javax.swing.GroupLayout PanelOutputLayout = new javax.swing.GroupLayout(PanelOutput);
-	PanelOutput.setLayout(PanelOutputLayout);
-	PanelOutputLayout.setHorizontalGroup(PanelOutputLayout
-	        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(PanelOutputLayout
-	                .createSequentialGroup().addContainerGap().addComponent(ScrollPaneOutput).addContainerGap()));
-	PanelOutputLayout.setVerticalGroup(PanelOutputLayout
-	        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	        .addGroup(PanelOutputLayout.createSequentialGroup().addContainerGap()
-	                .addComponent(ScrollPaneOutput, javax.swing.GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE)
-	                .addContainerGap()));
+        javax.swing.GroupLayout PanelOutputLayout = new javax.swing.GroupLayout(PanelOutput);
+        PanelOutput.setLayout(PanelOutputLayout);
+        PanelOutputLayout.setHorizontalGroup(PanelOutputLayout
+                .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(PanelOutputLayout
+                        .createSequentialGroup().addContainerGap().addComponent(ScrollPaneOutput).addContainerGap()));
+        PanelOutputLayout.setVerticalGroup(PanelOutputLayout
+                .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(PanelOutputLayout.createSequentialGroup().addContainerGap()
+                        .addComponent(ScrollPaneOutput, javax.swing.GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE)
+                        .addContainerGap()));
 
-	PanelActions.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Actions",
-	        javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION,
-	        new java.awt.Font("Tahoma", 1, 11))); // NOI18N
+        PanelActions.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Actions",
+                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                new java.awt.Font("Tahoma", 1, 11))); // NOI18N
 
-	BtnStart.setText("Start sending");
-	BtnStart.setName("ButtonRemoveAddressee"); // NOI18N
-	BtnStart.addActionListener(new java.awt.event.ActionListener() {
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		BtnStartActionPerformed(evt);
-	    }
-	});
+        BtnStart.setText("Start sending");
+        BtnStart.setName("ButtonRemoveAddressee"); // NOI18N
+        BtnStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnStartActionPerformed(evt);
+            }
+        });
 
-	BtnStop.setText("Stop sending");
-	BtnStop.setEnabled(false);
-	BtnStop.setMaximumSize(new java.awt.Dimension(97, 23));
-	BtnStop.setMinimumSize(new java.awt.Dimension(97, 23));
-	BtnStop.setName("ButtonRemoveAddressee"); // NOI18N
-	BtnStop.setPreferredSize(new java.awt.Dimension(97, 23));
-	BtnStop.addActionListener(new java.awt.event.ActionListener() {
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		BtnStopActionPerformed(evt);
-	    }
-	});
+        BtnStop.setText("Stop sending");
+        BtnStop.setEnabled(false);
+        BtnStop.setMaximumSize(new java.awt.Dimension(97, 23));
+        BtnStop.setMinimumSize(new java.awt.Dimension(97, 23));
+        BtnStop.setName("ButtonRemoveAddressee"); // NOI18N
+        BtnStop.setPreferredSize(new java.awt.Dimension(97, 23));
+        BtnStop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnStopActionPerformed(evt);
+            }
+        });
 
-	BtnClearOutput.setText("Clear output");
-	BtnClearOutput.setName("ButtonRemoveAddressee"); // NOI18N
-	BtnClearOutput.addActionListener(new java.awt.event.ActionListener() {
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		BtnClearOutputActionPerformed(evt);
-	    }
-	});
+        BtnClearOutput.setText("Clear output");
+        BtnClearOutput.setName("ButtonRemoveAddressee"); // NOI18N
+        BtnClearOutput.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnClearOutputActionPerformed(evt);
+            }
+        });
 
-	menuBar = new JMenuBar();
-	setJMenuBar(menuBar);
+        menuBar = new JMenuBar();
+        setJMenuBar(menuBar);
 
-	mnNewMenu = new JMenu("Options");
-	menuBar.add(mnNewMenu);
+        mnNewMenu = new JMenu("Options");
+        menuBar.add(mnNewMenu);
 
-	chckbxmntmHideSkippedRecipients = new JCheckBoxMenuItem("Hide skipped recipients");
-	chckbxmntmHideSkippedRecipients.addItemListener(new java.awt.event.ItemListener() {
-	    public void itemStateChanged(java.awt.event.ItemEvent evt) {
-		chckbxmntmHideSkippedRecipientsItemStateChanged(evt);
-	    }
-	});
-	mnNewMenu.add(chckbxmntmHideSkippedRecipients);
+        chckbxmntmHideSkippedRecipients = new JCheckBoxMenuItem("Hide skipped recipients");
+        chckbxmntmHideSkippedRecipients.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                chckbxmntmHideSkippedRecipientsItemStateChanged(evt);
+            }
+        });
+        mnNewMenu.add(chckbxmntmHideSkippedRecipients);
 
-	chckbxmntmRunIndefinitely = new JCheckBoxMenuItem("Run indefinitely");
-	chckbxmntmRunIndefinitely.addItemListener(new java.awt.event.ItemListener() {
-	    public void itemStateChanged(java.awt.event.ItemEvent evt) {
-		chckbxmntmRunIndefinitelyItemStateChanged(evt);
-	    }
-	});
+        chckbxmntmRunIndefinitely = new JCheckBoxMenuItem("Run indefinitely");
+        chckbxmntmRunIndefinitely.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                chckbxmntmRunIndefinitelyItemStateChanged(evt);
+            }
+        });
 
-	chckbxmntmRefreshRecipientsAfter = new JCheckBoxMenuItem("Refresh recipients after every telegram");
-	chckbxmntmRefreshRecipientsAfter.addItemListener(new ItemListener() {
-	    public void itemStateChanged(ItemEvent e) {
-		chckbxmntmRefreshRecipientsAfterItemStateChanged(e);
-	    }
-	});
-	mnNewMenu.add(chckbxmntmRefreshRecipientsAfter);
-	mnNewMenu.add(chckbxmntmRunIndefinitely);
+        chckbxmntmRefreshRecipientsAfter = new JCheckBoxMenuItem("Refresh recipients after every telegram");
+        chckbxmntmRefreshRecipientsAfter.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                chckbxmntmRefreshRecipientsAfterItemStateChanged(e);
+            }
+        });
+        mnNewMenu.add(chckbxmntmRefreshRecipientsAfter);
+        mnNewMenu.add(chckbxmntmRunIndefinitely);
 
-	chckbxmntmStartSendingOn = new JCheckBoxMenuItem("Start sending on startup");
-	chckbxmntmStartSendingOn.addItemListener(new java.awt.event.ItemListener() {
-	    public void itemStateChanged(java.awt.event.ItemEvent evt) {
-		chckbxmntmStartSendingOnItemStateChanged(evt);
-	    }
-	});
+        chckbxmntmStartSendingOn = new JCheckBoxMenuItem("Start sending on startup");
+        chckbxmntmStartSendingOn.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                chckbxmntmStartSendingOnItemStateChanged(evt);
+            }
+        });
 
-	chckbxmntmStartMinimized = new JCheckBoxMenuItem("Start minimized");
-	mnNewMenu.add(chckbxmntmStartMinimized);
-	chckbxmntmStartMinimized.addItemListener(new java.awt.event.ItemListener() {
-	    public void itemStateChanged(java.awt.event.ItemEvent evt) {
-		chckbxmntmStartMinimizedOnItemStateChanged(evt);
-	    }
-	});
-	mnNewMenu.add(chckbxmntmStartSendingOn);
+        chckbxmntmStartMinimized = new JCheckBoxMenuItem("Start minimized");
+        mnNewMenu.add(chckbxmntmStartMinimized);
+        chckbxmntmStartMinimized.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                chckbxmntmStartMinimizedOnItemStateChanged(evt);
+            }
+        });
+        mnNewMenu.add(chckbxmntmStartSendingOn);
 
-	javax.swing.GroupLayout PanelActionsLayout = new javax.swing.GroupLayout(PanelActions);
-	PanelActions.setLayout(PanelActionsLayout);
-	PanelActionsLayout
-	        .setHorizontalGroup(PanelActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	                .addGroup(PanelActionsLayout.createSequentialGroup().addContainerGap().addComponent(BtnStart)
-	                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-	                        .addComponent(BtnClearOutput)
-	                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-	                        .addComponent(BtnStop, javax.swing.GroupLayout.PREFERRED_SIZE, 128,
-	                                javax.swing.GroupLayout.PREFERRED_SIZE)
-	                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
-	PanelActionsLayout.setVerticalGroup(PanelActionsLayout
-	        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	        .addGroup(PanelActionsLayout.createSequentialGroup().addContainerGap()
-	                .addGroup(PanelActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-	                        .addComponent(BtnStart).addComponent(BtnClearOutput).addComponent(BtnStop,
-	                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
-	                                Short.MAX_VALUE))
-	                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+        javax.swing.GroupLayout PanelActionsLayout = new javax.swing.GroupLayout(PanelActions);
+        PanelActions.setLayout(PanelActionsLayout);
+        PanelActionsLayout
+                .setHorizontalGroup(PanelActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(PanelActionsLayout.createSequentialGroup().addContainerGap().addComponent(BtnStart)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(BtnClearOutput)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(BtnStop, javax.swing.GroupLayout.PREFERRED_SIZE, 128,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+        PanelActionsLayout.setVerticalGroup(PanelActionsLayout
+                .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(PanelActionsLayout.createSequentialGroup().addContainerGap()
+                        .addGroup(PanelActionsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(BtnStart).addComponent(BtnClearOutput).addComponent(BtnStop,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                        Short.MAX_VALUE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
 
-	javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-	layout.setHorizontalGroup(
-	        layout.createParallelGroup(Alignment.LEADING)
-	                .addGroup(layout.createSequentialGroup().addContainerGap()
-	                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
-	                                .addComponent(PanelFilters, GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
-	                                .addComponent(PanelTelegram, GroupLayout.PREFERRED_SIZE,
-	                                        GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-	                        .addPreferredGap(ComponentPlacement.UNRELATED)
-	                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
-	                                .addComponent(PanelActions, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
-	                                        Short.MAX_VALUE)
-	                                .addComponent(PanelOutput, GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE))
-	                        .addContainerGap()));
-	layout.setVerticalGroup(layout.createParallelGroup(Alignment.LEADING)
-	        .addGroup(layout.createSequentialGroup().addContainerGap()
-	                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-	                        .addGroup(layout.createSequentialGroup()
-	                                .addComponent(PanelTelegram, GroupLayout.PREFERRED_SIZE, 202,
-	                                        GroupLayout.PREFERRED_SIZE)
-	                                .addPreferredGap(ComponentPlacement.RELATED)
-	                                .addComponent(PanelFilters, GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE))
-	                        .addGroup(layout.createSequentialGroup()
-	                                .addComponent(PanelOutput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
-	                                        GroupLayout.PREFERRED_SIZE)
-	                                .addPreferredGap(ComponentPlacement.RELATED)
-	                                .addComponent(PanelActions, GroupLayout.DEFAULT_SIZE, 76, Short.MAX_VALUE)))
-	                .addContainerGap()));
-	layout.setAutoCreateContainerGaps(true);
-	layout.setAutoCreateGaps(true);
-	getContentPane().setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup().addContainerGap()
+                                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                                        .addComponent(PanelFilters, GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
+                                        .addComponent(PanelTelegram, GroupLayout.PREFERRED_SIZE,
+                                                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                                        .addComponent(PanelActions, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
+                                                Short.MAX_VALUE)
+                                        .addComponent(PanelOutput, GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE))
+                                .addContainerGap()));
+        layout.setVerticalGroup(layout.createParallelGroup(Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup().addContainerGap()
+                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
+                                        .addComponent(PanelTelegram, GroupLayout.PREFERRED_SIZE, 202,
+                                                GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(ComponentPlacement.RELATED)
+                                        .addComponent(PanelFilters, GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE))
+                                .addGroup(layout.createSequentialGroup()
+                                        .addComponent(PanelOutput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                                                GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(ComponentPlacement.RELATED)
+                                        .addComponent(PanelActions, GroupLayout.DEFAULT_SIZE, 76, Short.MAX_VALUE)))
+                        .addContainerGap()));
+        layout.setAutoCreateContainerGaps(true);
+        layout.setAutoCreateGaps(true);
+        getContentPane().setLayout(layout);
 
-	pack();
+        pack();
     }
 
     /**
@@ -807,9 +811,9 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void JListFiltersValueChanged(javax.swing.event.ListSelectionEvent evt) {
-	if (!evt.getValueIsAdjusting() && JListFilters.getSelectedIndex() != -1) {
-	    ButtonRemoveFilter.setEnabled(true);
-	}
+        if (!evt.getValueIsAdjusting() && JListFilters.getSelectedIndex() != -1) {
+            ButtonRemoveFilter.setEnabled(true);
+        }
     }
 
     /**
@@ -821,13 +825,13 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param clear
      */
     public void printToOutput(String msg, boolean clear) {
-	msg = "[" + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + "] " + msg + "\n";
+        msg = "[" + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + "] " + msg + "\n";
 
-	if (clear) {
-	    TextAreaOutput.setText(msg);
-	} else {
-	    TextAreaOutput.append(msg);
-	}
+        if (clear) {
+            TextAreaOutput.setText(msg);
+        } else {
+            TextAreaOutput.append(msg);
+        }
     }
 
     /**
@@ -837,24 +841,24 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param type
      */
     private void setFilterComboBoxEnabled(RecipientsProviderType type, Status status) {
-	// If type is null, always disable.
-	if (status != Status.Idle || type == null) {
-	    TextFieldFilterValues.setEditable(false);
-	    return;
-	}
+        // If type is null, always disable.
+        if (status != Status.Idle || type == null) {
+            TextFieldFilterValues.setEditable(false);
+            return;
+        }
 
-	// Else, enable/disable according to type.
-	switch (type) {
-	case NATIONS_IN_EMBASSY_REGIONS:
-	case NATIONS:
-	case NATIONS_IN_REGIONS:
-	case NATIONS_IN_REGIONS_WITH_TAGS:
-	case NATIONS_IN_REGIONS_WITHOUT_TAGS:
-	    TextFieldFilterValues.setEditable(true);
-	    break;
-	default:
-	    TextFieldFilterValues.setEditable(false);
-	}
+        // Else, enable/disable according to type.
+        switch (type) {
+        case NATIONS_IN_EMBASSY_REGIONS:
+        case NATIONS:
+        case NATIONS_IN_REGIONS:
+        case NATIONS_IN_REGIONS_WITH_TAGS:
+        case NATIONS_IN_REGIONS_WITHOUT_TAGS:
+            TextFieldFilterValues.setEditable(true);
+            break;
+        default:
+            TextFieldFilterValues.setEditable(false);
+        }
     }
 
     /**
@@ -864,15 +868,15 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param type
      */
     private void setFromRegionTextAndEnabled(TelegramType type, Status status) {
-	if (status != Status.Idle) {
-	    TxtFieldRegionFrom.setEditable(false);
-	} else if (type == TelegramType.RECRUITMENT || type == TelegramType.CAMPAIGN) {
-	    TxtFieldRegionFrom.setEditable(true);
-	    TxtFieldRegionFrom.setText(properties.fromRegion);
-	} else {
-	    TxtFieldRegionFrom.setEditable(false);
-	    TxtFieldRegionFrom.setText("");
-	}
+        if (status != Status.Idle) {
+            TxtFieldRegionFrom.setEditable(false);
+        } else if (type == TelegramType.RECRUITMENT || type == TelegramType.CAMPAIGN) {
+            TxtFieldRegionFrom.setEditable(true);
+            TxtFieldRegionFrom.setText(properties.fromRegion);
+        } else {
+            TxtFieldRegionFrom.setEditable(false);
+            TxtFieldRegionFrom.setText("");
+        }
     }
 
     /**
@@ -881,28 +885,28 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param type
      */
     private void setInputHint(RecipientsProviderType type) {
-	String hint = "";
+        String hint = "";
 
-	switch (type) {
-	case NATIONS_IN_EMBASSY_REGIONS:
-	case NATIONS_IN_REGIONS:
-	    hint = "Insert region names, e.g. 'region1, region2'.";
-	    break;
-	case NATIONS:
-	    hint = "Insert nation names, e.g. 'nation1, nation2'.";
-	    break;
-	case NATIONS_IN_REGIONS_WITH_TAGS:
-	case NATIONS_IN_REGIONS_WITHOUT_TAGS:
-	    hint = "Insert region tags, e.g. 'tag1, tag2'.";
-	    break;
-	default:
-	    break;
-	}
-	this.TextFieldFilterValues.setHint(hint);
+        switch (type) {
+        case NATIONS_IN_EMBASSY_REGIONS:
+        case NATIONS_IN_REGIONS:
+            hint = "Insert region names, e.g. 'region1, region2'.";
+            break;
+        case NATIONS:
+            hint = "Insert nation names, e.g. 'nation1, nation2'.";
+            break;
+        case NATIONS_IN_REGIONS_WITH_TAGS:
+        case NATIONS_IN_REGIONS_WITHOUT_TAGS:
+            hint = "Insert region tags, e.g. 'tag1, tag2'.";
+            break;
+        default:
+            break;
+        }
+        this.TextFieldFilterValues.setHint(hint);
     }
 
     private void TxtFieldClientKeyKeyReleased(java.awt.event.KeyEvent evt) {
-	properties.clientKey = TxtFieldClientKey.getText();
+        properties.clientKey = TxtFieldClientKey.getText();
     }
 
     /**
@@ -911,18 +915,18 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void TxtFieldRegionFromKeyReleased(java.awt.event.KeyEvent evt) {
-	properties.fromRegion = TxtFieldRegionFrom.getText();
+        properties.fromRegion = TxtFieldRegionFrom.getText();
     }
 
     private void TxtFieldSecretKeyKeyReleased(java.awt.event.KeyEvent evt) {
-	properties.secretKey = TxtFieldSecretKey.getText();
+        properties.secretKey = TxtFieldSecretKey.getText();
     }
 
     private void TxtFieldTelegramIdKeyReleased(java.awt.event.KeyEvent evt) {
-	properties.telegramId = TxtFieldTelegramId.getText();
+        properties.telegramId = TxtFieldTelegramId.getText();
 
-	// Update recipients list, because some recipients may be valid or invalid for
-	// the new telegram id.
-	TextAreaOutput.setText(duration());
+        // Update recipients list, because some recipients may be valid or invalid for
+        // the new telegram id.
+        TextAreaOutput.setText(duration());
     }
 }

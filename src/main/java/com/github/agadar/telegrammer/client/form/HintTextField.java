@@ -16,7 +16,9 @@ import javax.swing.JTextField;
  */
 public class HintTextField extends JTextField {
 
-    /* The hint to show. */
+    private static final long serialVersionUID = 1L;
+
+    /** The hint to show. */
     private String hint;
 
     public HintTextField() {
@@ -28,7 +30,8 @@ public class HintTextField extends JTextField {
         super.paint(g);
         if (getText().length() == 0 && hint != null) {
             int h = getHeight();
-            ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                    RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
             Insets ins = getInsets();
             FontMetrics fm = g.getFontMetrics();
             int c0 = getBackground().getRGB();

@@ -26,22 +26,20 @@ public class RefreshFilterRunnable implements Runnable {
     public void run() {
         try {
             recipientsFilterToRefresh.refreshFilter();
-            SwingUtilities.invokeLater(()
-                    -> {
-                ((DefaultListModel) form.JListFilters.getModel()).addElement(recipientsFilterToRefresh.toString());
+            SwingUtilities.invokeLater(() -> {
+                ((DefaultListModel<String>) form.JListFilters.getModel())
+                        .addElement(recipientsFilterToRefresh.toString());
                 form.TextAreaOutput.setText(form.duration());
             });
 
         } catch (Exception | OutOfMemoryError ex) {
             // If an exception occured, print it to the output textarea.
-            SwingUtilities.invokeLater(()
-                    -> {
+            SwingUtilities.invokeLater(() -> {
                 form.printToOutput("a fatal error occured:\n" + ex.getMessage(), false);
             });
         } finally {
             // Always re-enable the 'add filter' and 'start sending' buttons.
-            SwingUtilities.invokeLater(()
-                    -> {
+            SwingUtilities.invokeLater(() -> {
                 form.updateGui(Status.Idle);
             });
         }
