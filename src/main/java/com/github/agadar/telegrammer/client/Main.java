@@ -42,7 +42,7 @@ public class Main {
         // Retrieve properties and history.
         propertiesManager.loadProperties(properties);
         telegramHistory.loadHistory();
-        properties.recipientsListBuilder.refreshFilters();
+        properties.getRecipientsListBuilder().refreshFilters();
 
         // Set-up graphical form.
         try {
