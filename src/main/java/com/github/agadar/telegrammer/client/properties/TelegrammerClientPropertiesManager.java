@@ -15,30 +15,30 @@ public class TelegrammerClientPropertiesManager extends AbstractPropertiesManage
 
     public TelegrammerClientPropertiesManager(IRecipientsListBuilderTranslator builderTranslator,
             String propertiesFileName) {
-	super(builderTranslator, propertiesFileName);
+        super(builderTranslator, propertiesFileName);
     }
 
     @Override
     protected TelegrammerClientProperties createApplicationProperties() {
-	return new TelegrammerClientProperties();
+        return new TelegrammerClientProperties();
     }
 
     @Override
     protected void setApplicationPropertiesFromProperties(TelegrammerClientProperties target, Properties source) {
-	super.setApplicationPropertiesFromProperties(target, source);
-	target.hideSkippedRecipients = Boolean
-	        .valueOf(source.getProperty("hideSkippedRecipients", defaultBooleanValue));
-	target.startSendingOnStartup = Boolean
-	        .valueOf(source.getProperty("startSendingOnStartup", defaultBooleanValue));
-	target.startMinimized = Boolean.valueOf(source.getProperty("startMinimized", defaultBooleanValue));
+        super.setApplicationPropertiesFromProperties(target, source);
+        target.setHideSkippedRecipients(
+                Boolean.valueOf(source.getProperty("hideSkippedRecipients", defaultBooleanValue)));
+        target.setStartSendingOnStartup(
+                Boolean.valueOf(source.getProperty("startSendingOnStartup", defaultBooleanValue)));
+        target.setStartMinimized(Boolean.valueOf(source.getProperty("startMinimized", defaultBooleanValue)));
     }
 
     @Override
     protected void setPropertiesFromApplicationProperties(Properties target, TelegrammerClientProperties source) {
-	super.setPropertiesFromApplicationProperties(target, source);
-	target.setProperty("hideSkippedRecipients", Boolean.toString(source.hideSkippedRecipients));
-	target.setProperty("startSendingOnStartup", Boolean.toString(source.startSendingOnStartup));
-	target.setProperty("startMinimized", Boolean.toString(source.startMinimized));
+        super.setPropertiesFromApplicationProperties(target, source);
+        target.setProperty("hideSkippedRecipients", Boolean.toString(source.isHideSkippedRecipients()));
+        target.setProperty("startSendingOnStartup", Boolean.toString(source.isStartSendingOnStartup()));
+        target.setProperty("startMinimized", Boolean.toString(source.isStartMinimized()));
     }
 
 }

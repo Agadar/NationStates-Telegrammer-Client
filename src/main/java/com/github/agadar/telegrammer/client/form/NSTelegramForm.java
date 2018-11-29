@@ -116,9 +116,9 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         ComboBoxTelegramType.setSelectedItem(properties.getLastTelegramType());
         TxtFieldRegionFrom.setText(properties.getFromRegion());
         chckbxmntmRunIndefinitely.setSelected(properties.isRunIndefinitely());
-        chckbxmntmHideSkippedRecipients.setSelected(properties.hideSkippedRecipients);
-        chckbxmntmStartSendingOn.setSelected(properties.startSendingOnStartup);
-        chckbxmntmStartMinimized.setSelected(properties.startMinimized);
+        chckbxmntmHideSkippedRecipients.setSelected(properties.isHideSkippedRecipients());
+        chckbxmntmStartSendingOn.setSelected(properties.isStartSendingOnStartup());
+        chckbxmntmStartMinimized.setSelected(properties.isStartMinimized());
         chckbxmntmRefreshRecipientsAfter.setSelected(properties.isUpdateRecipientsAfterEveryTelegram());
         var filtersModel = (DefaultListModel<String>) this.JListFilters.getModel();
         properties.getRecipientsListBuilder().getFilters().forEach(filter -> {
@@ -129,7 +129,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         setInputHint((RecipientsProviderType) ComboBoxProviderType.getSelectedItem());
 
         // Start sending telegrams right away if so configured.
-        if (!this.properties.startSendingOnStartup) {
+        if (!this.properties.isStartSendingOnStartup()) {
             updateGui(Status.Idle); // Update entire GUI in case we missed something in visual designer.
             TextAreaOutput.setText(duration()); // Set output textarea, for consistency's sake.
         } else {
@@ -137,7 +137,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         }
 
         // Minimize if so configured.
-        if (this.properties.startMinimized) {
+        if (this.properties.isStartMinimized()) {
             this.setExtendedState(java.awt.Frame.ICONIFIED);
         }
     }
@@ -243,7 +243,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     }
 
     private void chckbxmntmStartMinimizedOnItemStateChanged(ItemEvent evt) {
-        properties.startMinimized = chckbxmntmStartMinimized.isSelected();
+        properties.setStartMinimized(chckbxmntmStartMinimized.isSelected());
 
     }
 
@@ -252,11 +252,11 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     }
 
     private void chckbxmntmHideSkippedRecipientsItemStateChanged(ItemEvent evt) {
-        properties.hideSkippedRecipients = chckbxmntmHideSkippedRecipients.isSelected();
+        properties.setHideSkippedRecipients(chckbxmntmHideSkippedRecipients.isSelected());
     }
 
     private void chckbxmntmStartSendingOnItemStateChanged(java.awt.event.ItemEvent evt) {
-        properties.startSendingOnStartup = chckbxmntmStartSendingOn.isSelected();
+        properties.setStartSendingOnStartup(chckbxmntmStartSendingOn.isSelected());
     }
 
     private void chckbxmntmRefreshRecipientsAfterItemStateChanged(ItemEvent e) {
@@ -349,7 +349,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 
     @Override
     public void handleRecipientRemoved(RecipientRemovedEvent event) {
-        if (!this.properties.hideSkippedRecipients) {
+        if (!this.properties.isHideSkippedRecipients()) {
             SwingUtilities.invokeLater(() -> {
                 printToOutput("skipping recipient '" + event.getRecipient() + "': " + event.getReason(), false);
             });
