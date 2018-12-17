@@ -359,7 +359,15 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     @Override
     public void handleRecipientsRefreshed(RecipientsRefreshedEvent event) {
         SwingUtilities.invokeLater(() -> {
-            printToOutput("updating recipients list...", false);
+            if (event.getFailedFilters().isEmpty()) {
+                printToOutput("updated recipients list", false);
+            } else {
+                var builder = new StringBuilder("errors while updating recipients list:");
+                event.getFailedFilters().forEach((filter, ex) -> {
+                    builder.append("\n" + filter.toString() + " - " + ex.getMessage());
+                });
+                printToOutput(builder.toString(), false);
+            }
         });
     }
 
