@@ -2,7 +2,7 @@ package com.github.agadar.telegrammer.client.runnable;
 
 import com.github.agadar.telegrammer.client.form.NSTelegramForm;
 import com.github.agadar.telegrammer.client.form.NSTelegramForm.Status;
-import com.github.agadar.telegrammer.core.recipients.filter.IRecipientsFilter;
+import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilter;
 
 import javax.swing.DefaultListModel;
 import javax.swing.SwingUtilities;
@@ -15,9 +15,9 @@ import javax.swing.SwingUtilities;
 public class RefreshFilterRunnable implements Runnable {
 
     private final NSTelegramForm form;
-    private final IRecipientsFilter recipientsFilterToRefresh;
+    private final RecipientsFilter recipientsFilterToRefresh;
 
-    public RefreshFilterRunnable(NSTelegramForm form, IRecipientsFilter recipientsFilterToRefresh) {
+    public RefreshFilterRunnable(NSTelegramForm form, RecipientsFilter recipientsFilterToRefresh) {
         this.form = form;
         this.recipientsFilterToRefresh = recipientsFilterToRefresh;
     }

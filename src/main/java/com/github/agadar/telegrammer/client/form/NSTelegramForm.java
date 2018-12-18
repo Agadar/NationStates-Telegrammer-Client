@@ -1,10 +1,10 @@
 package com.github.agadar.telegrammer.client.form;
 
 import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
-import java.util.Set;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -20,20 +20,19 @@ import javax.swing.text.DefaultCaret;
 import com.github.agadar.nationstates.event.TelegramSentEvent;
 import com.github.agadar.telegrammer.client.properties.TelegrammerClientProperties;
 import com.github.agadar.telegrammer.client.runnable.RefreshFilterRunnable;
-import com.github.agadar.telegrammer.core.properties.manager.IPropertiesManager;
+import com.github.agadar.telegrammer.core.properties.manager.PropertiesManager;
 import com.github.agadar.telegrammer.core.recipients.RecipientsProviderType;
-import com.github.agadar.telegrammer.core.recipients.filter.IRecipientsFilter;
+import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilter;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterType;
-import com.github.agadar.telegrammer.core.recipients.translator.IRecipientsFilterTranslator;
+import com.github.agadar.telegrammer.core.recipients.translator.RecipientsFilterTranslator;
 import com.github.agadar.telegrammer.core.telegram.TelegramType;
 import com.github.agadar.telegrammer.core.telegram.event.NoRecipientsFoundEvent;
 import com.github.agadar.telegrammer.core.telegram.event.RecipientRemovedEvent;
 import com.github.agadar.telegrammer.core.telegram.event.RecipientsRefreshedEvent;
 import com.github.agadar.telegrammer.core.telegram.event.StoppedSendingEvent;
 import com.github.agadar.telegrammer.core.telegram.event.TelegramManagerListener;
-import com.github.agadar.telegrammer.core.telegram.sender.ITelegramSender;
+import com.github.agadar.telegrammer.core.telegram.sender.TelegramSender;
 import com.github.agadar.telegrammer.core.util.StringFunctions;
-import java.awt.event.ItemListener;
 
 /**
  * The main GUI of this application.
@@ -56,10 +55,10 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     private final static String BORDER = "------------------------------------------";
 
     private Thread compileRecipientsWorker;
-    private final IRecipientsFilterTranslator filterTranslator;
+    private final RecipientsFilterTranslator filterTranslator;
     private final TelegrammerClientProperties properties;
-    private final IPropertiesManager<TelegrammerClientProperties> propertiesManager;
-    private final ITelegramSender telegramSender;
+    private final PropertiesManager<TelegrammerClientProperties> propertiesManager;
+    private final TelegramSender telegramSender;
 
     // GUI elements.
     public javax.swing.JTextArea TextAreaOutput;
@@ -96,9 +95,9 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     private JCheckBoxMenuItem chckbxmntmStartMinimized;
     private JCheckBoxMenuItem chckbxmntmRefreshRecipientsAfter;
 
-    public NSTelegramForm(ITelegramSender telegramSender,
-            IPropertiesManager<TelegrammerClientProperties> propertiesManager, TelegrammerClientProperties properties,
-            IRecipientsFilterTranslator filterTranslator) {
+    public NSTelegramForm(TelegramSender telegramSender,
+            PropertiesManager<TelegrammerClientProperties> propertiesManager, TelegrammerClientProperties properties,
+            RecipientsFilterTranslator filterTranslator) {
         initComponents();
 
         this.telegramSender = telegramSender;
@@ -206,7 +205,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
         TextFieldFilterValues.setText("");
         final RecipientsProviderType providerType = (RecipientsProviderType) ComboBoxProviderType.getSelectedItem();
         final RecipientsFilterType filterType = (RecipientsFilterType) ComboBoxFilterType.getSelectedItem();
-        final IRecipientsFilter filter = filterTranslator.toFilter(filterType, providerType, filterValues);
+        final RecipientsFilter filter = filterTranslator.toFilter(filterType, providerType, filterValues);
 
         // Check to make sure the thread is not already running to prevent
         // synchronization issues.
@@ -306,7 +305,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @return
      */
     public final String duration() {
-        final Set<String> recipients = properties.getRecipientsListBuilder().getRecipients();
+        var recipients = properties.getRecipientsListBuilder().getRecipients();
         int estimatedDuration = Math.max(recipients.size() - 1, 0)
                 * ((ComboBoxTelegramType.getSelectedItem() == TelegramType.RECRUITMENT ? 180050 : 30050) / 1000);
         int hours = estimatedDuration / 3600;

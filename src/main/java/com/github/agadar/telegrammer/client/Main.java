@@ -6,16 +6,16 @@ import java.util.logging.Logger;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import com.github.agadar.nationstates.NationStates;
+import com.github.agadar.nationstates.DefaultNationStatesImpl;
 import com.github.agadar.telegrammer.client.form.NSTelegramForm;
 import com.github.agadar.telegrammer.client.properties.TelegrammerClientProperties;
 import com.github.agadar.telegrammer.client.properties.TelegrammerClientPropertiesManager;
-import com.github.agadar.telegrammer.core.recipients.translator.RecipientsFilterTranslator;
-import com.github.agadar.telegrammer.core.recipients.translator.RecipientsListBuilderTranslator;
-import com.github.agadar.telegrammer.core.recipients.translator.RecipientsProviderTranslator;
-import com.github.agadar.telegrammer.core.regiondumpaccess.RegionDumpAccess;
-import com.github.agadar.telegrammer.core.telegram.history.TelegramHistory;
-import com.github.agadar.telegrammer.core.telegram.sender.TelegramSender;
+import com.github.agadar.telegrammer.core.recipients.translator.RecipientsFilterTranslatorImpl;
+import com.github.agadar.telegrammer.core.recipients.translator.RecipientsListBuilderTranslatorImpl;
+import com.github.agadar.telegrammer.core.recipients.translator.RecipientsProviderTranslatorImpl;
+import com.github.agadar.telegrammer.core.regiondumpaccess.RegionDumpAccessImpl;
+import com.github.agadar.telegrammer.core.telegram.history.TelegramHistoryImpl;
+import com.github.agadar.telegrammer.core.telegram.sender.TelegramSenderImpl;
 
 /**
  * Main entry for this application.
@@ -27,17 +27,17 @@ public class Main {
     public static void main(String args[]) {
 
         // Context root.
-        var nationStates = new NationStates(
+        var nationStates = new DefaultNationStatesImpl(
                 "Agadar's Telegrammer Client (https://github.com/Agadar/NationStates-Telegrammer-Client)");
         var properties = new TelegrammerClientProperties();
-        var telegramHistory = new TelegramHistory(properties, ".nationstates-telegrammer.history");
-        var regionDumpAccess = new RegionDumpAccess(nationStates);
-        var providerTranslator = new RecipientsProviderTranslator(nationStates, regionDumpAccess);
-        var filterTranslator = new RecipientsFilterTranslator(providerTranslator);
-        var recipientsListBuilderTranslator = new RecipientsListBuilderTranslator(telegramHistory, filterTranslator);
+        var telegramHistory = new TelegramHistoryImpl(properties, ".nationstates-telegrammer.history");
+        var regionDumpAccess = new RegionDumpAccessImpl(nationStates);
+        var providerTranslator = new RecipientsProviderTranslatorImpl(nationStates, regionDumpAccess);
+        var filterTranslator = new RecipientsFilterTranslatorImpl(providerTranslator);
+        var recipientsListBuilderTranslator = new RecipientsListBuilderTranslatorImpl(telegramHistory, filterTranslator);
         var propertiesManager = new TelegrammerClientPropertiesManager(recipientsListBuilderTranslator,
                 ".nationstates-telegrammer.properties");
-        var telegramSender = new TelegramSender(nationStates, telegramHistory, properties);
+        var telegramSender = new TelegramSenderImpl(nationStates, telegramHistory, properties);
 
         // Retrieve properties and history.
         propertiesManager.loadProperties(properties);

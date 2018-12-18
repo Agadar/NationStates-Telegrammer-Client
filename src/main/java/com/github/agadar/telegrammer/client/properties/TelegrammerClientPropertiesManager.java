@@ -3,7 +3,7 @@ package com.github.agadar.telegrammer.client.properties;
 import java.util.Properties;
 
 import com.github.agadar.telegrammer.core.properties.manager.AbstractPropertiesManager;
-import com.github.agadar.telegrammer.core.recipients.translator.IRecipientsListBuilderTranslator;
+import com.github.agadar.telegrammer.core.recipients.translator.RecipientsListBuilderTranslator;
 
 /**
  * Manages the telegrammer client's properties.
@@ -13,7 +13,7 @@ import com.github.agadar.telegrammer.core.recipients.translator.IRecipientsListB
  */
 public class TelegrammerClientPropertiesManager extends AbstractPropertiesManager<TelegrammerClientProperties> {
 
-    public TelegrammerClientPropertiesManager(IRecipientsListBuilderTranslator builderTranslator,
+    public TelegrammerClientPropertiesManager(RecipientsListBuilderTranslator builderTranslator,
             String propertiesFileName) {
         super(builderTranslator, propertiesFileName);
     }
