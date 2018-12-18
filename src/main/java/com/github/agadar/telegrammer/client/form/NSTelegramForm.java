@@ -86,7 +86,7 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     private javax.swing.JPanel PanelTelegram;
     private javax.swing.JScrollPane ScrollPaneFilters;
     private javax.swing.JScrollPane ScrollPaneOutput;
-    private com.github.agadar.telegrammer.client.form.HintTextField TextFieldFilterValues;
+    public com.github.agadar.telegrammer.client.form.HintTextField TextFieldFilterValues;
     private javax.swing.JTextField TxtFieldClientKey;
     private javax.swing.JTextField TxtFieldRegionFrom;
     private javax.swing.JTextField TxtFieldSecretKey;
@@ -198,13 +198,9 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void ButtonAddFilterActionPerformed(java.awt.event.ActionEvent evt) {
-        TextAreaOutput.setText("updating recipient list...\n"); // Inform user, as this might take a while.
-        updateGui(Status.CompilingRecipients);
         var filter = createRecipientsFilterFromUserInput();
-        TextFieldFilterValues.setText("");
-
-        properties.getRecipientsListBuilder().addFilter(filter);
-        compileRecipientsWorker = new Thread(new RefreshFilterRunnable(this, filter));
+        var runnable = new RefreshFilterRunnable(this, filter, properties.getRecipientsListBuilder());
+        compileRecipientsWorker = new Thread(runnable);
         compileRecipientsWorker.start();
     }
 
@@ -223,13 +219,16 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
      * @param evt
      */
     private void ButtonRemoveFilterActionPerformed(java.awt.event.ActionEvent evt) {
-        // Retrieve selected index, remove filter from telegram manager.
-        int index = JListFilters.getSelectedIndex();
-        properties.getRecipientsListBuilder().removeFilterAt(index);
+        int filterIndex = JListFilters.getSelectedIndex();
+        removeFilter(filterIndex);
+    }
+
+    public void removeFilter(int filterIndex) {
+        properties.getRecipientsListBuilder().removeFilterAt(filterIndex);
 
         // Remove filter from GUI, try select preceding filter.
-        ((DefaultListModel<String>) JListFilters.getModel()).remove(index);
-        JListFilters.setSelectedIndex(Math.max(0, --index));
+        ((DefaultListModel<String>) JListFilters.getModel()).remove(filterIndex);
+        JListFilters.setSelectedIndex(Math.max(0, --filterIndex));
 
         // Update rest of GUI.
         ButtonRemoveFilter.setEnabled(!JListFilters.isSelectionEmpty());
