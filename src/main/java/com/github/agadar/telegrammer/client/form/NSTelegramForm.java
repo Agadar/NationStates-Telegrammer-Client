@@ -386,15 +386,13 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
 
     @Override
     public void handleTelegramSent(TelegramSentEvent event) {
-        // Print info to output.
         SwingUtilities.invokeLater(() -> {
-            if (event.isQueued()) {
-                printToOutput("queued telegram for '" + event.getRecipient() + "'", false);
-            } else {
-                printToOutput(
-                        "failed to queue telegram for '" + event.getRecipient() + "':\n" + event.getErrorMessage(),
+            event.getException().ifPresentOrElse(exception -> {
+                printToOutput("failed to queue telegram for '" + event.getRecipient() + "': " + exception.getMessage(),
                         false);
-            }
+            }, () -> {
+                printToOutput("queued telegram for '" + event.getRecipient() + "'", false);
+            });
         });
     }
 
