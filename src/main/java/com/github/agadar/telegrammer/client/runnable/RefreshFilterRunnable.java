@@ -15,33 +15,42 @@ import javax.swing.SwingUtilities;
 public class RefreshFilterRunnable implements Runnable {
 
     private final NSTelegramForm form;
-    private final RecipientsFilter recipientsFilterToRefresh;
+    private final RecipientsFilter filter;
 
-    public RefreshFilterRunnable(NSTelegramForm form, RecipientsFilter recipientsFilterToRefresh) {
+    public RefreshFilterRunnable(NSTelegramForm form, RecipientsFilter filter) {
         this.form = form;
-        this.recipientsFilterToRefresh = recipientsFilterToRefresh;
+        this.filter = filter;
     }
 
     @Override
     public void run() {
         try {
-            recipientsFilterToRefresh.refreshFilter();
-            SwingUtilities.invokeLater(() -> {
-                ((DefaultListModel<String>) form.JListFilters.getModel())
-                        .addElement(recipientsFilterToRefresh.toString());
+            filter.refreshFilter();
+            invokeOnGuiThread(() -> {
+                addFilterToGuiFilterList();
                 form.TextAreaOutput.setText(form.duration());
             });
 
         } catch (Exception | OutOfMemoryError ex) {
-            // If an exception occured, print it to the output textarea.
-            SwingUtilities.invokeLater(() -> {
-                form.printToOutput("a fatal error occured:\n" + ex.getMessage(), false);
+            invokeOnGuiThread(() -> {
+                form.TextAreaOutput.setText("");
+                form.printFailedFilterRefreshToOutput(filter, ex);
             });
+
         } finally {
-            // Always re-enable the 'add filter' and 'start sending' buttons.
-            SwingUtilities.invokeLater(() -> {
-                form.updateGui(Status.Idle);
-            });
+            reenableButtons();
         }
+    }
+
+    private void addFilterToGuiFilterList() {
+        ((DefaultListModel<String>) form.JListFilters.getModel()).addElement(filter.toString());
+    }
+
+    private void reenableButtons() {
+        invokeOnGuiThread(() -> form.updateGui(Status.Idle));
+    }
+
+    private void invokeOnGuiThread(Runnable action) {
+        SwingUtilities.invokeLater(action);
     }
 }

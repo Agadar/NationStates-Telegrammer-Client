@@ -4,7 +4,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -201,23 +200,19 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     private void ButtonAddFilterActionPerformed(java.awt.event.ActionEvent evt) {
         TextAreaOutput.setText("updating recipient list...\n"); // Inform user, as this might take a while.
         updateGui(Status.CompilingRecipients);
-        final HashSet<String> filterValues = StringFunctions.stringToHashSet(TextFieldFilterValues.getText());
+        var filter = createRecipientsFilterFromUserInput();
         TextFieldFilterValues.setText("");
-        final RecipientsProviderType providerType = (RecipientsProviderType) ComboBoxProviderType.getSelectedItem();
-        final RecipientsFilterType filterType = (RecipientsFilterType) ComboBoxFilterType.getSelectedItem();
-        final RecipientsFilter filter = filterTranslator.toFilter(filterType, providerType, filterValues);
 
-        // Check to make sure the thread is not already running to prevent
-        // synchronization issues.
-        if (compileRecipientsWorker != null && compileRecipientsWorker.isAlive()) {
-            TextAreaOutput.setText("Compile recipient list thread already running!\n");
-            return;
-        }
-
-        // Prepare thread, then run it.
         properties.getRecipientsListBuilder().addFilter(filter);
         compileRecipientsWorker = new Thread(new RefreshFilterRunnable(this, filter));
         compileRecipientsWorker.start();
+    }
+
+    private RecipientsFilter createRecipientsFilterFromUserInput() {
+        var filterValues = StringFunctions.stringToHashSet(TextFieldFilterValues.getText());
+        var providerType = (RecipientsProviderType) ComboBoxProviderType.getSelectedItem();
+        var filterType = (RecipientsFilterType) ComboBoxFilterType.getSelectedItem();
+        return filterTranslator.toFilter(filterType, providerType, filterValues);
     }
 
     /**
@@ -358,16 +353,13 @@ public final class NSTelegramForm extends javax.swing.JFrame implements Telegram
     @Override
     public void handleRecipientsRefreshed(RecipientsRefreshedEvent event) {
         SwingUtilities.invokeLater(() -> {
-            if (event.getFailedFilters().isEmpty()) {
-                printToOutput("updated recipients list", false);
-            } else {
-                var builder = new StringBuilder("errors while updating recipients list:");
-                event.getFailedFilters().forEach((filter, ex) -> {
-                    builder.append("\n" + filter.toString() + " - " + ex.getMessage());
-                });
-                printToOutput(builder.toString(), false);
-            }
+            printToOutput("updated recipients list", false);
+            event.getFailedFilters().forEach((filter, ex) -> printFailedFilterRefreshToOutput(filter, ex));
         });
+    }
+
+    public void printFailedFilterRefreshToOutput(RecipientsFilter filter, Throwable ex) {
+        printToOutput("error while refreshing filter '" + filter.toString() + "' : " + ex.getMessage(), false);
     }
 
     @Override

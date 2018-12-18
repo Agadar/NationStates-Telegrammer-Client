@@ -34,7 +34,8 @@ public class Main {
         var regionDumpAccess = new RegionDumpAccessImpl(nationStates);
         var providerTranslator = new RecipientsProviderTranslatorImpl(nationStates, regionDumpAccess);
         var filterTranslator = new RecipientsFilterTranslatorImpl(providerTranslator);
-        var recipientsListBuilderTranslator = new RecipientsListBuilderTranslatorImpl(telegramHistory, filterTranslator);
+        var recipientsListBuilderTranslator = new RecipientsListBuilderTranslatorImpl(telegramHistory,
+                filterTranslator);
         var propertiesManager = new TelegrammerClientPropertiesManager(recipientsListBuilderTranslator,
                 ".nationstates-telegrammer.properties");
         var telegramSender = new TelegramSenderImpl(nationStates, telegramHistory, properties);
@@ -46,14 +47,12 @@ public class Main {
 
         // Set-up graphical form.
         try {
-            // Set cross-platform look&feel.
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 
             // Create and display the form.
             java.awt.EventQueue.invokeLater(() -> {
-                final NSTelegramForm form = new NSTelegramForm(telegramSender, propertiesManager, properties,
-                        filterTranslator);
-                telegramSender.addListeners(form); // subscribe form to TelegramManager.
+                var form = new NSTelegramForm(telegramSender, propertiesManager, properties, filterTranslator);
+                telegramSender.addListeners(form);
                 form.setLocationRelativeTo(null);
                 form.setVisible(true);
             });
