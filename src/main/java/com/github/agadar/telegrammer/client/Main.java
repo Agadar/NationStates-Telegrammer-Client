@@ -7,9 +7,10 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import com.github.agadar.nationstates.DefaultNationStatesImpl;
-import com.github.agadar.telegrammer.client.form.NSTelegramForm;
 import com.github.agadar.telegrammer.client.properties.TelegrammerClientProperties;
 import com.github.agadar.telegrammer.client.properties.TelegrammerClientPropertiesManager;
+import com.github.agadar.telegrammer.client.view.TelegrammerView;
+import com.github.agadar.telegrammer.client.viewmodel.TelegrammerViewModel;
 import com.github.agadar.telegrammer.core.recipients.translator.RecipientsFilterTranslatorImpl;
 import com.github.agadar.telegrammer.core.recipients.translator.RecipientsListBuilderTranslatorImpl;
 import com.github.agadar.telegrammer.core.recipients.translator.RecipientsProviderTranslatorImpl;
@@ -51,14 +52,15 @@ public class Main {
 
             // Create and display the form.
             java.awt.EventQueue.invokeLater(() -> {
-                var form = new NSTelegramForm(telegramSender, propertiesManager, properties, filterTranslator);
-                telegramSender.addListeners(form);
-                form.setLocationRelativeTo(null);
-                form.setVisible(true);
+                var viewModel = new TelegrammerViewModel(telegramSender, propertiesManager, properties,
+                        filterTranslator);
+                var view = new TelegrammerView(viewModel);
+                view.setLocationRelativeTo(null);
+                view.setVisible(true);
             });
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                 | UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(NSTelegramForm.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
