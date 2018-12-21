@@ -16,7 +16,8 @@ import com.github.agadar.telegrammer.client.viewmodel.TelegrammerViewModel;
 import com.github.agadar.telegrammer.client.viewmodel.TelegrammerViewModelListener;
 
 /**
- * The main GUI of this application.
+ * A view representing the TelegrammerViewModel, implemented using the Swing
+ * technologies.
  *
  * @author Agadar (https://github.com/Agadar/)
  */

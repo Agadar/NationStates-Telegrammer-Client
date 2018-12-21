@@ -10,6 +10,7 @@ import com.github.agadar.nationstates.DefaultNationStatesImpl;
 import com.github.agadar.telegrammer.client.properties.TelegrammerClientProperties;
 import com.github.agadar.telegrammer.client.properties.TelegrammerClientPropertiesManager;
 import com.github.agadar.telegrammer.client.view.TelegrammerView;
+import com.github.agadar.telegrammer.client.viewmodel.OutputTextCreator;
 import com.github.agadar.telegrammer.client.viewmodel.TelegrammerViewModel;
 import com.github.agadar.telegrammer.core.recipients.translator.RecipientsFilterTranslatorImpl;
 import com.github.agadar.telegrammer.core.recipients.translator.RecipientsListBuilderTranslatorImpl;
@@ -21,7 +22,7 @@ import com.github.agadar.telegrammer.core.telegram.sender.TelegramSenderImpl;
 /**
  * Main entry for this application.
  *
- * @author Agadar (https://github.com/Agadar/)n
+ * @author Agadar (https://github.com/Agadar/)
  */
 public class Main {
 
@@ -40,6 +41,7 @@ public class Main {
         var propertiesManager = new TelegrammerClientPropertiesManager(recipientsListBuilderTranslator,
                 ".nationstates-telegrammer.properties");
         var telegramSender = new TelegramSenderImpl(nationStates, telegramHistory, properties);
+        var outputTextCreator = new OutputTextCreator(properties);
 
         // Retrieve properties and history.
         propertiesManager.loadProperties(properties);
@@ -53,7 +55,7 @@ public class Main {
             // Create and display the form.
             java.awt.EventQueue.invokeLater(() -> {
                 var viewModel = new TelegrammerViewModel(telegramSender, propertiesManager, properties,
-                        filterTranslator);
+                        filterTranslator, outputTextCreator);
                 var view = new TelegrammerView(viewModel);
                 view.setLocationRelativeTo(null);
                 view.setVisible(true);

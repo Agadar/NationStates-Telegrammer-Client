@@ -1,7 +1,5 @@
 package com.github.agadar.telegrammer.client.viewmodel;
 
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,7 +8,6 @@ import com.github.agadar.nationstates.event.TelegramSentEvent;
 import com.github.agadar.telegrammer.client.properties.TelegrammerClientProperties;
 import com.github.agadar.telegrammer.core.properties.manager.PropertiesManager;
 import com.github.agadar.telegrammer.core.recipients.RecipientsProviderType;
-import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilter;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterType;
 import com.github.agadar.telegrammer.core.recipients.translator.RecipientsFilterTranslator;
 import com.github.agadar.telegrammer.core.telegram.TelegramType;
@@ -24,9 +21,15 @@ import com.github.agadar.telegrammer.core.util.StringFunctions;
 
 import lombok.Getter;
 
+/**
+ * The abstract representation of the GUI, exposing all information needed to
+ * construct an arbitrary framework-specific view that implements the
+ * ITelegrammerViewModelListener.
+ * 
+ * @author Agadar (https://github.com/Agadar/)
+ *
+ */
 public class TelegrammerViewModel implements TelegramManagerListener {
-
-    private final static String BORDER = "------------------------------------------";
 
     @Getter private final String title = "Agadar's NationStates Telegrammer Client 2.0.0";
 
@@ -34,6 +37,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     private final TelegrammerClientProperties properties;
     private final PropertiesManager<TelegrammerClientProperties> propertiesManager;
     private final TelegramSender telegramSender;
+    private final OutputTextCreator outputTextCreator;
 
     @Getter private int selectedFilterTypeIndex = 0;
     @Getter private int selectedProviderTypeIndex = 0;
@@ -47,14 +51,15 @@ public class TelegrammerViewModel implements TelegramManagerListener {
 
     public TelegrammerViewModel(TelegramSender telegramSender,
             PropertiesManager<TelegrammerClientProperties> propertiesManager, TelegrammerClientProperties properties,
-            RecipientsFilterTranslator filterTranslator) {
+            RecipientsFilterTranslator filterTranslator, OutputTextCreator outputTextCreator) {
 
         this.telegramSender = telegramSender;
         this.propertiesManager = propertiesManager;
         this.filterTranslator = filterTranslator;
         this.properties = properties;
+        this.outputTextCreator = outputTextCreator;
 
-        outputText = getDurationText();
+        outputText = outputTextCreator.createExpectedDurationMessage();
         telegramSender.addListeners(this);
 
         if (properties.isStartSendingOnStartup()) {
@@ -146,7 +151,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     public void setTelegramId(String value) {
         if (isTelegramIdInputEnabled()) {
             properties.setTelegramId(value);
-            outputText = getDurationText();
+            outputText = outputTextCreator.createExpectedDurationMessage();
             listener.refreshOutput();
         }
     }
@@ -181,7 +186,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
         if (isAvailableTelegramTypesEnabled()) {
             var telegramType = TelegramType.values()[value];
             properties.setLastTelegramType(telegramType);
-            outputText = getDurationText();
+            outputText = outputTextCreator.createExpectedDurationMessage();
 
             if (telegramType != TelegramType.RECRUITMENT && telegramType != TelegramType.CAMPAIGN) {
                 properties.setFromRegion("");
@@ -321,7 +326,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
         properties.setClientKey(removeWhiteSpaces(properties.getClientKey()));
         properties.setTelegramId(removeWhiteSpaces(properties.getTelegramId()));
         properties.setSecretKey(removeWhiteSpaces(properties.getSecretKey()));
-        outputText = getDurationText();
+        outputText = outputTextCreator.createExpectedDurationMessage();
         changeStateAndInformListener(TelegrammerState.SendingTelegrams);
 
         try {
@@ -359,9 +364,9 @@ public class TelegrammerViewModel implements TelegramManagerListener {
             try {
                 filter.refreshFilter();
                 properties.getRecipientsListBuilder().addFilter(filter);
-                outputText = getDurationText();
+                outputText = outputTextCreator.createExpectedDurationMessage();
             } catch (Exception | OutOfMemoryError ex) {
-                outputText = createFailedFilterRefreshMessage(filter, ex);
+                outputText = outputTextCreator.createFailedFilterRefreshMessage(filter, ex);
             } finally {
                 changeStateAndInformListener(TelegrammerState.Idle);
             }
@@ -373,7 +378,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
         if (isRemoveFilterButtonEnabled()) {
             properties.getRecipientsListBuilder().removeFilterAt(selectedConfiguredRecipientsFilterIndex);
             selectedConfiguredRecipientsFilterIndex = Math.max(0, --selectedConfiguredRecipientsFilterIndex);
-            outputText = getDurationText();
+            outputText = outputTextCreator.createExpectedDurationMessage();
             listener.refreshEverything();
         }
     }
@@ -384,7 +389,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
 
     @Override
     public void handleNoRecipientsFound(NoRecipientsFoundEvent event) {
-        outputText += createTimestampedMessage(
+        outputText += outputTextCreator.createTimestampedMessage(
                 "no new recipients found, timing out for " + event.getTimeOut() / 1000 + " seconds...");
         listener.refreshOutput();
     }
@@ -392,7 +397,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     @Override
     public void handleRecipientRemoved(RecipientRemovedEvent event) {
         if (!properties.isHideSkippedRecipients()) {
-            outputText += createTimestampedMessage(
+            outputText += outputTextCreator.createTimestampedMessage(
                     "skipping recipient '" + event.getRecipient() + "': " + event.getReason());
             listener.refreshOutput();
         }
@@ -400,28 +405,26 @@ public class TelegrammerViewModel implements TelegramManagerListener {
 
     @Override
     public void handleRecipientsRefreshed(RecipientsRefreshedEvent event) {
-        outputText += createTimestampedMessage("updated recipients list");
-        event.getFailedFilters().forEach((filter, ex) -> outputText += createFailedFilterRefreshMessage(filter, ex));
+        outputText += outputTextCreator.createTimestampedMessage("updated recipients list");
+        event.getFailedFilters()
+                .forEach((filter, ex) -> outputText += outputTextCreator.createFailedFilterRefreshMessage(filter, ex));
         listener.refreshOutput();
     }
 
     @Override
     public void handleStoppedSending(StoppedSendingEvent event) {
-        outputText += BORDER + "\nfinished"
-                + (event.isCausedByError() ? " with error: " + event.getErrorMsg() + "\n" : " without fatal errors\n")
-                + "telegrams queued: " + event.getQueuedSucces() + "\n" + "blocked by category: "
-                + event.getRecipientIsBlocking() + "\n" + "recipients not found: " + event.getRecipientDidntExist()
-                + "\n" + "failed b/c other reasons: " + event.getDisconnectOrOtherReason() + "\n" + BORDER + "\n";
+        outputText += outputTextCreator.createStoppedSendingMessage(event);
         changeStateAndInformListener(TelegrammerState.Idle);
     }
 
     @Override
     public void handleTelegramSent(TelegramSentEvent event) {
         event.getException().ifPresentOrElse(exception -> {
-            outputText += createTimestampedMessage(
+            outputText += outputTextCreator.createTimestampedMessage(
                     "failed to queue telegram for '" + event.getRecipient() + "': " + exception.getMessage());
         }, () -> {
-            outputText += createTimestampedMessage("queued telegram for '" + event.getRecipient() + "'");
+            outputText += outputTextCreator
+                    .createTimestampedMessage("queued telegram for '" + event.getRecipient() + "'");
         });
         listener.refreshOutput();
     }
@@ -433,27 +436,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
         }
     }
 
-    private String getDurationText() {
-        var recipients = properties.getRecipientsListBuilder().getRecipients();
-        int timePerTelegram = properties.getLastTelegramType() == TelegramType.RECRUITMENT ? 180050 : 30050;
-        int estimatedDuration = Math.max(recipients.size() - 1, 0) * (timePerTelegram / 1000);
-        int hours = estimatedDuration / 3600;
-        int minutes = estimatedDuration % 3600 / 60;
-        int seconds = estimatedDuration % 3600 % 60;
-        return String.format(BORDER + "%naddressees selected: %s%nestimated duration: "
-                + "%s hours, %s minutes, %s seconds%n" + BORDER + "%n", recipients.size(), hours, minutes, seconds);
-    }
-
     private String removeWhiteSpaces(String target) {
         return target.replace(" ", "");
-    }
-
-    private String createTimestampedMessage(String msg) {
-        return "[" + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + "] " + msg + "\n";
-    }
-
-    private String createFailedFilterRefreshMessage(RecipientsFilter filter, Throwable ex) {
-        return createTimestampedMessage(
-                "error while refreshing filter '" + filter.toString() + "' : " + ex.getMessage());
     }
 }
