@@ -25,13 +25,16 @@ public class OutputTextCreator {
     }
 
     public String createExpectedDurationMessage() {
-        int numberOfRecipients = applicationProperties.getRecipientsListBuilder().getRecipients().size();
+        String telegramId = applicationProperties.getTelegramId();
+        int numberOfRecipients = applicationProperties.getRecipientsListBuilder().getRecipients(telegramId).size();
         var telegramType = applicationProperties.getLastTelegramType();
+
         int timePerTelegram = telegramType == TelegramType.RECRUITMENT ? 180050 : 30050;
         int estimatedDuration = Math.max(numberOfRecipients - 1, 0) * (timePerTelegram / 1000);
         int hours = estimatedDuration / 3600;
         int minutes = estimatedDuration % 3600 / 60;
         int seconds = estimatedDuration % 3600 % 60;
+
         return String.format(BORDER + "%naddressees selected: %s%nestimated duration: "
                 + "%s hours, %s minutes, %s seconds%n" + BORDER + "%n", numberOfRecipients, hours, minutes, seconds);
     }

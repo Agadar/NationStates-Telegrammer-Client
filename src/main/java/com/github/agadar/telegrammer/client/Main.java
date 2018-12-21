@@ -32,7 +32,7 @@ public class Main {
         var nationStates = new DefaultNationStatesImpl(
                 "Agadar's Telegrammer Client (https://github.com/Agadar/NationStates-Telegrammer-Client)");
         var properties = new TelegrammerClientProperties();
-        var telegramHistory = new TelegramHistoryImpl(properties, ".nationstates-telegrammer.history");
+        var telegramHistory = new TelegramHistoryImpl(".nationstates-telegrammer.history");
         var regionDumpAccess = new RegionDumpAccessImpl(nationStates);
         var providerTranslator = new RecipientsProviderTranslatorImpl(nationStates, regionDumpAccess);
         var filterTranslator = new RecipientsFilterTranslatorImpl(providerTranslator);
