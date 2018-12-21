@@ -47,8 +47,7 @@ public class OutputTextCreator {
     }
 
     public String createFailedFilterRefreshMessage(RecipientsFilter filter, Throwable ex) {
-        return createTimestampedMessage(
-                "error while refreshing filter '" + filter.toString() + "' : " + ex.getMessage());
+        return "error while refreshing filter '" + filter.toString() + "' : " + ex.getMessage() + "\n";
     }
 
     public String createStoppedSendingMessage(StoppedSendingEvent event) {

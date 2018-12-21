@@ -34,6 +34,7 @@ public final class TelegrammerView extends javax.swing.JFrame implements Telegra
     private javax.swing.JButton BtnStop;
     private javax.swing.JButton ButtonAddFilter;
     private javax.swing.JButton ButtonRemoveFilter;
+    private javax.swing.JButton ButtonRefreshFilters;
     private JCheckBoxMenuItem chckbxmntmHideSkippedRecipients;
     private JCheckBoxMenuItem chckbxmntmRunIndefinitely;
     private JCheckBoxMenuItem chckbxmntmStartSendingOn;
@@ -107,6 +108,7 @@ public final class TelegrammerView extends javax.swing.JFrame implements Telegra
         BtnStop.setEnabled(viewModel.isStopSendingButtonEnabled());
         ButtonAddFilter.setEnabled(viewModel.isAddFilterButtonEnabled());
         ButtonRemoveFilter.setEnabled(viewModel.isRemoveFilterButtonEnabled());
+        ButtonRefreshFilters.setEnabled(viewModel.isRefreshFiltersButtonEnabled());
         chckbxmntmHideSkippedRecipients.setEnabled(viewModel.isOptionsMenuEnabled());
         chckbxmntmHideSkippedRecipients.setSelected(viewModel.getHideSkippedRecipients());
         chckbxmntmRunIndefinitely.setEnabled(viewModel.isOptionsMenuEnabled());
@@ -153,6 +155,7 @@ public final class TelegrammerView extends javax.swing.JFrame implements Telegra
         ScrollPaneFilters = new javax.swing.JScrollPane();
         JListFilters = new javax.swing.JList<>();
         ButtonRemoveFilter = new javax.swing.JButton();
+        ButtonRefreshFilters = new javax.swing.JButton();
         ComboBoxProviderType = new javax.swing.JComboBox<>();
         ButtonAddFilter = new javax.swing.JButton();
         TextFieldFilterValues = new com.github.agadar.telegrammer.client.view.HintTextField();
@@ -304,7 +307,7 @@ public final class TelegrammerView extends javax.swing.JFrame implements Telegra
         });
         ScrollPaneFilters.setViewportView(JListFilters);
 
-        ButtonRemoveFilter.setText("Remove filter");
+        ButtonRemoveFilter.setText("Remove");
         ButtonRemoveFilter.setEnabled(false);
         ButtonRemoveFilter.setName("ButtonRemoveFilter"); // NOI18N
         ButtonRemoveFilter.addActionListener((event) -> viewModel.removeSelectedFilter());
@@ -316,9 +319,13 @@ public final class TelegrammerView extends javax.swing.JFrame implements Telegra
             }
         });
 
-        ButtonAddFilter.setText("Add filter");
+        ButtonAddFilter.setText("Add");
         ButtonAddFilter.setName("ButtonAddFilter"); // NOI18N
         ButtonAddFilter.addActionListener((event) -> viewModel.addNewFilter());
+
+        ButtonRefreshFilters.setText("Refresh");
+        ButtonRefreshFilters.setName("ButtonRefreshFilters");
+        ButtonRefreshFilters.addActionListener((event) -> viewModel.refreshFilters());
 
         TextFieldFilterValues.setHint("");
         TextFieldFilterValues.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -344,8 +351,11 @@ public final class TelegrammerView extends javax.swing.JFrame implements Telegra
                                 javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(ComboBoxProviderType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(ScrollPaneFilters, javax.swing.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
-                        .addGroup(PanelFiltersLayout.createSequentialGroup().addComponent(ButtonRemoveFilter)
+                        .addGroup(PanelFiltersLayout.createSequentialGroup().addComponent(ButtonRemoveFilter, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGap(18, 18, 18).addComponent(ButtonAddFilter, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addGap(18, 18, 18)
+                                .addComponent(ButtonRefreshFilters, javax.swing.GroupLayout.DEFAULT_SIZE,
                                         javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addComponent(ComboBoxFilterType, javax.swing.GroupLayout.Alignment.TRAILING, 0,
                                 javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -366,7 +376,8 @@ public final class TelegrammerView extends javax.swing.JFrame implements Telegra
                                 javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(12, 12, 12)
                         .addGroup(PanelFiltersLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(ButtonRemoveFilter).addComponent(ButtonAddFilter))
+                                .addComponent(ButtonRemoveFilter).addComponent(ButtonAddFilter)
+                                .addComponent(ButtonRefreshFilters))
                         .addContainerGap()));
 
         PanelOutput.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Output",
