@@ -7,7 +7,6 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import com.github.agadar.nationstates.DefaultNationStatesImpl;
-import com.github.agadar.telegrammer.client.properties.TelegrammerClientProperties;
 import com.github.agadar.telegrammer.client.properties.TelegrammerClientPropertiesManager;
 import com.github.agadar.telegrammer.client.view.TelegrammerView;
 import com.github.agadar.telegrammer.client.viewmodel.OutputTextCreator;
@@ -31,7 +30,6 @@ public class Main {
         // Context root.
         var nationStates = new DefaultNationStatesImpl(
                 "Agadar's Telegrammer Client (https://github.com/Agadar/NationStates-Telegrammer-Client)");
-        var properties = new TelegrammerClientProperties();
         var telegramHistory = new TelegramHistoryImpl(".nationstates-telegrammer.history");
         var regionDumpAccess = new RegionDumpAccessImpl(nationStates);
         var providerTranslator = new RecipientsProviderTranslatorImpl(nationStates, regionDumpAccess);
@@ -40,13 +38,13 @@ public class Main {
                 filterTranslator);
         var propertiesManager = new TelegrammerClientPropertiesManager(recipientsListBuilderTranslator,
                 ".nationstates-telegrammer.properties");
-        var telegramSender = new TelegramSenderImpl(nationStates, telegramHistory, properties);
-        var outputTextCreator = new OutputTextCreator(properties);
+        var telegramSender = new TelegramSenderImpl(nationStates, telegramHistory, propertiesManager);
+        var outputTextCreator = new OutputTextCreator(propertiesManager);
 
         // Retrieve properties and history.
-        propertiesManager.loadProperties(properties);
+        propertiesManager.loadPropertiesFromFileSystem();
         telegramHistory.loadHistory();
-        properties.getRecipientsListBuilder().refreshFilters();
+        propertiesManager.getProperties().getRecipientsListBuilder().refreshFilters();
 
         // Set-up graphical form.
         try {
@@ -54,8 +52,8 @@ public class Main {
 
             // Create and display the form.
             java.awt.EventQueue.invokeLater(() -> {
-                var viewModel = new TelegrammerViewModel(telegramSender, propertiesManager, properties,
-                        filterTranslator, outputTextCreator);
+                var viewModel = new TelegrammerViewModel(telegramSender, propertiesManager, filterTranslator,
+                        outputTextCreator);
                 var view = new TelegrammerView(viewModel);
                 view.setLocationRelativeTo(null);
                 view.setVisible(true);
