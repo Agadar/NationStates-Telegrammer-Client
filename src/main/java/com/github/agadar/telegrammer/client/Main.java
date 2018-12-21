@@ -44,7 +44,6 @@ public class Main {
         // Retrieve properties and history.
         propertiesManager.loadPropertiesFromFileSystem();
         telegramHistory.loadHistory();
-        propertiesManager.getProperties().getRecipientsListBuilder().refreshFilters();
 
         // Set-up graphical form.
         try {
