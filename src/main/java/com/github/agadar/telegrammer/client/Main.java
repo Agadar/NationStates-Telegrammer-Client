@@ -1,8 +1,5 @@
 package com.github.agadar.telegrammer.client;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -18,11 +15,14 @@ import com.github.agadar.telegrammer.core.regiondumpaccess.RegionDumpAccessImpl;
 import com.github.agadar.telegrammer.core.telegram.history.TelegramHistoryImpl;
 import com.github.agadar.telegrammer.core.telegram.sender.TelegramSenderImpl;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Main entry for this application.
  *
  * @author Agadar (https://github.com/Agadar/)
  */
+@Slf4j
 public class Main {
 
     public static void main(String args[]) {
@@ -59,7 +59,7 @@ public class Main {
             });
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                 | UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            log.error("Something went wrong during startup", ex);
         }
     }
 }

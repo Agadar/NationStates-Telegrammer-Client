@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import com.github.agadar.nationstates.event.TelegramSentEvent;
 import com.github.agadar.telegrammer.client.properties.TelegrammerClientProperties;
 import com.github.agadar.telegrammer.core.properties.manager.PropertiesManager;
-import com.github.agadar.telegrammer.core.recipients.RecipientsProviderType;
+import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterAction;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterType;
 import com.github.agadar.telegrammer.core.recipients.translator.RecipientsFilterTranslator;
 import com.github.agadar.telegrammer.core.telegram.TelegramType;
@@ -40,8 +40,8 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     private final TelegramSender telegramSender;
     private final OutputTextCreator outputTextCreator;
 
+    @Getter private int selectedFilterActionIndex = 0;
     @Getter private int selectedFilterTypeIndex = 0;
-    @Getter private int selectedProviderTypeIndex = 0;
     @Getter private int selectedConfiguredRecipientsFilterIndex = -1;
     @Getter private String filterParameters = "";
     @Getter private String outputText = "";
@@ -254,12 +254,12 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     }
 
     public String[] getAvailableFilterTypes() {
-        return Arrays.stream(RecipientsFilterType.values()).map(type -> type.toString()).toArray(String[]::new);
+        return Arrays.stream(RecipientsFilterAction.values()).map(type -> type.toString()).toArray(String[]::new);
     }
 
     public void setSelectedFilterTypeIndex(int value) {
-        if (isAvailableFilterTypesInputEnabled() && selectedFilterTypeIndex != value) {
-            selectedFilterTypeIndex = value;
+        if (isAvailableFilterTypesInputEnabled() && selectedFilterActionIndex != value) {
+            selectedFilterActionIndex = value;
         }
     }
 
@@ -268,19 +268,19 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     }
 
     public String[] getAvailableProviderTypes() {
-        return Arrays.stream(RecipientsProviderType.values()).map(type -> type.toString()).toArray(String[]::new);
+        return Arrays.stream(RecipientsFilterType.values()).map(type -> type.toString()).toArray(String[]::new);
     }
 
     public void setSelectedProviderTypeIndex(int value) {
-        if (isAvailableProviderTypesInputEnabled() && value != selectedProviderTypeIndex) {
-            selectedProviderTypeIndex = value;
+        if (isAvailableProviderTypesInputEnabled() && value != selectedFilterTypeIndex) {
+            selectedFilterTypeIndex = value;
             filterParameters = "";
             listener.refreshEverything();
         }
     }
 
     public boolean isFilterParametersInputEnabled() {
-        switch (RecipientsProviderType.values()[selectedProviderTypeIndex]) {
+        switch (RecipientsFilterType.values()[selectedFilterTypeIndex]) {
         case NATIONS_IN_EMBASSY_REGIONS:
         case NATIONS:
         case NATIONS_IN_REGIONS:
@@ -299,7 +299,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     }
 
     public String getFilterParametersHint() {
-        switch (RecipientsProviderType.values()[selectedProviderTypeIndex]) {
+        switch (RecipientsFilterType.values()[selectedFilterTypeIndex]) {
         case NATIONS_IN_EMBASSY_REGIONS:
         case NATIONS_IN_REGIONS:
             return "Insert region names, e.g. 'region1, region2'.";
@@ -368,9 +368,9 @@ public class TelegrammerViewModel implements TelegramManagerListener {
         changeStateAndInformListener(TelegrammerState.CompilingRecipients);
 
         var parsedFilterParams = StringFunctions.stringToHashSet(filterParameters);
+        var selectedFilterAction = RecipientsFilterAction.values()[selectedFilterActionIndex];
         var selectedFilterType = RecipientsFilterType.values()[selectedFilterTypeIndex];
-        var selectedProviderType = RecipientsProviderType.values()[selectedProviderTypeIndex];
-        var filter = filterTranslator.toFilter(selectedFilterType, selectedProviderType, parsedFilterParams);
+        var filter = filterTranslator.toFilter(selectedFilterType, selectedFilterAction, parsedFilterParams);
 
         compileRecipientsExecutor.execute(() -> {
             try {

@@ -120,9 +120,9 @@ public final class TelegrammerView extends javax.swing.JFrame implements Telegra
         chckbxmntmRefreshRecipientsAfter.setEnabled(viewModel.isOptionsMenuEnabled());
         chckbxmntmRefreshRecipientsAfter.setSelected(viewModel.getRefreshRecipientsAfterEveryTelegram());
         ComboBoxFilterType.setEnabled(viewModel.isAvailableFilterTypesInputEnabled());
-        ComboBoxFilterType.setSelectedIndex(viewModel.getSelectedFilterTypeIndex());
+        ComboBoxFilterType.setSelectedIndex(viewModel.getSelectedFilterActionIndex());
         ComboBoxProviderType.setEnabled(viewModel.isAvailableProviderTypesInputEnabled());
-        ComboBoxProviderType.setSelectedIndex(viewModel.getSelectedProviderTypeIndex());
+        ComboBoxProviderType.setSelectedIndex(viewModel.getSelectedFilterTypeIndex());
         ComboBoxTelegramType.setEnabled(viewModel.isAvailableTelegramTypesEnabled());
         ComboBoxTelegramType.setSelectedIndex(viewModel.getSelectedTelegramTypeIndex());
         TextFieldFilterValues.setEditable(viewModel.isFilterParametersInputEnabled());
