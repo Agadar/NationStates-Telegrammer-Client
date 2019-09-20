@@ -33,18 +33,24 @@ import lombok.Getter;
  */
 public class TelegrammerViewModel implements TelegramManagerListener {
 
-    @Getter private final String title = "Agadar's NationStates Telegrammer Client 2.0.0";
+    @Getter
+    private final String title = "Agadar's NationStates Telegrammer Client 2.1.0";
 
     private final RecipientsFilterTranslator filterTranslator;
     private final PropertiesManager<TelegrammerClientProperties> propertiesManager;
     private final TelegramSender telegramSender;
     private final OutputTextCreator outputTextCreator;
 
-    @Getter private int selectedFilterActionIndex = 0;
-    @Getter private int selectedFilterTypeIndex = 0;
-    @Getter private int selectedConfiguredRecipientsFilterIndex = -1;
-    @Getter private String filterParameters = "";
-    @Getter private String outputText = "";
+    @Getter
+    private RecipientsFilterAction selectedFilterAction = RecipientsFilterAction.ADD_TO_RECIPIENTS;
+    @Getter
+    private RecipientsFilterType selectedFilterType = RecipientsFilterType.ALL_NATIONS;
+    @Getter
+    private int selectedConfiguredRecipientsFilterIndex = -1;
+    @Getter
+    private String filterParameters = "";
+    @Getter
+    private String outputText = "";
 
     private TelegrammerViewModelListener listener = null;
     private Executor compileRecipientsExecutor = Executors.newSingleThreadExecutor();
@@ -249,46 +255,48 @@ public class TelegrammerViewModel implements TelegramManagerListener {
         }
     }
 
+    public boolean isAvailableFilterActionsInputEnabled() {
+        return state == TelegrammerState.Idle;
+    }
+
+    public RecipientsFilterAction[] getAvailableFilterActions() {
+        return RecipientsFilterAction.values();
+    }
+
+    public void setSelectedFilterAction(RecipientsFilterAction filterAction) {
+        if (isAvailableFilterActionsInputEnabled() && selectedFilterAction != filterAction) {
+            selectedFilterAction = filterAction;
+        }
+    }
+
     public boolean isAvailableFilterTypesInputEnabled() {
         return state == TelegrammerState.Idle;
     }
 
-    public String[] getAvailableFilterTypes() {
-        return Arrays.stream(RecipientsFilterAction.values()).map(type -> type.toString()).toArray(String[]::new);
+    public RecipientsFilterType[] getAvailableFilterTypes() {
+        return Arrays.stream(RecipientsFilterType.values())
+                .filter(this::filterTypeSupportsSelectedFilterAction)
+                .toArray(RecipientsFilterType[]::new);
     }
 
-    public void setSelectedFilterTypeIndex(int value) {
-        if (isAvailableFilterTypesInputEnabled() && selectedFilterActionIndex != value) {
-            selectedFilterActionIndex = value;
-        }
-    }
-
-    public boolean isAvailableProviderTypesInputEnabled() {
-        return state == TelegrammerState.Idle;
-    }
-
-    public String[] getAvailableProviderTypes() {
-        return Arrays.stream(RecipientsFilterType.values()).map(type -> type.toString()).toArray(String[]::new);
-    }
-
-    public void setSelectedProviderTypeIndex(int value) {
-        if (isAvailableProviderTypesInputEnabled() && value != selectedFilterTypeIndex) {
-            selectedFilterTypeIndex = value;
+    public void setSelectedFilterType(RecipientsFilterType filterType) {
+        if (isAvailableFilterTypesInputEnabled() && filterType != selectedFilterType) {
+            selectedFilterType = filterType;
             filterParameters = "";
             listener.refreshEverything();
         }
     }
 
     public boolean isFilterParametersInputEnabled() {
-        switch (RecipientsFilterType.values()[selectedFilterTypeIndex]) {
-        case NATIONS_IN_EMBASSY_REGIONS:
-        case NATIONS:
-        case NATIONS_IN_REGIONS:
-        case NATIONS_IN_REGIONS_WITH_TAGS:
-        case NATIONS_IN_REGIONS_WITHOUT_TAGS:
-            return true;
-        default:
-            return false;
+        switch (selectedFilterType) {
+            case NATIONS_IN_EMBASSY_REGIONS:
+            case NATIONS:
+            case NATIONS_IN_REGIONS:
+            case NATIONS_IN_REGIONS_WITH_TAGS:
+            case NATIONS_IN_REGIONS_WITHOUT_TAGS:
+                return true;
+            default:
+                return false;
         }
     }
 
@@ -299,17 +307,17 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     }
 
     public String getFilterParametersHint() {
-        switch (RecipientsFilterType.values()[selectedFilterTypeIndex]) {
-        case NATIONS_IN_EMBASSY_REGIONS:
-        case NATIONS_IN_REGIONS:
-            return "Insert region names, e.g. 'region1, region2'.";
-        case NATIONS:
-            return "Insert nation names, e.g. 'nation1, nation2'.";
-        case NATIONS_IN_REGIONS_WITH_TAGS:
-        case NATIONS_IN_REGIONS_WITHOUT_TAGS:
-            return "Insert region tags, e.g. 'tag1, tag2'.";
-        default:
-            return "";
+        switch (selectedFilterType) {
+            case NATIONS_IN_EMBASSY_REGIONS:
+            case NATIONS_IN_REGIONS:
+                return "Insert region names, e.g. 'region1, region2'.";
+            case NATIONS:
+                return "Insert nation names, e.g. 'nation1, nation2'.";
+            case NATIONS_IN_REGIONS_WITH_TAGS:
+            case NATIONS_IN_REGIONS_WITHOUT_TAGS:
+                return "Insert region tags, e.g. 'tag1, tag2'.";
+            default:
+                return "";
         }
     }
 
@@ -368,8 +376,6 @@ public class TelegrammerViewModel implements TelegramManagerListener {
         changeStateAndInformListener(TelegrammerState.CompilingRecipients);
 
         var parsedFilterParams = StringFunctions.stringToHashSet(filterParameters);
-        var selectedFilterAction = RecipientsFilterAction.values()[selectedFilterActionIndex];
-        var selectedFilterType = RecipientsFilterType.values()[selectedFilterTypeIndex];
         var filter = filterTranslator.toFilter(selectedFilterType, selectedFilterAction, parsedFilterParams);
 
         compileRecipientsExecutor.execute(() -> {
@@ -477,5 +483,10 @@ public class TelegrammerViewModel implements TelegramManagerListener {
 
     private String removeWhiteSpaces(String target) {
         return target.replace(" ", "");
+    }
+
+    private boolean filterTypeSupportsSelectedFilterAction(RecipientsFilterType filterType) {
+        return Arrays.stream(filterType.getSupportedActions())
+                .anyMatch(supportedAction -> supportedAction == selectedFilterAction);
     }
 }
