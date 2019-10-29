@@ -22,15 +22,17 @@ import com.github.agadar.telegrammer.core.telegram.sender.TelegramSender;
 import com.github.agadar.telegrammer.core.util.StringFunctions;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The abstract representation of the GUI, exposing all information needed to
  * construct an arbitrary framework-specific view that implements the
- * ITelegrammerViewModelListener.
+ * TelegrammerViewModelListener.
  * 
  * @author Agadar (https://github.com/Agadar/)
  *
  */
+@Slf4j
 public class TelegrammerViewModel implements TelegramManagerListener {
 
     @Getter
@@ -332,6 +334,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
         try {
             telegramSender.startSending(properties.getRecipientsListBuilder());
         } catch (Exception ex) {
+            log.error("An error occured while starting sending telegrams", ex);
             outputText += outputTextCreator.createTimestampedMessage(ex.getMessage());
             changeStateAndInformListener(TelegrammerState.Idle);
         }
@@ -364,6 +367,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
                 propertiesManager.getProperties().getRecipientsListBuilder().addFilter(filter);
                 outputText = outputTextCreator.createExpectedDurationMessage();
             } catch (Exception | OutOfMemoryError ex) {
+                log.error("An error occured while refreshing the filters", ex);
                 outputText = outputTextCreator.createTimestampedMessage("updated recipients list");
                 outputText += outputTextCreator.createFailedFilterRefreshMessage(filter, ex);
             } finally {
