@@ -288,16 +288,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     }
 
     public boolean isFilterParametersInputEnabled() {
-        switch (selectedFilterType) {
-            case NATIONS_IN_EMBASSY_REGIONS:
-            case NATIONS:
-            case NATIONS_IN_REGIONS:
-            case NATIONS_IN_REGIONS_WITH_TAGS:
-            case NATIONS_IN_REGIONS_WITHOUT_TAGS:
-                return true;
-            default:
-                return false;
-        }
+        return selectedFilterType.isAllowsInput();
     }
 
     public void setFilterParameters(String value) {
@@ -307,18 +298,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     }
 
     public String getFilterParametersHint() {
-        switch (selectedFilterType) {
-            case NATIONS_IN_EMBASSY_REGIONS:
-            case NATIONS_IN_REGIONS:
-                return "Insert region names, e.g. 'region1, region2'.";
-            case NATIONS:
-                return "Insert nation names, e.g. 'nation1, nation2'.";
-            case NATIONS_IN_REGIONS_WITH_TAGS:
-            case NATIONS_IN_REGIONS_WITHOUT_TAGS:
-                return "Insert region tags, e.g. 'tag1, tag2'.";
-            default:
-                return "";
-        }
+        return selectedFilterType.getInputHint();
     }
 
     public boolean isRemoveFilterButtonEnabled() {
