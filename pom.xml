@@ -36,7 +36,7 @@
         <dependency>
             <groupId>com.github.agadar.telegrammer</groupId>
             <artifactId>nationstates-telegrammer-core</artifactId>
-            <version>4.1.0</version>
+            <version>5.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
