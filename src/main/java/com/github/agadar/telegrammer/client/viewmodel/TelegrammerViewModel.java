@@ -333,8 +333,11 @@ public class TelegrammerViewModel implements TelegramManagerListener {
         changeStateAndInformListener(TelegrammerState.SendingTelegrams);
         try {
             telegramSender.startSending(properties.getRecipientsListBuilder());
+
         } catch (Exception ex) {
-            log.error("An error occured while starting sending telegrams", ex);
+            if (!(ex instanceof IllegalArgumentException)) {
+                log.error("An error occured while starting sending telegrams", ex);
+            }
             outputText += outputTextCreator.createTimestampedMessage(ex.getMessage());
             changeStateAndInformListener(TelegrammerState.Idle);
         }
