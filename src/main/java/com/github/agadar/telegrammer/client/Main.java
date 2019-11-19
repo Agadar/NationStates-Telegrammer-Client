@@ -4,6 +4,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import com.github.agadar.nationstates.DefaultNationStatesImpl;
+import com.github.agadar.nationstates.exception.NationStatesAPIException;
 import com.github.agadar.telegrammer.client.properties.TelegrammerClientPropertiesManager;
 import com.github.agadar.telegrammer.client.view.TelegrammerView;
 import com.github.agadar.telegrammer.client.viewmodel.OutputTextCreator;
@@ -25,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Main {
 
-    public static void main(String args[]) {
+    public static void main(String args[]) throws NationStatesAPIException {
 
         // Context root.
         var nationStates = new DefaultNationStatesImpl(

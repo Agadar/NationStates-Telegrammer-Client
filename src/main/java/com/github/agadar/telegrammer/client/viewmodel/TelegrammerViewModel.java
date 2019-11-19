@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TelegrammerViewModel implements TelegramManagerListener {
 
     @Getter
-    private final String title = "Agadar's NationStates Telegrammer Client 2.1.0";
+    private final String title = "Agadar's NationStates Telegrammer Client 2.2.0";
 
     private final RecipientsFilterTranslator filterTranslator;
     private final PropertiesManager<TelegrammerClientProperties> propertiesManager;
