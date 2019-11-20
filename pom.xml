@@ -76,6 +76,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>com.github.agadar.telegrammer.client.Main</mainClass>
+                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                                 </manifest>
                             </archive>
                         </configuration>

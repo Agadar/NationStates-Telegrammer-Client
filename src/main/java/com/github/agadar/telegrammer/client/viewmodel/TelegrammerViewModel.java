@@ -35,9 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TelegrammerViewModel implements TelegramManagerListener {
 
-    @Getter
-    private final String title = "Agadar's NationStates Telegrammer Client 2.2.0";
-
     private final RecipientsFilterTranslator filterTranslator;
     private final PropertiesManager<TelegrammerClientProperties> propertiesManager;
     private final TelegramSender telegramSender;
@@ -417,6 +414,12 @@ public class TelegrammerViewModel implements TelegramManagerListener {
 
     public void performPreCloseActions() {
         propertiesManager.persistPropertiesToFileSystem();
+    }
+
+    public String getTitle() {
+        String version = getClass().getPackage().getImplementationVersion();
+        version = version == null ? "[DEVELOPMENT VERSION]" : version;
+        return String.format("Agadar's NationStates Telegrammer Client %s", version);
     }
 
     @Override
