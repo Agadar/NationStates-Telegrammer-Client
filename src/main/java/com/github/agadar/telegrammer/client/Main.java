@@ -1,10 +1,10 @@
 package com.github.agadar.telegrammer.client;
 
+import java.awt.EventQueue;
+
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 import com.github.agadar.nationstates.DefaultNationStatesImpl;
-import com.github.agadar.nationstates.exception.NationStatesAPIException;
 import com.github.agadar.telegrammer.client.properties.TelegrammerClientPropertiesManager;
 import com.github.agadar.telegrammer.client.view.TelegrammerView;
 import com.github.agadar.telegrammer.client.viewmodel.OutputTextCreator;
@@ -26,40 +26,38 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Main {
 
-    public static void main(String args[]) throws NationStatesAPIException {
+    public static void main(String args[]) {
 
-        // Context root.
-        var nationStates = new DefaultNationStatesImpl(
-                "Agadar's Telegrammer Client (https://github.com/Agadar/NationStates-Telegrammer-Client)");
-        var telegramHistory = new TelegramHistoryImpl(".nationstates-telegrammer.history");
-        var regionDumpAccess = new RegionDumpAccessImpl(nationStates);
-        var providerTranslator = new RecipientsProviderTranslatorImpl(nationStates, regionDumpAccess);
-        var filterTranslator = new RecipientsFilterTranslatorImpl(providerTranslator);
-        var recipientsListBuilderTranslator = new RecipientsListBuilderTranslatorImpl(telegramHistory,
-                filterTranslator);
-        var propertiesManager = new TelegrammerClientPropertiesManager(recipientsListBuilderTranslator,
-                ".nationstates-telegrammer.properties");
-        var telegramSender = new TelegramSenderImpl(nationStates, telegramHistory, propertiesManager);
-        var outputTextCreator = new OutputTextCreator(propertiesManager);
-
-        // Retrieve properties and history.
-        propertiesManager.loadPropertiesFromFileSystem();
-        telegramHistory.loadHistory();
-
-        // Set-up graphical form.
         try {
+            // Context root.
+            var nationStates = new DefaultNationStatesImpl(
+                    "Agadar's Telegrammer Client (https://github.com/Agadar/NationStates-Telegrammer-Client)");
+            var telegramHistory = new TelegramHistoryImpl(".nationstates-telegrammer.history");
+            var regionDumpAccess = new RegionDumpAccessImpl(nationStates);
+            var providerTranslator = new RecipientsProviderTranslatorImpl(nationStates, regionDumpAccess);
+            var filterTranslator = new RecipientsFilterTranslatorImpl(providerTranslator);
+            var recipientsListBuilderTranslator = new RecipientsListBuilderTranslatorImpl(telegramHistory,
+                    filterTranslator);
+            var propertiesManager = new TelegrammerClientPropertiesManager(recipientsListBuilderTranslator,
+                    ".nationstates-telegrammer.properties");
+            var telegramSender = new TelegramSenderImpl(nationStates, telegramHistory, propertiesManager);
+            var outputTextCreator = new OutputTextCreator(propertiesManager);
+
+            // Retrieve properties and history.
+            propertiesManager.loadPropertiesFromFileSystem();
+            telegramHistory.loadHistory();
+
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 
             // Create and display the form.
-            java.awt.EventQueue.invokeLater(() -> {
+            EventQueue.invokeLater(() -> {
                 var viewModel = new TelegrammerViewModel(telegramSender, propertiesManager, filterTranslator,
                         outputTextCreator);
                 var view = new TelegrammerView(viewModel);
                 view.setLocationRelativeTo(null);
                 view.setVisible(true);
             });
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-                | UnsupportedLookAndFeelException ex) {
+        } catch (Exception ex) {
             log.error("Something went wrong during startup", ex);
         }
     }
