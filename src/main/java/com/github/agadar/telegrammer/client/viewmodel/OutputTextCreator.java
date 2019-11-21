@@ -51,8 +51,7 @@ public class OutputTextCreator {
     }
 
     public String createStoppedSendingMessage(StoppedSendingEvent event) {
-        return BORDER + "\nfinished"
-                + (event.isCausedByError() ? " with error: " + event.getErrorMsg() + "\n" : " without fatal errors\n")
+        return BORDER + "\nfinished queueing telegrams\n\n"
                 + "telegrams queued: " + event.getQueuedSucces() + "\n" + "blocked by category: "
                 + event.getRecipientIsBlocking() + "\n" + "recipients not found: " + event.getRecipientDidntExist()
                 + "\n" + "failed b/c other reasons: " + event.getDisconnectOrOtherReason() + "\n" + BORDER + "\n";
