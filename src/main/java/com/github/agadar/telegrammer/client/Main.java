@@ -9,6 +9,7 @@ import com.github.agadar.telegrammer.client.view.TelegrammerView;
 import com.github.agadar.telegrammer.client.viewmodel.OutputTextCreator;
 import com.github.agadar.telegrammer.client.viewmodel.TelegrammerViewModel;
 import com.github.agadar.telegrammer.core.DefaultTelegrammerImpl;
+import com.github.agadar.telegrammer.core.settings.Settings;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,16 +25,17 @@ public class Main {
 
         try {
             // Context root.
-            var telegrammer = new DefaultTelegrammerImpl();
-            var clientSettings = new TelegrammerClientSettings(telegrammer.getSettings());
-            telegrammer.initialise(
-                    "Agadar's Telegrammer Client (https://github.com/Agadar/NationStates-Telegrammer-Client)");
-            var outputTextCreator = new OutputTextCreator(telegrammer.getTelegrammerCoreSettings());
+            String userAgent = "Agadar's Telegrammer Client (https://github.com/Agadar/NationStates-Telegrammer-Client)";
+            var settings = new Settings(".nationstates-telegrammer.properties");
+            var telegrammer = new DefaultTelegrammerImpl(userAgent, settings);
+            var clientSettings = new TelegrammerClientSettings(settings);
 
+            settings.loadPropertiesFile();
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 
             // Create and display the form.
             EventQueue.invokeLater(() -> {
+                var outputTextCreator = new OutputTextCreator(telegrammer.getTelegrammerCoreSettings());
                 var viewModel = new TelegrammerViewModel(telegrammer, clientSettings, outputTextCreator);
                 var view = new TelegrammerView(viewModel);
                 view.setLocationRelativeTo(null);
