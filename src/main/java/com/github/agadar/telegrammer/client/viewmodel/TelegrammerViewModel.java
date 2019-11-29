@@ -8,17 +8,16 @@ import java.util.stream.Collectors;
 
 import com.github.agadar.nationstates.event.TelegramSentEvent;
 import com.github.agadar.telegrammer.client.settings.TelegrammerClientSettings;
+import com.github.agadar.telegrammer.core.Telegrammer;
 import com.github.agadar.telegrammer.core.event.NoRecipientsFoundEvent;
 import com.github.agadar.telegrammer.core.event.RecipientRemovedEvent;
 import com.github.agadar.telegrammer.core.event.RecipientsRefreshedEvent;
 import com.github.agadar.telegrammer.core.event.StoppedSendingEvent;
-import com.github.agadar.telegrammer.core.event.TelegramManagerListener;
+import com.github.agadar.telegrammer.core.event.TelegrammerListener;
 import com.github.agadar.telegrammer.core.misc.StringFunctions;
 import com.github.agadar.telegrammer.core.misc.TelegramType;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterAction;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterType;
-import com.github.agadar.telegrammer.core.recipients.translator.RecipientsFilterTranslator;
-import com.github.agadar.telegrammer.core.sender.TelegramSender;
 import com.github.agadar.telegrammer.core.settings.TelegrammerCoreSettings;
 
 import lombok.Getter;
@@ -34,13 +33,12 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public class TelegrammerViewModel implements TelegramManagerListener {
+public class TelegrammerViewModel implements TelegrammerListener {
 
-    private final RecipientsFilterTranslator filterTranslator;
-    private final TelegramSender telegramSender;
+    private final Telegrammer telegrammer;
     private final OutputTextCreator outputTextCreator;
-    private final TelegrammerCoreSettings coreSettings;
     private final TelegrammerClientSettings clientSettings;
+    private final TelegrammerCoreSettings coreSettings;
 
     @Getter
     private RecipientsFilterAction selectedFilterAction = RecipientsFilterAction.ADD_TO_RECIPIENTS;
@@ -57,19 +55,16 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     private Executor compileRecipientsExecutor = Executors.newSingleThreadExecutor();
     private TelegrammerState state = TelegrammerState.CompilingRecipients;
 
-    public TelegrammerViewModel(@NonNull TelegramSender telegramSender,
-            @NonNull TelegrammerCoreSettings coreSettings,
+    public TelegrammerViewModel(@NonNull Telegrammer telegrammer,
             @NonNull TelegrammerClientSettings clientSettings,
-            @NonNull RecipientsFilterTranslator filterTranslator,
             @NonNull OutputTextCreator outputTextCreator) {
 
-        this.telegramSender = telegramSender;
-        this.coreSettings = coreSettings;
+        this.telegrammer = telegrammer;
         this.clientSettings = clientSettings;
-        this.filterTranslator = filterTranslator;
         this.outputTextCreator = outputTextCreator;
+        coreSettings = telegrammer.getTelegrammerCoreSettings();
 
-        telegramSender.addListeners(this);
+        telegrammer.addListeners(this);
         outputText = "updating recipient list...\n";
 
         compileRecipientsExecutor.execute(() -> {
@@ -333,7 +328,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
 
         changeStateAndInformListener(TelegrammerState.SendingTelegrams);
         try {
-            telegramSender.startSending(coreSettings);
+            telegrammer.startSending();
 
         } catch (Exception ex) {
             if (!(ex instanceof IllegalArgumentException)) {
@@ -346,7 +341,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
 
     public void stopSendingTelegrams() {
         if (isStopSendingButtonEnabled()) {
-            telegramSender.stopSending();
+            telegrammer.stopSending();
         }
     }
 
@@ -363,7 +358,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
         changeStateAndInformListener(TelegrammerState.CompilingRecipients);
 
         var parsedFilterParams = StringFunctions.stringToHashSet(filterParameters);
-        var filter = filterTranslator.toFilter(selectedFilterType, selectedFilterAction, parsedFilterParams);
+        var filter = telegrammer.createFilter(selectedFilterType, selectedFilterAction, parsedFilterParams);
 
         compileRecipientsExecutor.execute(() -> {
             try {
