@@ -7,21 +7,22 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import com.github.agadar.nationstates.event.TelegramSentEvent;
-import com.github.agadar.telegrammer.client.properties.TelegrammerClientProperties;
-import com.github.agadar.telegrammer.core.properties.manager.PropertiesManager;
+import com.github.agadar.telegrammer.client.settings.TelegrammerClientSettings;
+import com.github.agadar.telegrammer.core.event.NoRecipientsFoundEvent;
+import com.github.agadar.telegrammer.core.event.RecipientRemovedEvent;
+import com.github.agadar.telegrammer.core.event.RecipientsRefreshedEvent;
+import com.github.agadar.telegrammer.core.event.StoppedSendingEvent;
+import com.github.agadar.telegrammer.core.event.TelegramManagerListener;
+import com.github.agadar.telegrammer.core.misc.StringFunctions;
+import com.github.agadar.telegrammer.core.misc.TelegramType;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterAction;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterType;
 import com.github.agadar.telegrammer.core.recipients.translator.RecipientsFilterTranslator;
-import com.github.agadar.telegrammer.core.telegram.TelegramType;
-import com.github.agadar.telegrammer.core.telegram.event.NoRecipientsFoundEvent;
-import com.github.agadar.telegrammer.core.telegram.event.RecipientRemovedEvent;
-import com.github.agadar.telegrammer.core.telegram.event.RecipientsRefreshedEvent;
-import com.github.agadar.telegrammer.core.telegram.event.StoppedSendingEvent;
-import com.github.agadar.telegrammer.core.telegram.event.TelegramManagerListener;
-import com.github.agadar.telegrammer.core.telegram.sender.TelegramSender;
-import com.github.agadar.telegrammer.core.util.StringFunctions;
+import com.github.agadar.telegrammer.core.sender.TelegramSender;
+import com.github.agadar.telegrammer.core.settings.TelegrammerCoreSettings;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -36,9 +37,10 @@ import lombok.extern.slf4j.Slf4j;
 public class TelegrammerViewModel implements TelegramManagerListener {
 
     private final RecipientsFilterTranslator filterTranslator;
-    private final PropertiesManager<TelegrammerClientProperties> propertiesManager;
     private final TelegramSender telegramSender;
     private final OutputTextCreator outputTextCreator;
+    private final TelegrammerCoreSettings coreSettings;
+    private final TelegrammerClientSettings clientSettings;
 
     @Getter
     private RecipientsFilterAction selectedFilterAction = RecipientsFilterAction.ADD_TO_RECIPIENTS;
@@ -55,12 +57,15 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     private Executor compileRecipientsExecutor = Executors.newSingleThreadExecutor();
     private TelegrammerState state = TelegrammerState.CompilingRecipients;
 
-    public TelegrammerViewModel(TelegramSender telegramSender,
-            PropertiesManager<TelegrammerClientProperties> propertiesManager,
-            RecipientsFilterTranslator filterTranslator, OutputTextCreator outputTextCreator) {
+    public TelegrammerViewModel(@NonNull TelegramSender telegramSender,
+            @NonNull TelegrammerCoreSettings coreSettings,
+            @NonNull TelegrammerClientSettings clientSettings,
+            @NonNull RecipientsFilterTranslator filterTranslator,
+            @NonNull OutputTextCreator outputTextCreator) {
 
         this.telegramSender = telegramSender;
-        this.propertiesManager = propertiesManager;
+        this.coreSettings = coreSettings;
+        this.clientSettings = clientSettings;
         this.filterTranslator = filterTranslator;
         this.outputTextCreator = outputTextCreator;
 
@@ -68,8 +73,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
         outputText = "updating recipient list...\n";
 
         compileRecipientsExecutor.execute(() -> {
-            var properties = propertiesManager.getProperties();
-            var failedFilters = properties.getRecipientsListBuilder().refreshFilters();
+            var failedFilters = coreSettings.getFilters().refreshFilters();
 
             if (!failedFilters.isEmpty()) {
                 outputText = outputTextCreator.createTimestampedMessage("updated recipients list");
@@ -80,7 +84,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
             }
             changeStateAndInformListener(TelegrammerState.Idle);
 
-            if (properties.isStartSendingOnStartup()) {
+            if (clientSettings.getStartSendingOnStartup()) {
                 this.startSendingTelegrams();
             }
         });
@@ -96,52 +100,52 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     }
 
     public boolean getHideSkippedRecipients() {
-        return propertiesManager.getProperties().isHideSkippedRecipients();
+        return clientSettings.getHideSkippedRecipients();
     }
 
     public void setHideSkippedRecipients(boolean value) {
         if (isOptionsMenuEnabled()) {
-            propertiesManager.getProperties().setHideSkippedRecipients(value);
+            clientSettings.setHideSkippedRecipients(value);
         }
     }
 
     public boolean getRefreshRecipientsAfterEveryTelegram() {
-        return propertiesManager.getProperties().isUpdateRecipientsAfterEveryTelegram();
+        return coreSettings.getUpdateAfterEveryTelegram();
     }
 
     public void setRefreshRecipientsAfterEveryTelegram(boolean value) {
         if (isOptionsMenuEnabled()) {
-            propertiesManager.getProperties().setUpdateRecipientsAfterEveryTelegram(value);
+            coreSettings.setUpdateAfterEveryTelegram(value);
         }
     }
 
     public boolean getRunIndefinitely() {
-        return propertiesManager.getProperties().isRunIndefinitely();
+        return coreSettings.getRunIndefinitely();
     }
 
     public void setRunIndefinitely(boolean value) {
         if (isOptionsMenuEnabled()) {
-            propertiesManager.getProperties().setRunIndefinitely(value);
+            coreSettings.setRunIndefinitely(value);
         }
     }
 
     public boolean getStartMinimized() {
-        return propertiesManager.getProperties().isStartMinimized();
+        return clientSettings.getStartMinimized();
     }
 
     public void setStartMinimized(boolean value) {
         if (isOptionsMenuEnabled()) {
-            propertiesManager.getProperties().setStartMinimized(value);
+            clientSettings.setStartMinimized(value);
         }
     }
 
     public boolean getStartSendingOnStartup() {
-        return propertiesManager.getProperties().isStartSendingOnStartup();
+        return clientSettings.getStartSendingOnStartup();
     }
 
     public void setStartSendingOnStartup(boolean value) {
         if (isOptionsMenuEnabled()) {
-            propertiesManager.getProperties().setStartSendingOnStartup(value);
+            clientSettings.setStartSendingOnStartup(value);
         }
     }
 
@@ -150,12 +154,12 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     }
 
     public String getClientKey() {
-        return propertiesManager.getProperties().getClientKey();
+        return coreSettings.getClientKey();
     }
 
     public void setClientKey(String value) {
         if (isClientKeyInputEnabled()) {
-            propertiesManager.getProperties().setClientKey(value);
+            coreSettings.setClientKey(value);
         }
     }
 
@@ -164,12 +168,12 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     }
 
     public String getTelegramId() {
-        return propertiesManager.getProperties().getTelegramId();
+        return coreSettings.getTelegramId();
     }
 
     public void setTelegramId(String value) {
         if (isTelegramIdInputEnabled()) {
-            propertiesManager.getProperties().setTelegramId(value);
+            coreSettings.setTelegramId(value);
             outputText = outputTextCreator.createExpectedDurationMessage();
             listener.refreshOutput();
         }
@@ -180,12 +184,12 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     }
 
     public String getSecretKey() {
-        return propertiesManager.getProperties().getSecretKey();
+        return coreSettings.getSecretKey();
     }
 
     public void setSecretKey(String value) {
         if (isSecretKeyInputEnabled()) {
-            propertiesManager.getProperties().setSecretKey(value);
+            coreSettings.setSecretKey(value);
         }
     }
 
@@ -198,36 +202,36 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     }
 
     public int getSelectedTelegramTypeIndex() {
-        var telegramType = propertiesManager.getProperties().getLastTelegramType();
+        var telegramType = coreSettings.getTelegramType();
         return Arrays.asList(TelegramType.values()).indexOf(telegramType);
     }
 
     public void setSelectedTelegramTypeIndex(int value) {
         if (isAvailableTelegramTypesEnabled() && value != getSelectedTelegramTypeIndex()) {
             var telegramType = TelegramType.values()[value];
-            propertiesManager.getProperties().setLastTelegramType(telegramType);
+            coreSettings.setTelegramType(telegramType);
             outputText = outputTextCreator.createExpectedDurationMessage();
 
             if (telegramType != TelegramType.RECRUITMENT && telegramType != TelegramType.CAMPAIGN) {
-                propertiesManager.getProperties().setFromRegion("");
+                coreSettings.setFromRegion("");
             }
             listener.refreshEverything();
         }
     }
 
     public boolean isForRegionInputEnabled() {
-        var telegramType = propertiesManager.getProperties().getLastTelegramType();
+        var telegramType = coreSettings.getTelegramType();
         return state == TelegrammerState.Idle
                 && (telegramType == TelegramType.RECRUITMENT || telegramType == TelegramType.CAMPAIGN);
     }
 
     public String getForRegion() {
-        return propertiesManager.getProperties().getFromRegion();
+        return coreSettings.getFromRegion();
     }
 
     public void setForRegion(String value) {
         if (isForRegionInputEnabled()) {
-            propertiesManager.getProperties().setFromRegion(value);
+            coreSettings.setFromRegion(value);
         }
     }
 
@@ -236,8 +240,9 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     }
 
     public List<String> getConfiguredRecipientsFilters() {
-        return propertiesManager.getProperties().getRecipientsListBuilder().getFilters().stream()
-                .map(filter -> filter.toString()).collect(Collectors.toList());
+        return coreSettings.getFilters().getFilters().stream()
+                .map(filter -> filter.toString())
+                .collect(Collectors.toList());
     }
 
     public void setSelectedConfiguredRecipientsFilter(int index) {
@@ -321,15 +326,14 @@ public class TelegrammerViewModel implements TelegramManagerListener {
             return;
         }
 
-        var properties = propertiesManager.getProperties();
-        properties.setFromRegion(properties.getFromRegion().trim());
-        properties.setClientKey(removeWhiteSpaces(properties.getClientKey()));
-        properties.setTelegramId(removeWhiteSpaces(properties.getTelegramId()));
-        properties.setSecretKey(removeWhiteSpaces(properties.getSecretKey()));
+        coreSettings.setFromRegion(coreSettings.getFromRegion().trim());
+        coreSettings.setClientKey(removeWhiteSpaces(coreSettings.getClientKey()));
+        coreSettings.setTelegramId(removeWhiteSpaces(coreSettings.getTelegramId()));
+        coreSettings.setSecretKey(removeWhiteSpaces(coreSettings.getSecretKey()));
 
         changeStateAndInformListener(TelegrammerState.SendingTelegrams);
         try {
-            telegramSender.startSending(properties.getRecipientsListBuilder());
+            telegramSender.startSending(coreSettings);
 
         } catch (Exception ex) {
             if (!(ex instanceof IllegalArgumentException)) {
@@ -364,7 +368,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
         compileRecipientsExecutor.execute(() -> {
             try {
                 filter.refreshFilter();
-                propertiesManager.getProperties().getRecipientsListBuilder().addFilter(filter);
+                coreSettings.getFilters().addFilter(filter);
                 outputText = outputTextCreator.createExpectedDurationMessage();
             } catch (Exception | OutOfMemoryError ex) {
                 log.error("An error occured while refreshing the filters", ex);
@@ -378,8 +382,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
 
     public void removeSelectedFilter() {
         if (isRemoveFilterButtonEnabled()) {
-            propertiesManager.getProperties().getRecipientsListBuilder()
-                    .removeFilterAt(selectedConfiguredRecipientsFilterIndex);
+            coreSettings.getFilters().removeFilterAt(selectedConfiguredRecipientsFilterIndex);
             --selectedConfiguredRecipientsFilterIndex;
             outputText = outputTextCreator.createExpectedDurationMessage();
             listener.refreshEverything();
@@ -387,8 +390,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     }
 
     public boolean isRefreshFiltersButtonEnabled() {
-        return state == TelegrammerState.Idle
-                && propertiesManager.getProperties().getRecipientsListBuilder().getFilters().size() > 0;
+        return state == TelegrammerState.Idle && coreSettings.getFilters().getFilters().size() > 0;
     }
 
     public void refreshFilters() {
@@ -399,7 +401,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
         changeStateAndInformListener(TelegrammerState.CompilingRecipients);
 
         compileRecipientsExecutor.execute(() -> {
-            var failedFilters = propertiesManager.getProperties().getRecipientsListBuilder().refreshFilters();
+            var failedFilters = coreSettings.getFilters().refreshFilters();
 
             if (!failedFilters.isEmpty()) {
                 outputText = outputTextCreator.createTimestampedMessage("updated recipients list");
@@ -413,7 +415,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
     }
 
     public void performPreCloseActions() {
-        propertiesManager.persistPropertiesToFileSystem();
+        coreSettings.savePropertiesFile();
     }
 
     public String getTitle() {
@@ -431,7 +433,7 @@ public class TelegrammerViewModel implements TelegramManagerListener {
 
     @Override
     public void handleRecipientRemoved(RecipientRemovedEvent event) {
-        if (!propertiesManager.getProperties().isHideSkippedRecipients()) {
+        if (!clientSettings.getHideSkippedRecipients()) {
             outputText += outputTextCreator.createTimestampedMessage(
                     "skipping recipient '" + event.getRecipient() + "': " + event.getReason());
             listener.refreshOutput();

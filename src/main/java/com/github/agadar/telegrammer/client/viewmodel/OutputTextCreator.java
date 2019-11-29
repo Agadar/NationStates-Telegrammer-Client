@@ -3,10 +3,10 @@ package com.github.agadar.telegrammer.client.viewmodel;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-import com.github.agadar.telegrammer.core.properties.manager.PropertiesManager;
+import com.github.agadar.telegrammer.core.event.StoppedSendingEvent;
+import com.github.agadar.telegrammer.core.misc.TelegramType;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilter;
-import com.github.agadar.telegrammer.core.telegram.TelegramType;
-import com.github.agadar.telegrammer.core.telegram.event.StoppedSendingEvent;
+import com.github.agadar.telegrammer.core.settings.TelegrammerCoreSettings;
 
 import lombok.NonNull;
 
@@ -20,17 +20,17 @@ public class OutputTextCreator {
 
     private final static String BORDER = "------------------------------------------";
 
-    private final PropertiesManager<?> propertiesManager;
+    private final TelegrammerCoreSettings telegrammerCoreSettings;
 
-    public OutputTextCreator(@NonNull PropertiesManager<?> propertiesManager) {
-        this.propertiesManager = propertiesManager;
+    public OutputTextCreator(@NonNull TelegrammerCoreSettings telegrammerCoreSettings) {
+        this.telegrammerCoreSettings = telegrammerCoreSettings;
     }
 
     public String createExpectedDurationMessage() {
-        var properties = propertiesManager.getProperties();
-        String telegramId = properties.getTelegramId();
-        int numberOfRecipients = properties.getRecipientsListBuilder().getRecipients(telegramId).size();
-        var telegramType = properties.getLastTelegramType();
+
+        String telegramId = telegrammerCoreSettings.getTelegramId();
+        int numberOfRecipients = telegrammerCoreSettings.getFilters().getRecipients(telegramId).size();
+        var telegramType = telegrammerCoreSettings.getTelegramType();
 
         int timePerTelegram = telegramType == TelegramType.RECRUITMENT ? 180050 : 30050;
         int estimatedDuration = Math.max(numberOfRecipients - 1, 0) * (timePerTelegram / 1000);

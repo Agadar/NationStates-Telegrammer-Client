@@ -5,16 +5,18 @@ import java.awt.EventQueue;
 import javax.swing.UIManager;
 
 import com.github.agadar.nationstates.DefaultNationStatesImpl;
-import com.github.agadar.telegrammer.client.properties.TelegrammerClientPropertiesManager;
+import com.github.agadar.telegrammer.client.settings.TelegrammerClientSettings;
 import com.github.agadar.telegrammer.client.view.TelegrammerView;
 import com.github.agadar.telegrammer.client.viewmodel.OutputTextCreator;
 import com.github.agadar.telegrammer.client.viewmodel.TelegrammerViewModel;
+import com.github.agadar.telegrammer.core.history.TelegramHistoryImpl;
 import com.github.agadar.telegrammer.core.recipients.translator.RecipientsFilterTranslatorImpl;
 import com.github.agadar.telegrammer.core.recipients.translator.RecipientsListBuilderTranslatorImpl;
 import com.github.agadar.telegrammer.core.recipients.translator.RecipientsProviderTranslatorImpl;
 import com.github.agadar.telegrammer.core.regiondumpaccess.RegionDumpAccessImpl;
-import com.github.agadar.telegrammer.core.telegram.history.TelegramHistoryImpl;
-import com.github.agadar.telegrammer.core.telegram.sender.TelegramSenderImpl;
+import com.github.agadar.telegrammer.core.sender.TelegramSenderImpl;
+import com.github.agadar.telegrammer.core.settings.Settings;
+import com.github.agadar.telegrammer.core.settings.TelegrammerCoreSettings;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,20 +40,21 @@ public class Main {
             var filterTranslator = new RecipientsFilterTranslatorImpl(providerTranslator);
             var recipientsListBuilderTranslator = new RecipientsListBuilderTranslatorImpl(telegramHistory,
                     filterTranslator);
-            var propertiesManager = new TelegrammerClientPropertiesManager(recipientsListBuilderTranslator,
-                    ".nationstates-telegrammer.properties");
-            var telegramSender = new TelegramSenderImpl(nationStates, telegramHistory, propertiesManager);
-            var outputTextCreator = new OutputTextCreator(propertiesManager);
+            var settings = new Settings(".nationstates-telegrammer.properties");
+            var coreSettings = new TelegrammerCoreSettings(settings, recipientsListBuilderTranslator);
+            var clientSettings = new TelegrammerClientSettings(settings);
+            var telegramSender = new TelegramSenderImpl(nationStates, telegramHistory);
+            var outputTextCreator = new OutputTextCreator(coreSettings);
 
             // Retrieve properties and history.
-            propertiesManager.loadPropertiesFromFileSystem();
+            settings.loadPropertiesFile();
             telegramHistory.loadHistory();
 
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 
             // Create and display the form.
             EventQueue.invokeLater(() -> {
-                var viewModel = new TelegrammerViewModel(telegramSender, propertiesManager, filterTranslator,
+                var viewModel = new TelegrammerViewModel(telegramSender, coreSettings, clientSettings, filterTranslator,
                         outputTextCreator);
                 var view = new TelegrammerView(viewModel);
                 view.setLocationRelativeTo(null);
