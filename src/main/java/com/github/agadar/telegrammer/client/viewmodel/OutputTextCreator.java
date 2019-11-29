@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 import com.github.agadar.telegrammer.core.event.StoppedSendingEvent;
 import com.github.agadar.telegrammer.core.misc.TelegramType;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilter;
-import com.github.agadar.telegrammer.core.settings.TelegrammerCoreSettings;
+import com.github.agadar.telegrammer.core.settings.CoreSettings;
 
 import lombok.NonNull;
 
@@ -20,9 +20,9 @@ public class OutputTextCreator {
 
     private final static String BORDER = "------------------------------------------";
 
-    private final TelegrammerCoreSettings telegrammerCoreSettings;
+    private final CoreSettings telegrammerCoreSettings;
 
-    public OutputTextCreator(@NonNull TelegrammerCoreSettings telegrammerCoreSettings) {
+    public OutputTextCreator(@NonNull CoreSettings telegrammerCoreSettings) {
         this.telegrammerCoreSettings = telegrammerCoreSettings;
     }
 

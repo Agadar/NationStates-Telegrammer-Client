@@ -4,7 +4,7 @@ import java.awt.EventQueue;
 
 import javax.swing.UIManager;
 
-import com.github.agadar.telegrammer.client.settings.TelegrammerClientSettings;
+import com.github.agadar.telegrammer.client.settings.ClientSettings;
 import com.github.agadar.telegrammer.client.view.TelegrammerView;
 import com.github.agadar.telegrammer.client.viewmodel.OutputTextCreator;
 import com.github.agadar.telegrammer.client.viewmodel.TelegrammerViewModel;
@@ -28,7 +28,7 @@ public class Main {
             String userAgent = "Agadar's Telegrammer Client (https://github.com/Agadar/NationStates-Telegrammer-Client)";
             var settings = new Settings(".nationstates-telegrammer.properties");
             var telegrammer = new DefaultTelegrammerImpl(userAgent, settings);
-            var clientSettings = new TelegrammerClientSettings(settings);
+            var clientSettings = new ClientSettings(settings);
 
             settings.loadPropertiesFile();
             UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());

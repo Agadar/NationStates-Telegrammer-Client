@@ -1,8 +1,8 @@
 package com.github.agadar.telegrammer.client.settings;
 
-import static com.github.agadar.telegrammer.client.settings.TelegrammerClientSettingsKeys.HIDE_SKIPPED_RECIPIENTS;
-import static com.github.agadar.telegrammer.client.settings.TelegrammerClientSettingsKeys.START_MINIMIZED;
-import static com.github.agadar.telegrammer.client.settings.TelegrammerClientSettingsKeys.START_SENDING_ON_STARTUP;
+import static com.github.agadar.telegrammer.client.settings.ClientSettingsKeys.HIDE_SKIPPED_RECIPIENTS;
+import static com.github.agadar.telegrammer.client.settings.ClientSettingsKeys.START_MINIMIZED;
+import static com.github.agadar.telegrammer.client.settings.ClientSettingsKeys.START_SENDING_ON_STARTUP;
 
 import com.github.agadar.telegrammer.core.settings.Settings;
 
@@ -15,7 +15,7 @@ import lombok.NonNull;
  * @author Agadar (https://github.com/Agadar/)
  *
  */
-public class TelegrammerClientSettings {
+public class ClientSettings {
 
     private final Settings settings;
 
@@ -25,7 +25,7 @@ public class TelegrammerClientSettings {
      * @param settings For registering and getting/setting telegrammer client
      *                 settings.
      */
-    public TelegrammerClientSettings(@NonNull Settings settings) {
+    public ClientSettings(@NonNull Settings settings) {
         this.settings = settings;
         settings.addBooleanSetting(START_SENDING_ON_STARTUP.getKey(), false);
         settings.addBooleanSetting(HIDE_SKIPPED_RECIPIENTS.getKey(), false);

@@ -7,18 +7,18 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import com.github.agadar.nationstates.event.TelegramSentEvent;
-import com.github.agadar.telegrammer.client.settings.TelegrammerClientSettings;
+import com.github.agadar.telegrammer.client.settings.ClientSettings;
 import com.github.agadar.telegrammer.core.Telegrammer;
+import com.github.agadar.telegrammer.core.TelegrammerListener;
 import com.github.agadar.telegrammer.core.event.NoRecipientsFoundEvent;
 import com.github.agadar.telegrammer.core.event.RecipientRemovedEvent;
 import com.github.agadar.telegrammer.core.event.RecipientsRefreshedEvent;
 import com.github.agadar.telegrammer.core.event.StoppedSendingEvent;
-import com.github.agadar.telegrammer.core.event.TelegrammerListener;
 import com.github.agadar.telegrammer.core.misc.StringFunctions;
 import com.github.agadar.telegrammer.core.misc.TelegramType;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterAction;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterType;
-import com.github.agadar.telegrammer.core.settings.TelegrammerCoreSettings;
+import com.github.agadar.telegrammer.core.settings.CoreSettings;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -37,8 +37,8 @@ public class TelegrammerViewModel implements TelegrammerListener {
 
     private final Telegrammer telegrammer;
     private final OutputTextCreator outputTextCreator;
-    private final TelegrammerClientSettings clientSettings;
-    private final TelegrammerCoreSettings coreSettings;
+    private final ClientSettings clientSettings;
+    private final CoreSettings coreSettings;
 
     @Getter
     private RecipientsFilterAction selectedFilterAction = RecipientsFilterAction.ADD_TO_RECIPIENTS;
@@ -56,7 +56,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
     private TelegrammerState state = TelegrammerState.CompilingRecipients;
 
     public TelegrammerViewModel(@NonNull Telegrammer telegrammer,
-            @NonNull TelegrammerClientSettings clientSettings,
+            @NonNull ClientSettings clientSettings,
             @NonNull OutputTextCreator outputTextCreator) {
 
         this.telegrammer = telegrammer;
