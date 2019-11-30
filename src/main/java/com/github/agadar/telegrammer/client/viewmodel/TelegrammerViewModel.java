@@ -13,6 +13,9 @@ import com.github.agadar.telegrammer.core.TelegrammerListener;
 import com.github.agadar.telegrammer.core.event.NoRecipientsFoundEvent;
 import com.github.agadar.telegrammer.core.event.RecipientRemovedEvent;
 import com.github.agadar.telegrammer.core.event.RecipientsRefreshedEvent;
+import com.github.agadar.telegrammer.core.event.StartedCompilingRecipientsEvent;
+import com.github.agadar.telegrammer.core.event.StartedSendingEvent;
+import com.github.agadar.telegrammer.core.event.StoppedCompilingRecipientsEvent;
 import com.github.agadar.telegrammer.core.event.StoppedSendingEvent;
 import com.github.agadar.telegrammer.core.misc.StringFunctions;
 import com.github.agadar.telegrammer.core.misc.TelegramType;
@@ -54,7 +57,6 @@ public class TelegrammerViewModel implements TelegrammerListener {
 
     private TelegrammerViewModelListener listener = null;
     private Executor compileRecipientsExecutor = Executors.newSingleThreadExecutor();
-    private TelegrammerState state = TelegrammerState.COMPILING_RECIPIENTS;
 
     public TelegrammerViewModel(@NonNull Telegrammer telegrammer,
             @NonNull ClientSettings clientSettings,
@@ -63,7 +65,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
         this.telegrammer = telegrammer;
         this.clientSettings = clientSettings;
         this.outputTextCreator = outputTextCreator;
-        coreSettings = telegrammer.getTelegrammerCoreSettings();
+        coreSettings = telegrammer.getCoreSettings();
 
         telegrammer.addListeners(this);
         outputText = "updating recipient list...\n";
@@ -92,11 +94,11 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public boolean isTelegrammerIdle() {
-        return state == TelegrammerState.IDLE;
+        return telegrammer.getState() == TelegrammerState.IDLE;
     }
 
     public boolean isTelegrammerQueuing() {
-        return state == TelegrammerState.QUEUING_TELEGRAMS;
+        return telegrammer.getState() == TelegrammerState.QUEUING_TELEGRAMS;
     }
 
     public boolean getHideSkippedRecipients() {
@@ -385,6 +387,33 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     @Override
+    public void handleStartedCompilingRecipients(StartedCompilingRecipientsEvent event) {
+        // TODO Implementation.
+    }
+
+    @Override
+    public void handleFinishedCompilingRecipients(StoppedCompilingRecipientsEvent event) {
+        // TODO Implementation.
+    }
+
+    @Override
+    public void handleStartedSending(StartedSendingEvent event) {
+        // TODO Implementation.
+    }
+
+    @Override
+    public void handleTelegramSent(TelegramSentEvent event) {
+        event.getException().ifPresentOrElse(exception -> {
+            outputText += outputTextCreator.createTimestampedMessage(
+                    "failed to queue telegram for '" + event.getRecipient() + "': " + exception.getMessage());
+        }, () -> {
+            outputText += outputTextCreator
+                    .createTimestampedMessage("queued telegram for '" + event.getRecipient() + "'");
+        });
+        listener.refreshOutput();
+    }
+
+    @Override
     public void handleNoRecipientsFound(NoRecipientsFoundEvent event) {
         outputText += outputTextCreator.createTimestampedMessage(
                 "no new recipients found, timing out for " + event.getTimeOut() / 1000 + " seconds...");
@@ -414,20 +443,8 @@ public class TelegrammerViewModel implements TelegrammerListener {
         changeStateAndInformListener(TelegrammerState.IDLE);
     }
 
-    @Override
-    public void handleTelegramSent(TelegramSentEvent event) {
-        event.getException().ifPresentOrElse(exception -> {
-            outputText += outputTextCreator.createTimestampedMessage(
-                    "failed to queue telegram for '" + event.getRecipient() + "': " + exception.getMessage());
-        }, () -> {
-            outputText += outputTextCreator
-                    .createTimestampedMessage("queued telegram for '" + event.getRecipient() + "'");
-        });
-        listener.refreshOutput();
-    }
-
     private void changeStateAndInformListener(TelegrammerState newState) {
-        state = newState;
+        telegrammer.setState(newState);
         if (listener != null) {
             listener.refreshEverything();
         }
@@ -441,4 +458,5 @@ public class TelegrammerViewModel implements TelegrammerListener {
         return Arrays.stream(filterType.getSupportedActions())
                 .anyMatch(supportedAction -> supportedAction == selectedFilterAction);
     }
+
 }
