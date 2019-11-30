@@ -16,6 +16,7 @@ import com.github.agadar.telegrammer.core.event.RecipientsRefreshedEvent;
 import com.github.agadar.telegrammer.core.event.StoppedSendingEvent;
 import com.github.agadar.telegrammer.core.misc.StringFunctions;
 import com.github.agadar.telegrammer.core.misc.TelegramType;
+import com.github.agadar.telegrammer.core.misc.TelegrammerState;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterAction;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterType;
 import com.github.agadar.telegrammer.core.settings.CoreSettings;
@@ -53,7 +54,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
 
     private TelegrammerViewModelListener listener = null;
     private Executor compileRecipientsExecutor = Executors.newSingleThreadExecutor();
-    private TelegrammerState state = TelegrammerState.CompilingRecipients;
+    private TelegrammerState state = TelegrammerState.COMPILING_RECIPIENTS;
 
     public TelegrammerViewModel(@NonNull Telegrammer telegrammer,
             @NonNull ClientSettings clientSettings,
@@ -77,7 +78,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
             } else {
                 outputText = outputTextCreator.createExpectedDurationMessage();
             }
-            changeStateAndInformListener(TelegrammerState.Idle);
+            changeStateAndInformListener(TelegrammerState.IDLE);
 
             if (clientSettings.getStartSendingOnStartup()) {
                 this.startSendingTelegrams();
@@ -90,8 +91,12 @@ public class TelegrammerViewModel implements TelegrammerListener {
         listener.refreshEverything();
     }
 
-    public boolean isOptionsMenuEnabled() {
-        return state == TelegrammerState.Idle;
+    public boolean isTelegrammerIdle() {
+        return state == TelegrammerState.IDLE;
+    }
+
+    public boolean isTelegrammerQueuing() {
+        return state == TelegrammerState.QUEUING_TELEGRAMS;
     }
 
     public boolean getHideSkippedRecipients() {
@@ -99,7 +104,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public void setHideSkippedRecipients(boolean value) {
-        if (isOptionsMenuEnabled()) {
+        if (isTelegrammerIdle()) {
             clientSettings.setHideSkippedRecipients(value);
         }
     }
@@ -109,7 +114,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public void setRefreshRecipientsAfterEveryTelegram(boolean value) {
-        if (isOptionsMenuEnabled()) {
+        if (isTelegrammerIdle()) {
             coreSettings.setUpdateAfterEveryTelegram(value);
         }
     }
@@ -119,7 +124,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public void setRunIndefinitely(boolean value) {
-        if (isOptionsMenuEnabled()) {
+        if (isTelegrammerIdle()) {
             coreSettings.setRunIndefinitely(value);
         }
     }
@@ -129,7 +134,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public void setStartMinimized(boolean value) {
-        if (isOptionsMenuEnabled()) {
+        if (isTelegrammerIdle()) {
             clientSettings.setStartMinimized(value);
         }
     }
@@ -139,13 +144,9 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public void setStartSendingOnStartup(boolean value) {
-        if (isOptionsMenuEnabled()) {
+        if (isTelegrammerIdle()) {
             clientSettings.setStartSendingOnStartup(value);
         }
-    }
-
-    public boolean isClientKeyInputEnabled() {
-        return state == TelegrammerState.Idle;
     }
 
     public String getClientKey() {
@@ -153,13 +154,9 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public void setClientKey(String value) {
-        if (isClientKeyInputEnabled()) {
+        if (isTelegrammerIdle()) {
             coreSettings.setClientKey(value);
         }
-    }
-
-    public boolean isTelegramIdInputEnabled() {
-        return state == TelegrammerState.Idle;
     }
 
     public String getTelegramId() {
@@ -167,15 +164,11 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public void setTelegramId(String value) {
-        if (isTelegramIdInputEnabled()) {
+        if (isTelegrammerIdle()) {
             coreSettings.setTelegramId(value);
             outputText = outputTextCreator.createExpectedDurationMessage();
             listener.refreshOutput();
         }
-    }
-
-    public boolean isSecretKeyInputEnabled() {
-        return state == TelegrammerState.Idle;
     }
 
     public String getSecretKey() {
@@ -183,13 +176,9 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public void setSecretKey(String value) {
-        if (isSecretKeyInputEnabled()) {
+        if (isTelegrammerIdle()) {
             coreSettings.setSecretKey(value);
         }
-    }
-
-    public boolean isAvailableTelegramTypesEnabled() {
-        return state == TelegrammerState.Idle;
     }
 
     public String[] getAvailableTelegramTypes() {
@@ -202,7 +191,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public void setSelectedTelegramTypeIndex(int value) {
-        if (isAvailableTelegramTypesEnabled() && value != getSelectedTelegramTypeIndex()) {
+        if (isTelegrammerIdle() && value != getSelectedTelegramTypeIndex()) {
             var telegramType = TelegramType.values()[value];
             coreSettings.setTelegramType(telegramType);
             outputText = outputTextCreator.createExpectedDurationMessage();
@@ -216,7 +205,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
 
     public boolean isForRegionInputEnabled() {
         var telegramType = coreSettings.getTelegramType();
-        return state == TelegrammerState.Idle
+        return isTelegrammerIdle()
                 && (telegramType == TelegramType.RECRUITMENT || telegramType == TelegramType.CAMPAIGN);
     }
 
@@ -230,10 +219,6 @@ public class TelegrammerViewModel implements TelegrammerListener {
         }
     }
 
-    public boolean isConfiguredRecipientsFiltersEnabled() {
-        return state == TelegrammerState.Idle;
-    }
-
     public List<String> getConfiguredRecipientsFilters() {
         return coreSettings.getFilters().getFilters().stream()
                 .map(filter -> filter.toString())
@@ -241,21 +226,17 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public void setSelectedConfiguredRecipientsFilter(int index) {
-        if (isConfiguredRecipientsFiltersEnabled() && index != selectedConfiguredRecipientsFilterIndex) {
+        if (isTelegrammerIdle() && index != selectedConfiguredRecipientsFilterIndex) {
             selectedConfiguredRecipientsFilterIndex = index;
             listener.refreshEverything();
         }
     }
 
     public void unsetSelectedConfiguredRecipientsFilter() {
-        if (isConfiguredRecipientsFiltersEnabled() && selectedConfiguredRecipientsFilterIndex > -1) {
+        if (isTelegrammerIdle() && selectedConfiguredRecipientsFilterIndex > -1) {
             selectedConfiguredRecipientsFilterIndex = -1;
             listener.refreshEverything();
         }
-    }
-
-    public boolean isAvailableFilterActionsInputEnabled() {
-        return state == TelegrammerState.Idle;
     }
 
     public RecipientsFilterAction[] getAvailableFilterActions() {
@@ -263,13 +244,9 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public void setSelectedFilterAction(RecipientsFilterAction filterAction) {
-        if (isAvailableFilterActionsInputEnabled() && selectedFilterAction != filterAction) {
+        if (isTelegrammerIdle() && selectedFilterAction != filterAction) {
             selectedFilterAction = filterAction;
         }
-    }
-
-    public boolean isAvailableFilterTypesInputEnabled() {
-        return state == TelegrammerState.Idle;
     }
 
     public RecipientsFilterType[] getAvailableFilterTypes() {
@@ -279,7 +256,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public void setSelectedFilterType(RecipientsFilterType filterType) {
-        if (isAvailableFilterTypesInputEnabled() && filterType != selectedFilterType) {
+        if (isTelegrammerIdle() && filterType != selectedFilterType) {
             selectedFilterType = filterType;
             filterParameters = "";
             listener.refreshEverything();
@@ -301,23 +278,11 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public boolean isRemoveFilterButtonEnabled() {
-        return state == TelegrammerState.Idle && selectedConfiguredRecipientsFilterIndex > -1;
-    }
-
-    public boolean isAddFilterButtonEnabled() {
-        return state == TelegrammerState.Idle;
-    }
-
-    public boolean isStartSendingButtonEnabled() {
-        return state == TelegrammerState.Idle;
-    }
-
-    public boolean isStopSendingButtonEnabled() {
-        return state == TelegrammerState.SendingTelegrams;
+        return isTelegrammerIdle() && selectedConfiguredRecipientsFilterIndex > -1;
     }
 
     public void startSendingTelegrams() {
-        if (!isStartSendingButtonEnabled()) {
+        if (!isTelegrammerIdle()) {
             return;
         }
 
@@ -326,7 +291,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
         coreSettings.setTelegramId(removeWhiteSpaces(coreSettings.getTelegramId()));
         coreSettings.setSecretKey(removeWhiteSpaces(coreSettings.getSecretKey()));
 
-        changeStateAndInformListener(TelegrammerState.SendingTelegrams);
+        changeStateAndInformListener(TelegrammerState.QUEUING_TELEGRAMS);
         try {
             telegrammer.startSending();
 
@@ -335,12 +300,12 @@ public class TelegrammerViewModel implements TelegrammerListener {
                 log.error("An error occured while starting sending telegrams", ex);
             }
             outputText += outputTextCreator.createTimestampedMessage(ex.getMessage());
-            changeStateAndInformListener(TelegrammerState.Idle);
+            changeStateAndInformListener(TelegrammerState.IDLE);
         }
     }
 
     public void stopSendingTelegrams() {
-        if (isStopSendingButtonEnabled()) {
+        if (isTelegrammerQueuing()) {
             telegrammer.stopSending();
         }
     }
@@ -351,11 +316,11 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public void addNewFilter() {
-        if (!isAddFilterButtonEnabled()) {
+        if (!isTelegrammerIdle()) {
             return;
         }
         outputText = "updating recipient list...\n";
-        changeStateAndInformListener(TelegrammerState.CompilingRecipients);
+        changeStateAndInformListener(TelegrammerState.COMPILING_RECIPIENTS);
 
         var parsedFilterParams = StringFunctions.stringToHashSet(filterParameters);
         var filter = telegrammer.createFilter(selectedFilterType, selectedFilterAction, parsedFilterParams);
@@ -370,7 +335,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
                 outputText = outputTextCreator.createTimestampedMessage("updated recipients list");
                 outputText += outputTextCreator.createFailedFilterRefreshMessage(filter, ex);
             } finally {
-                changeStateAndInformListener(TelegrammerState.Idle);
+                changeStateAndInformListener(TelegrammerState.IDLE);
             }
         });
     }
@@ -385,7 +350,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public boolean isRefreshFiltersButtonEnabled() {
-        return state == TelegrammerState.Idle && coreSettings.getFilters().getFilters().size() > 0;
+        return isTelegrammerIdle() && coreSettings.getFilters().getFilters().size() > 0;
     }
 
     public void refreshFilters() {
@@ -393,7 +358,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
             return;
         }
         outputText = "updating recipient list...\n";
-        changeStateAndInformListener(TelegrammerState.CompilingRecipients);
+        changeStateAndInformListener(TelegrammerState.COMPILING_RECIPIENTS);
 
         compileRecipientsExecutor.execute(() -> {
             var failedFilters = coreSettings.getFilters().refreshFilters();
@@ -405,7 +370,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
             } else {
                 outputText = outputTextCreator.createExpectedDurationMessage();
             }
-            changeStateAndInformListener(TelegrammerState.Idle);
+            changeStateAndInformListener(TelegrammerState.IDLE);
         });
     }
 
@@ -446,7 +411,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
     @Override
     public void handleStoppedSending(StoppedSendingEvent event) {
         outputText += outputTextCreator.createStoppedSendingMessage(event);
-        changeStateAndInformListener(TelegrammerState.Idle);
+        changeStateAndInformListener(TelegrammerState.IDLE);
     }
 
     @Override
