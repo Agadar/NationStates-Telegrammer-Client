@@ -11,6 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultCaret;
 
 import com.github.agadar.telegrammer.client.viewmodel.TelegrammerViewModel;
@@ -80,34 +81,30 @@ public final class TelegrammerView extends JFrame implements TelegrammerViewMode
         if (viewModel.getStartMinimized()) {
             this.setExtendedState(java.awt.Frame.ICONIFIED);
         }
-        viewModel.setListener(this);
+        viewModel.initialise(this);
     }
 
     @Override
     public void refreshOutput() {
-        if (java.awt.EventQueue.isDispatchThread()) {
-            TextAreaOutput.setText(viewModel.getOutputText());
-        } else {
-            java.awt.EventQueue.invokeLater(() -> TextAreaOutput.setText(viewModel.getOutputText()));
-        }
+        SwingUtilities.invokeLater(() -> {
+            synchronized (this) {
+                TextAreaOutput.setText(viewModel.getOutputText());
+            }
+        });
     }
 
     @Override
     public void refreshEverything() {
-        if (java.awt.EventQueue.isDispatchThread()) {
-            updateGuiComponents();
-        } else {
-            java.awt.EventQueue.invokeLater(() -> updateGuiComponents());
-        }
+        SwingUtilities.invokeLater(this::updateGuiComponents);
     }
 
-    private void updateGuiComponents() {
+    private synchronized void updateGuiComponents() {
         TextAreaOutput.setText(viewModel.getOutputText());
         var configuredFilters = (DefaultListModel<String>) JListFilters.getModel();
         configuredFilters.clear();
-        configuredFilters.addAll(viewModel.getConfiguredRecipientsFilters());
+        configuredFilters.addAll(viewModel.getConfiguredFilters());
         JListFilters.setEnabled(viewModel.isTelegrammerIdle());
-        JListFilters.setSelectedIndex(viewModel.getSelectedConfiguredRecipientsFilterIndex());
+        JListFilters.setSelectedIndex(viewModel.getSelectedFilterIndex());
         BtnStart.setEnabled(viewModel.isTelegrammerIdle());
         BtnStop.setEnabled(viewModel.isTelegrammerQueuing());
         ButtonAddFilter.setEnabled(viewModel.isTelegrammerIdle());

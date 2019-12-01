@@ -20,17 +20,17 @@ public class OutputTextCreator {
 
     private final static String BORDER = "------------------------------------------";
 
-    private final CoreSettings telegrammerCoreSettings;
+    private final CoreSettings coreSettings;
 
-    public OutputTextCreator(@NonNull CoreSettings telegrammerCoreSettings) {
-        this.telegrammerCoreSettings = telegrammerCoreSettings;
+    public OutputTextCreator(@NonNull CoreSettings coreSettings) {
+        this.coreSettings = coreSettings;
     }
 
     public String createExpectedDurationMessage() {
 
-        String telegramId = telegrammerCoreSettings.getTelegramId();
-        int numberOfRecipients = telegrammerCoreSettings.getFilters().getRecipients(telegramId).size();
-        var telegramType = telegrammerCoreSettings.getTelegramType();
+        String telegramId = coreSettings.getTelegramId();
+        int numberOfRecipients = coreSettings.getFilters().getRecipients(telegramId).size();
+        var telegramType = coreSettings.getTelegramType();
 
         int timePerTelegram = telegramType == TelegramType.RECRUITMENT ? 180050 : 30050;
         int estimatedDuration = Math.max(numberOfRecipients - 1, 0) * (timePerTelegram / 1000);
