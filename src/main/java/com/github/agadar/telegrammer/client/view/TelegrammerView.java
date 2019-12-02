@@ -14,6 +14,8 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultCaret;
 
+import com.github.agadar.telegrammer.client.event.RefreshEverythingEvent;
+import com.github.agadar.telegrammer.client.event.RefreshOutputEvent;
 import com.github.agadar.telegrammer.client.viewmodel.TelegrammerViewModel;
 import com.github.agadar.telegrammer.client.viewmodel.TelegrammerViewModelListener;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterAction;
@@ -85,17 +87,17 @@ public final class TelegrammerView extends JFrame implements TelegrammerViewMode
     }
 
     @Override
-    public void refreshOutput() {
+    public void onRefreshEverything(RefreshEverythingEvent event) {
+        SwingUtilities.invokeLater(this::updateGuiComponents);
+    }
+
+    @Override
+    public void onRefreshOutput(RefreshOutputEvent event) {
         SwingUtilities.invokeLater(() -> {
             synchronized (this) {
                 TextAreaOutput.setText(viewModel.getOutputText());
             }
         });
-    }
-
-    @Override
-    public void refreshEverything() {
-        SwingUtilities.invokeLater(this::updateGuiComponents);
     }
 
     private synchronized void updateGuiComponents() {

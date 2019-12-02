@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.github.agadar.nationstates.event.TelegramSentEvent;
+import com.github.agadar.telegrammer.client.event.RefreshEverythingEvent;
+import com.github.agadar.telegrammer.client.event.RefreshOutputEvent;
 import com.github.agadar.telegrammer.client.settings.ClientSettings;
 import com.github.agadar.telegrammer.core.Telegrammer;
 import com.github.agadar.telegrammer.core.TelegrammerListener;
@@ -50,11 +52,12 @@ public class TelegrammerViewModel implements TelegrammerListener {
     private int selectedFilterIndex = -1;
     @Getter
     private String filterParameters = "";
+    private TelegrammerViewModelListener listener = null;
+
     @Getter
     private volatile String outputText = "";
     private volatile boolean refreshedRecipientsAtLeastOnce = false;
-
-    private volatile TelegrammerViewModelListener listener = null;
+    private volatile TelegrammerState telegrammerState = TelegrammerState.IDLE;
 
     public TelegrammerViewModel(@NonNull Telegrammer telegrammer,
             @NonNull ClientSettings clientSettings,
@@ -78,11 +81,11 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public boolean isTelegrammerIdle() {
-        return telegrammer.getState() == TelegrammerState.IDLE;
+        return telegrammerState == TelegrammerState.IDLE;
     }
 
     public boolean isTelegrammerQueuing() {
-        return telegrammer.getState() == TelegrammerState.QUEUING_TELEGRAMS;
+        return telegrammerState == TelegrammerState.QUEUING_TELEGRAMS;
     }
 
     public boolean getHideSkippedRecipients() {
@@ -140,7 +143,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
     public void setTelegramId(String value) {
         coreSettings.setTelegramId(value);
         outputText = outputTextCreator.createExpectedDurationMessage();
-        listener.refreshOutput();
+        listener.onRefreshOutput(new RefreshOutputEvent(this));
     }
 
     public String getSecretKey() {
@@ -171,7 +174,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
             if (telegramType != TelegramType.RECRUITMENT && telegramType != TelegramType.CAMPAIGN) {
                 coreSettings.setFromRegion("");
             }
-            listener.refreshEverything();
+            listener.onRefreshEverything(new RefreshEverythingEvent(this));
         }
     }
 
@@ -198,14 +201,14 @@ public class TelegrammerViewModel implements TelegrammerListener {
     public void setSelectedConfiguredRecipientsFilter(int index) {
         if (index != selectedFilterIndex) {
             selectedFilterIndex = index;
-            listener.refreshEverything();
+            listener.onRefreshEverything(new RefreshEverythingEvent(this));
         }
     }
 
     public void unsetSelectedConfiguredRecipientsFilter() {
         if (selectedFilterIndex > -1) {
             selectedFilterIndex = -1;
-            listener.refreshEverything();
+            listener.onRefreshEverything(new RefreshEverythingEvent(this));
         }
     }
 
@@ -234,7 +237,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
         if (filterType != selectedFilterType) {
             selectedFilterType = filterType;
             filterParameters = "";
-            listener.refreshEverything();
+            listener.onRefreshEverything(new RefreshEverythingEvent(this));
         }
     }
 
@@ -274,7 +277,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
 
     public void clearOutput() {
         outputText = "";
-        listener.refreshOutput();
+        listener.onRefreshOutput(new RefreshOutputEvent(this));
     }
 
     public void addNewFilter() {
@@ -308,7 +311,8 @@ public class TelegrammerViewModel implements TelegrammerListener {
     public void handleStartedRefreshingRecipients(StartedRefreshingRecipientsEvent event) {
         if (event.getTelegrammerState() == TelegrammerState.REFRESHING_RECIPIENTS) {
             outputText = "updating recipient list...\n";
-            listener.refreshEverything();
+            telegrammerState = event.getTelegrammerState();
+            listener.onRefreshEverything(new RefreshEverythingEvent(this));
         }
     }
 
@@ -319,7 +323,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
             event.getFailedFilters()
                     .forEach((filter,
                             ex) -> outputText += outputTextCreator.createFailedFilterRefreshMessage(filter, ex));
-            listener.refreshOutput();
+            listener.onRefreshOutput(new RefreshOutputEvent(this));
 
         } else if (event.getTelegrammerState() == TelegrammerState.REFRESHING_RECIPIENTS) {
             if (!event.getFailedFilters().isEmpty()) {
@@ -329,7 +333,8 @@ public class TelegrammerViewModel implements TelegrammerListener {
             } else {
                 outputText = outputTextCreator.createExpectedDurationMessage();
             }
-            listener.refreshEverything();
+            telegrammerState = TelegrammerState.IDLE;
+            listener.onRefreshEverything(new RefreshEverythingEvent(this));
 
             if (clientSettings.getStartSendingOnStartup() && !refreshedRecipientsAtLeastOnce) {
                 this.startSendingTelegrams();
@@ -342,12 +347,13 @@ public class TelegrammerViewModel implements TelegrammerListener {
     public void handleFilterRemoved(FilterRemovedEvent event) {
         selectedFilterIndex = Math.max(-1, selectedFilterIndex - 1);
         outputText = outputTextCreator.createExpectedDurationMessage();
-        listener.refreshEverything();
+        listener.onRefreshEverything(new RefreshEverythingEvent(this));
     }
 
     @Override
     public void handleStartedSending(StartedSendingEvent event) {
-        listener.refreshEverything();
+        telegrammerState = TelegrammerState.QUEUING_TELEGRAMS;
+        listener.onRefreshEverything(new RefreshEverythingEvent(this));
     }
 
     @Override
@@ -359,14 +365,14 @@ public class TelegrammerViewModel implements TelegrammerListener {
             outputText += outputTextCreator
                     .createTimestampedMessage("queued telegram for '" + event.getRecipient() + "'");
         });
-        listener.refreshOutput();
+        listener.onRefreshOutput(new RefreshOutputEvent(this));
     }
 
     @Override
     public void handleNoRecipientsFound(NoRecipientsFoundEvent event) {
         outputText += outputTextCreator.createTimestampedMessage(
                 "no new recipients found, timing out for " + event.getTimeOut() / 1000 + " seconds...");
-        listener.refreshOutput();
+        listener.onRefreshOutput(new RefreshOutputEvent(this));
     }
 
     @Override
@@ -374,14 +380,15 @@ public class TelegrammerViewModel implements TelegrammerListener {
         if (!clientSettings.getHideSkippedRecipients()) {
             outputText += outputTextCreator.createTimestampedMessage(
                     "skipping recipient '" + event.getRecipient() + "': " + event.getReason());
-            listener.refreshOutput();
+            listener.onRefreshOutput(new RefreshOutputEvent(this));
         }
     }
 
     @Override
     public void handleStoppedSending(StoppedSendingEvent event) {
+        telegrammerState = TelegrammerState.IDLE;
         outputText += outputTextCreator.createStoppedSendingMessage(event);
-        listener.refreshEverything();
+        listener.onRefreshEverything(new RefreshEverythingEvent(this));
     }
 
     private boolean filterTypeSupportsSelectedFilterAction(RecipientsFilterType filterType) {
