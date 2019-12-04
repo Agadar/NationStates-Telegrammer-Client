@@ -6,9 +6,6 @@ import java.time.format.DateTimeFormatter;
 import com.github.agadar.telegrammer.core.event.StoppedSendingEvent;
 import com.github.agadar.telegrammer.core.misc.TelegramType;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilter;
-import com.github.agadar.telegrammer.core.settings.CoreSettings;
-
-import lombok.NonNull;
 
 /**
  * Provides methods for creating texts meant for the output/log window.
@@ -20,18 +17,7 @@ public class OutputTextCreator {
 
     private final static String BORDER = "------------------------------------------";
 
-    private final CoreSettings coreSettings;
-
-    public OutputTextCreator(@NonNull CoreSettings coreSettings) {
-        this.coreSettings = coreSettings;
-    }
-
-    public String createExpectedDurationMessage() {
-
-        String telegramId = coreSettings.getTelegramId();
-        int numberOfRecipients = coreSettings.getFilters().getRecipients(telegramId).size();
-        var telegramType = coreSettings.getTelegramType();
-
+    public String createExpectedDurationMessage(int numberOfRecipients, TelegramType telegramType) {
         int timePerTelegram = telegramType == TelegramType.RECRUITMENT ? 180050 : 30050;
         int estimatedDuration = Math.max(numberOfRecipients - 1, 0) * (timePerTelegram / 1000);
         int hours = estimatedDuration / 3600;

@@ -1,8 +1,8 @@
 package com.github.agadar.telegrammer.client.settings;
 
-import static com.github.agadar.telegrammer.client.settings.ClientSettingsKeys.HIDE_SKIPPED_RECIPIENTS;
-import static com.github.agadar.telegrammer.client.settings.ClientSettingsKeys.START_MINIMIZED;
-import static com.github.agadar.telegrammer.client.settings.ClientSettingsKeys.START_SENDING_ON_STARTUP;
+import static com.github.agadar.telegrammer.client.settings.ClientSettingKey.HIDE_SKIPPED_RECIPIENTS;
+import static com.github.agadar.telegrammer.client.settings.ClientSettingKey.START_MINIMIZED;
+import static com.github.agadar.telegrammer.client.settings.ClientSettingKey.START_SENDING_ON_STARTUP;
 
 import com.github.agadar.telegrammer.core.settings.Settings;
 

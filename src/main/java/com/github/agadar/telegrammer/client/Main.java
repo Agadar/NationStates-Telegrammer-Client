@@ -35,7 +35,7 @@ public class Main {
 
             // Create and display the form.
             EventQueue.invokeLater(() -> {
-                var outputTextCreator = new OutputTextCreator(telegrammer.getCoreSettings());
+                var outputTextCreator = new OutputTextCreator();
                 var viewModel = new TelegrammerViewModel(telegrammer, clientSettings, outputTextCreator);
                 var view = new TelegrammerView(viewModel);
                 view.setLocationRelativeTo(null);

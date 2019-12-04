@@ -1,8 +1,8 @@
 package com.github.agadar.telegrammer.client.viewmodel;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.github.agadar.nationstates.event.TelegramSentEvent;
 import com.github.agadar.telegrammer.client.event.RefreshEverythingEvent;
@@ -14,6 +14,7 @@ import com.github.agadar.telegrammer.core.event.FilterRemovedEvent;
 import com.github.agadar.telegrammer.core.event.FinishedRefreshingRecipientsEvent;
 import com.github.agadar.telegrammer.core.event.NoRecipientsFoundEvent;
 import com.github.agadar.telegrammer.core.event.RecipientRemovedEvent;
+import com.github.agadar.telegrammer.core.event.SettingsUpdatedEvent;
 import com.github.agadar.telegrammer.core.event.StartedRefreshingRecipientsEvent;
 import com.github.agadar.telegrammer.core.event.StartedSendingEvent;
 import com.github.agadar.telegrammer.core.event.StoppedSendingEvent;
@@ -22,16 +23,16 @@ import com.github.agadar.telegrammer.core.misc.TelegramType;
 import com.github.agadar.telegrammer.core.misc.TelegrammerState;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterAction;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterType;
-import com.github.agadar.telegrammer.core.settings.CoreSettings;
+import com.github.agadar.telegrammer.core.settings.CoreSettingKey;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * The abstract representation of the GUI, exposing all information needed to
+ * The abstract representation of the UI, exposing all information needed to
  * construct an arbitrary framework-specific view that implements the
- * TelegrammerViewModelListener.
+ * {@link TelegrammerViewModelListener}.
  * 
  * @author Agadar (https://github.com/Agadar/)
  *
@@ -42,20 +43,36 @@ public class TelegrammerViewModel implements TelegrammerListener {
     private final Telegrammer telegrammer;
     private final OutputTextCreator outputTextCreator;
     private final ClientSettings clientSettings;
-    private final CoreSettings coreSettings;
-
-    @Getter
-    private RecipientsFilterAction selectedFilterAction = RecipientsFilterAction.ADD_TO_RECIPIENTS;
-    @Getter
-    private RecipientsFilterType selectedFilterType = RecipientsFilterType.ALL_NATIONS;
-    @Getter
-    private int selectedFilterIndex = -1;
-    @Getter
-    private String filterParameters = "";
-    private TelegrammerViewModelListener listener = null;
 
     @Getter
     private volatile String outputText = "";
+    @Getter
+    private volatile TelegramType telegramType = TelegramType.NORMAL;
+    @Getter
+    private volatile RecipientsFilterAction selectedFilterAction = RecipientsFilterAction.ADD_TO_RECIPIENTS;
+    @Getter
+    private volatile RecipientsFilterType selectedFilterType = RecipientsFilterType.ALL_NATIONS;
+    @Getter
+    private volatile int selectedFilterIndex = -1;
+    @Getter
+    private volatile String filterParameters = "";
+    @Getter
+    private volatile List<String> filters = Collections.emptyList();
+    @Getter
+    private volatile boolean runIndefinitely = false;
+    @Getter
+    private volatile boolean refreshRecipientsAfterEveryTelegram = false;
+    @Getter
+    private volatile String telegramId = "";
+    @Getter
+    private volatile String secretKey = "";
+    @Getter
+    private volatile String clientKey = "";
+    @Getter
+    private volatile String forRegion = "";
+
+    private volatile TelegrammerViewModelListener listener = null;
+    private volatile int numberOfRecipients = 0;
     private volatile boolean refreshedRecipientsAtLeastOnce = false;
     private volatile TelegrammerState telegrammerState = TelegrammerState.IDLE;
 
@@ -66,8 +83,6 @@ public class TelegrammerViewModel implements TelegrammerListener {
         this.telegrammer = telegrammer;
         this.clientSettings = clientSettings;
         this.outputTextCreator = outputTextCreator;
-        coreSettings = telegrammer.getCoreSettings();
-        telegrammer.addListeners(this);
     }
 
     /**
@@ -77,6 +92,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
      */
     public void initialise(@NonNull TelegrammerViewModelListener listener) {
         this.listener = listener;
+        telegrammer.addListeners(this);
         telegrammer.refreshFilters();
     }
 
@@ -96,22 +112,6 @@ public class TelegrammerViewModel implements TelegrammerListener {
         clientSettings.setHideSkippedRecipients(value);
     }
 
-    public boolean getRefreshRecipientsAfterEveryTelegram() {
-        return coreSettings.getUpdateAfterEveryTelegram();
-    }
-
-    public void setRefreshRecipientsAfterEveryTelegram(boolean value) {
-        coreSettings.setUpdateAfterEveryTelegram(value);
-    }
-
-    public boolean getRunIndefinitely() {
-        return coreSettings.getRunIndefinitely();
-    }
-
-    public void setRunIndefinitely(boolean value) {
-        coreSettings.setRunIndefinitely(value);
-    }
-
     public boolean getStartMinimized() {
         return clientSettings.getStartMinimized();
     }
@@ -128,30 +128,28 @@ public class TelegrammerViewModel implements TelegrammerListener {
         clientSettings.setStartSendingOnStartup(value);
     }
 
-    public String getClientKey() {
-        return coreSettings.getClientKey();
+    public void setRefreshRecipientsAfterEveryTelegram(boolean value) {
+        telegrammer.updateSetting(CoreSettingKey.UPDATE_AFTER_EVERY_TELEGRAM, value);
+    }
+
+    public void setRunIndefinitely(boolean value) {
+        telegrammer.updateSetting(CoreSettingKey.RUN_INDEFINITELY, value);
     }
 
     public void setClientKey(String value) {
-        coreSettings.setClientKey(value);
-    }
-
-    public String getTelegramId() {
-        return coreSettings.getTelegramId();
+        telegrammer.updateSetting(CoreSettingKey.CLIENT_KEY, value);
     }
 
     public void setTelegramId(String value) {
-        coreSettings.setTelegramId(value);
-        outputText = outputTextCreator.createExpectedDurationMessage();
-        listener.onRefreshOutput(new RefreshOutputEvent(this));
-    }
-
-    public String getSecretKey() {
-        return coreSettings.getSecretKey();
+        telegrammer.updateSetting(CoreSettingKey.TELEGRAM_ID, value);
     }
 
     public void setSecretKey(String value) {
-        coreSettings.setSecretKey(value);
+        telegrammer.updateSetting(CoreSettingKey.SECRET_KEY, value);
+    }
+
+    public void setForRegion(String value) {
+        telegrammer.updateSetting(CoreSettingKey.FROM_REGION, value);
     }
 
     public String[] getAvailableTelegramTypes() {
@@ -161,41 +159,23 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public int getSelectedTelegramTypeIndex() {
-        var telegramType = coreSettings.getTelegramType();
         return Arrays.asList(TelegramType.values()).indexOf(telegramType);
     }
 
     public void setSelectedTelegramTypeIndex(int value) {
         if (value != getSelectedTelegramTypeIndex()) {
             var telegramType = TelegramType.values()[value];
-            coreSettings.setTelegramType(telegramType);
-            outputText = outputTextCreator.createExpectedDurationMessage();
+            telegrammer.updateSetting(CoreSettingKey.TELEGRAM_TYPE, telegramType);
 
             if (telegramType != TelegramType.RECRUITMENT && telegramType != TelegramType.CAMPAIGN) {
-                coreSettings.setFromRegion("");
+                telegrammer.updateSetting(CoreSettingKey.FROM_REGION, "");
             }
-            listener.onRefreshEverything(new RefreshEverythingEvent(this));
         }
     }
 
     public boolean isForRegionInputEnabled() {
-        var telegramType = coreSettings.getTelegramType();
         return isTelegrammerIdle()
                 && (telegramType == TelegramType.RECRUITMENT || telegramType == TelegramType.CAMPAIGN);
-    }
-
-    public String getForRegion() {
-        return coreSettings.getFromRegion();
-    }
-
-    public void setForRegion(String value) {
-        coreSettings.setFromRegion(value);
-    }
-
-    public List<String> getConfiguredFilters() {
-        return coreSettings.getFilters().getFilters().stream()
-                .map(filter -> filter.toString())
-                .collect(Collectors.toList());
     }
 
     public void setSelectedConfiguredRecipientsFilter(int index) {
@@ -290,21 +270,32 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public boolean isRefreshFiltersButtonEnabled() {
-        return isTelegrammerIdle() && coreSettings.getFilters().getFilters().size() > 0;
+        return isTelegrammerIdle() && filters.size() > 0;
     }
 
     public void refreshFilters() {
         telegrammer.refreshFilters();
     }
 
-    public void performPreCloseActions() {
-        coreSettings.savePropertiesFile();
-    }
-
     public String getTitle() {
         String version = getClass().getPackage().getImplementationVersion();
         version = version == null ? "[DEVELOPMENT VERSION]" : version;
         return String.format("Agadar's NationStates Telegrammer Client %s", version);
+    }
+
+    @Override
+    public void handleSettingsUpdated(SettingsUpdatedEvent event) {
+        telegramType = event.getTelegramType();
+        filters = event.getFilters();
+        runIndefinitely = event.isRunIndefinitely();
+        refreshRecipientsAfterEveryTelegram = event.isUpdateAfterEveryTelegram();
+        telegramId = event.getTelegramId();
+        secretKey = event.getSecretKey();
+        clientKey = event.getClientKey();
+        forRegion = event.getFromRegion();
+        numberOfRecipients = event.getNumberOfRecipients();
+        outputText = outputTextCreator.createExpectedDurationMessage(numberOfRecipients, telegramType);
+        listener.onRefreshEverything(new RefreshEverythingEvent(this));
     }
 
     @Override
@@ -318,6 +309,9 @@ public class TelegrammerViewModel implements TelegrammerListener {
 
     @Override
     public void handleFinishedRefreshingRecipients(FinishedRefreshingRecipientsEvent event) {
+        numberOfRecipients = event.getNumberOfRecipients();
+        filters = event.getFilters();
+
         if (event.getTelegrammerState() == TelegrammerState.QUEUING_TELEGRAMS) {
             outputText += outputTextCreator.createTimestampedMessage("updated recipients list");
             event.getFailedFilters()
@@ -331,7 +325,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
                 event.getFailedFilters().forEach(
                         (filter, ex) -> outputText += outputTextCreator.createFailedFilterRefreshMessage(filter, ex));
             } else {
-                outputText = outputTextCreator.createExpectedDurationMessage();
+                outputText = outputTextCreator.createExpectedDurationMessage(numberOfRecipients, telegramType);
             }
             telegrammerState = TelegrammerState.IDLE;
             listener.onRefreshEverything(new RefreshEverythingEvent(this));
@@ -345,8 +339,10 @@ public class TelegrammerViewModel implements TelegrammerListener {
 
     @Override
     public void handleFilterRemoved(FilterRemovedEvent event) {
-        selectedFilterIndex = Math.max(-1, selectedFilterIndex - 1);
-        outputText = outputTextCreator.createExpectedDurationMessage();
+        selectedFilterIndex = -1;
+        filters = event.getFilters();
+        numberOfRecipients = event.getNumberOfRecipients();
+        outputText = outputTextCreator.createExpectedDurationMessage(numberOfRecipients, telegramType);
         listener.onRefreshEverything(new RefreshEverythingEvent(this));
     }
 

@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 @Getter
-public enum ClientSettingsKeys {
+public enum ClientSettingKey {
 
     START_SENDING_ON_STARTUP("startSendingOnStartup"),
     HIDE_SKIPPED_RECIPIENTS("hideSkippedRecipients"),

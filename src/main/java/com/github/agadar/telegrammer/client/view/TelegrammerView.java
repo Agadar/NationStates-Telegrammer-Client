@@ -104,7 +104,7 @@ public final class TelegrammerView extends JFrame implements TelegrammerViewMode
         TextAreaOutput.setText(viewModel.getOutputText());
         var configuredFilters = (DefaultListModel<String>) JListFilters.getModel();
         configuredFilters.clear();
-        configuredFilters.addAll(viewModel.getConfiguredFilters());
+        configuredFilters.addAll(viewModel.getFilters());
         JListFilters.setEnabled(viewModel.isTelegrammerIdle());
         JListFilters.setSelectedIndex(viewModel.getSelectedFilterIndex());
         BtnStart.setEnabled(viewModel.isTelegrammerIdle());
@@ -115,13 +115,13 @@ public final class TelegrammerView extends JFrame implements TelegrammerViewMode
         chckbxmntmHideSkippedRecipients.setEnabled(viewModel.isTelegrammerIdle());
         chckbxmntmHideSkippedRecipients.setSelected(viewModel.getHideSkippedRecipients());
         chckbxmntmRunIndefinitely.setEnabled(viewModel.isTelegrammerIdle());
-        chckbxmntmRunIndefinitely.setSelected(viewModel.getRunIndefinitely());
+        chckbxmntmRunIndefinitely.setSelected(viewModel.isRunIndefinitely());
         chckbxmntmStartSendingOn.setEnabled(viewModel.isTelegrammerIdle());
         chckbxmntmStartSendingOn.setSelected(viewModel.getStartSendingOnStartup());
         chckbxmntmStartMinimized.setEnabled(viewModel.isTelegrammerIdle());
         chckbxmntmStartMinimized.setSelected(viewModel.getStartMinimized());
         chckbxmntmRefreshRecipientsAfter.setEnabled(viewModel.isTelegrammerIdle());
-        chckbxmntmRefreshRecipientsAfter.setSelected(viewModel.getRefreshRecipientsAfterEveryTelegram());
+        chckbxmntmRefreshRecipientsAfter.setSelected(viewModel.isRefreshRecipientsAfterEveryTelegram());
         comboBoxFilterAction.setEnabled(viewModel.isTelegrammerIdle());
         comboBoxFilterAction.setSelectedItem(viewModel.getSelectedFilterAction());
         comboBoxFilterType.setEnabled(viewModel.isTelegrammerIdle());
@@ -179,11 +179,6 @@ public final class TelegrammerView extends JFrame implements TelegrammerViewMode
                 if (JListFilters.getSelectedIndex() > -1) {
                     viewModel.unsetSelectedConfiguredRecipientsFilter();
                 }
-            }
-        });
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                viewModel.performPreCloseActions();
             }
         });
 
@@ -436,28 +431,28 @@ public final class TelegrammerView extends JFrame implements TelegrammerViewMode
         menuBar.add(mnNewMenu);
 
         chckbxmntmHideSkippedRecipients = new JCheckBoxMenuItem("Hide skipped recipients");
-        chckbxmntmHideSkippedRecipients.addItemListener(
+        chckbxmntmHideSkippedRecipients.addActionListener(
                 (event) -> viewModel.setHideSkippedRecipients(chckbxmntmHideSkippedRecipients.isSelected()));
         mnNewMenu.add(chckbxmntmHideSkippedRecipients);
 
         chckbxmntmRunIndefinitely = new JCheckBoxMenuItem("Run indefinitely");
         chckbxmntmRunIndefinitely
-                .addItemListener((event) -> viewModel.setRunIndefinitely(chckbxmntmRunIndefinitely.isSelected()));
+                .addActionListener((event) -> viewModel.setRunIndefinitely(chckbxmntmRunIndefinitely.isSelected()));
 
         chckbxmntmRefreshRecipientsAfter = new JCheckBoxMenuItem("Refresh recipients after every telegram");
-        chckbxmntmRefreshRecipientsAfter.addItemListener((event) -> viewModel
+        chckbxmntmRefreshRecipientsAfter.addActionListener((event) -> viewModel
                 .setRefreshRecipientsAfterEveryTelegram(chckbxmntmRefreshRecipientsAfter.isSelected()));
         mnNewMenu.add(chckbxmntmRefreshRecipientsAfter);
         mnNewMenu.add(chckbxmntmRunIndefinitely);
 
         chckbxmntmStartSendingOn = new JCheckBoxMenuItem("Start sending on startup");
         chckbxmntmStartSendingOn
-                .addItemListener((event) -> viewModel.setStartSendingOnStartup(chckbxmntmStartSendingOn.isSelected()));
+                .addActionListener((event) -> viewModel.setStartSendingOnStartup(chckbxmntmStartSendingOn.isSelected()));
 
         chckbxmntmStartMinimized = new JCheckBoxMenuItem("Start minimized");
         mnNewMenu.add(chckbxmntmStartMinimized);
         chckbxmntmStartMinimized
-                .addItemListener((event) -> viewModel.setStartMinimized(chckbxmntmStartMinimized.isSelected()));
+                .addActionListener((event) -> viewModel.setStartMinimized(chckbxmntmStartMinimized.isSelected()));
         mnNewMenu.add(chckbxmntmStartSendingOn);
 
         javax.swing.GroupLayout PanelActionsLayout = new javax.swing.GroupLayout(PanelActions);
