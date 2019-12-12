@@ -7,7 +7,7 @@ import java.util.List;
 import com.github.agadar.nationstates.event.TelegramSentEvent;
 import com.github.agadar.telegrammer.client.event.RefreshEverythingEvent;
 import com.github.agadar.telegrammer.client.event.RefreshOutputEvent;
-import com.github.agadar.telegrammer.client.settings.ClientSettings;
+import static com.github.agadar.telegrammer.client.settings.ClientSettingKey.*;
 import com.github.agadar.telegrammer.core.Telegrammer;
 import com.github.agadar.telegrammer.core.TelegrammerListener;
 import com.github.agadar.telegrammer.core.event.FilterRemovedEvent;
@@ -24,6 +24,7 @@ import com.github.agadar.telegrammer.core.misc.TelegrammerState;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterAction;
 import com.github.agadar.telegrammer.core.recipients.filter.RecipientsFilterType;
 import com.github.agadar.telegrammer.core.settings.CoreSettingKey;
+import com.github.agadar.telegrammer.core.settings.Settings;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -42,7 +43,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
 
     private final Telegrammer telegrammer;
     private final OutputTextCreator outputTextCreator;
-    private final ClientSettings clientSettings;
+    private final Settings settings;
 
     @Getter
     private volatile String outputText = "";
@@ -76,12 +77,11 @@ public class TelegrammerViewModel implements TelegrammerListener {
     private volatile boolean refreshedRecipientsAtLeastOnce = false;
     private volatile TelegrammerState telegrammerState = TelegrammerState.IDLE;
 
-    public TelegrammerViewModel(@NonNull Telegrammer telegrammer,
-            @NonNull ClientSettings clientSettings,
+    public TelegrammerViewModel(@NonNull Telegrammer telegrammer, @NonNull Settings settings,
             @NonNull OutputTextCreator outputTextCreator) {
 
         this.telegrammer = telegrammer;
-        this.clientSettings = clientSettings;
+        this.settings = settings;
         this.outputTextCreator = outputTextCreator;
     }
 
@@ -105,27 +105,27 @@ public class TelegrammerViewModel implements TelegrammerListener {
     }
 
     public boolean getHideSkippedRecipients() {
-        return clientSettings.getHideSkippedRecipients();
+        return settings.getValue(HIDE_SKIPPED_RECIPIENTS.getKey(), Boolean.class);
     }
 
     public void setHideSkippedRecipients(boolean value) {
-        clientSettings.setHideSkippedRecipients(value);
+        settings.setValue(HIDE_SKIPPED_RECIPIENTS.getKey(), value);
     }
 
     public boolean getStartMinimized() {
-        return clientSettings.getStartMinimized();
+        return settings.getValue(START_MINIMIZED.getKey(), Boolean.class);
     }
 
     public void setStartMinimized(boolean value) {
-        clientSettings.setStartMinimized(value);
+        settings.setValue(START_MINIMIZED.getKey(), value);
     }
 
     public boolean getStartSendingOnStartup() {
-        return clientSettings.getStartSendingOnStartup();
+        return settings.getValue(START_SENDING_ON_STARTUP.getKey(), Boolean.class);
     }
 
     public void setStartSendingOnStartup(boolean value) {
-        clientSettings.setStartSendingOnStartup(value);
+        settings.setValue(START_SENDING_ON_STARTUP.getKey(), value);
     }
 
     public void setRefreshRecipientsAfterEveryTelegram(boolean value) {
@@ -330,7 +330,8 @@ public class TelegrammerViewModel implements TelegrammerListener {
             telegrammerState = TelegrammerState.IDLE;
             listener.onRefreshEverything(new RefreshEverythingEvent(this));
 
-            if (clientSettings.getStartSendingOnStartup() && !refreshedRecipientsAtLeastOnce) {
+            if (settings.getValue(START_SENDING_ON_STARTUP.getKey(), Boolean.class)
+                    && !refreshedRecipientsAtLeastOnce) {
                 this.startSendingTelegrams();
             }
         }
@@ -373,7 +374,7 @@ public class TelegrammerViewModel implements TelegrammerListener {
 
     @Override
     public void handleRecipientRemoved(RecipientRemovedEvent event) {
-        if (!clientSettings.getHideSkippedRecipients()) {
+        if (!settings.getValue(HIDE_SKIPPED_RECIPIENTS.getKey(), Boolean.class)) {
             outputText += outputTextCreator.createTimestampedMessage(
                     "skipping recipient '" + event.getRecipient() + "': " + event.getReason());
             listener.onRefreshOutput(new RefreshOutputEvent(this));
